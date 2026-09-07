@@ -1,0 +1,28 @@
+[project]
+name = "progression-memory"
+version = "0.1.0"
+description = "Progression-aware long-term memory for LLM agents"
+requires-python = ">=3.11"
+dependencies = [
+  "pydantic>=2.7",
+  "numpy>=1.26",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.0",
+  "pytest-cov>=5.0",
+  "ruff>=0.5",
+  "mypy>=1.10",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
