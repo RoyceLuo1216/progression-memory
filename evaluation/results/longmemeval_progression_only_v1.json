@@ -1,0 +1,33 @@
+{
+  "dataset": "longmemeval",
+  "eligible_query_count": 470,
+  "excluded_without_evidence": 30,
+  "source_run": 34555762273,
+  "source_commit": "6a37be42be612d13c6146690f01055a1b4e23d22",
+  "system": "progression_only_bm25",
+  "top_8": {
+    "all_evidence_recall": 0.948936170212766,
+    "any_evidence_recall": 0.9851063829787234,
+    "avg_retrieved_chars": 173671.6489361702,
+    "macro_evidence_recall": 0.971595744680851,
+    "micro_evidence_recall": 0.9662921348314607,
+    "mrr": 0.9240888603122646
+  },
+  "corpus_stats": {
+    "avg_document_compression_ratio": 1.186550226375276,
+    "avg_evidence_duplication_ratio": 1.0321426792373611,
+    "avg_progressions": 40.61,
+    "avg_raw_chars": 493947.818,
+    "avg_raw_documents": 47.734,
+    "avg_retrieval_units": 40.61,
+    "unique_corpora": 500
+  },
+  "top_8_categories": {
+    "knowledge-update": 1.0,
+    "multi-session": 0.9608815426997245,
+    "single-session-assistant": 1.0,
+    "single-session-preference": 0.9,
+    "single-session-user": 1.0,
+    "temporal-reasoning": 0.9557742782152231
+  }
+}

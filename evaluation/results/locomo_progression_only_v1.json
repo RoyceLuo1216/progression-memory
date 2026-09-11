@@ -1,0 +1,32 @@
+{
+  "dataset": "locomo",
+  "eligible_query_count": 1982,
+  "excluded_without_evidence": 4,
+  "source_run": 34555762273,
+  "source_commit": "6a37be42be612d13c6146690f01055a1b4e23d22",
+  "system": "progression_only_bm25",
+  "top_8": {
+    "all_evidence_recall": 0.6024217961654894,
+    "any_evidence_recall": 0.7013118062563067,
+    "avg_retrieved_chars": 9379.483350151362,
+    "macro_evidence_recall": 0.64726377653484,
+    "micro_evidence_recall": 0.5516873889875666,
+    "mrr": 0.4708900236865976
+  },
+  "corpus_stats": {
+    "avg_document_compression_ratio": 3.708244804456465,
+    "avg_evidence_duplication_ratio": 1.4012219700553668,
+    "avg_progressions": 163.6,
+    "avg_raw_chars": 83692.6,
+    "avg_raw_documents": 588.2,
+    "avg_retrieval_units": 163.6,
+    "unique_corpora": 10
+  },
+  "top_8_categories": {
+    "1": 0.33703200753872653,
+    "2": 0.7157320872274142,
+    "3": 0.3396787568782454,
+    "4": 0.7316686484344035,
+    "5": 0.6984304932735426
+  }
+}

@@ -23,7 +23,7 @@ Raw result: `results/synthetic_v1.json`.
 
 Full public LoCoMo and LongMemEval-S are downloaded during GitHub Actions. All systems use the same dependency-free BM25 retriever and evidence-aware metric implementation. LongMemEval retrieval excludes the 30 abstention questions (`*_abs`), leaving 470 evidence-bearing questions; LoCoMo excludes four questions without annotated evidence.
 
-The progression systems use deterministic hashed lexical vectors so the benchmark is fully reproducible without an external embedding API. Every segment retains provenance links to its source evidence.
+The progression systems use deterministic hashed lexical vectors so the benchmark is fully reproducible without an external embedding API. Every progression/segment retains provenance links to its source evidence.
 
 #### LongMemEval-S — top-8
 
@@ -31,45 +31,55 @@ The progression systems use deterministic hashed lexical vectors so the benchmar
 |---|---:|---:|---:|---:|---:|---:|---:|
 | Append-only BM25 | 97.87% | 88.72% | 94.11% | 91.91% | 0.9164 | **101,661** | 47.73 |
 | Fixed progression | 98.30% | 92.13% | 95.83% | 94.83% | **0.9277** | 144,636 | 43.05 |
-| **Adaptive progression** | **98.51%** | **94.04%** | **96.77%** | **96.18%** | 0.9269 | 155,653 | **42.52** |
+| Adaptive progression v1 | 98.51% | 94.04% | 96.77% | 96.18% | 0.9269 | 155,653 | 42.52 |
+| **Progression only** | **98.51%** | **94.89%** | **97.16%** | **96.63%** | 0.9241 | 173,672 | **40.61** |
 
-Against append-only retrieval, adaptive progression improves macro evidence recall by **+2.66 percentage points** and all-evidence recall by **+5.32 points**. It also reduces the average number of retrieval units from 47.73 sessions to 42.52 segments. However, the retrieved segments are larger, so recalled text rises from about 101.7k to 155.7k characters. This is therefore a **retrieval-quality gain, not yet an efficiency/Pareto win**.
+The progression-only ablation is the current raw top-k recall leader: **+3.05 percentage points macro recall** and **+6.17 points all-evidence recall** over append-only. It also compresses the retrieval index from 47.73 raw sessions to 40.61 progression units on average. However, each progression is large, so its recalled payload is about **70.8% larger** than append-only at top-8. This is not yet an efficiency win.
 
-#### LongMemEval-S — categories most relevant to the hypothesis
+Adaptive temporal splitting recovers almost as much evidence as progression-only while recalling less text (155.7k vs 173.7k characters), but it still exceeds the append-only context budget. The next decisive experiment is therefore **equal-character-budget retrieval**, not another equal-top-k comparison.
 
-| Category | Append-only macro recall | Fixed progression | Adaptive progression | Adaptive vs append |
+#### LongMemEval-S — hypothesis-relevant categories at top-8
+
+| Category | Append-only | Fixed progression | Adaptive v1 | Progression only |
 |---|---:|---:|---:|---:|
-| Temporal reasoning | 91.56% | 93.22% | **95.18%** | **+3.62 pp** |
-| Multi-session | 89.68% | 93.82% | **94.99%** | **+5.30 pp** |
-| Knowledge update | 99.31% | 99.31% | **100.00%** | **+0.69 pp** |
+| Temporal reasoning | 91.56% | 93.22% | 95.18% | **95.58%** |
+| Multi-session | 89.68% | 93.82% | 94.99% | **96.09%** |
+| Knowledge update | 99.31% | 99.31% | **100.00%** | **100.00%** |
 
-These are the categories where progression-aware temporal structure is expected to help, so the direction of the result is encouraging. End-to-end answer accuracy is still required before making a paper-level performance claim.
+This result sharpens the hypothesis: **progression organization itself is already valuable**, while the extra contribution of temporal segmentation must be demonstrated as an efficiency/compactness improvement under a matched budget.
 
 #### LoCoMo — top-8
 
 | System | Any evidence | All evidence | Macro evidence recall | Micro evidence recall | MRR | Avg retrieved chars | Avg retrieval units |
 |---|---:|---:|---:|---:|---:|---:|---:|
 | Append-only BM25 | 60.60% | 52.67% | 56.18% | 45.72% | 0.4162 | **1,172** | 588.2 |
-| **Fixed progression** | **66.55%** | **57.62%** | **61.58%** | **50.94%** | **0.4646** | 3,546 | **320.5** |
-| Adaptive progression | 58.68% | 50.91% | 54.34% | 44.01% | 0.4121 | 1,323 | 746.3 |
+| Fixed progression | 66.55% | 57.62% | 61.58% | 50.94% | 0.4646 | 3,546 | 320.5 |
+| Adaptive progression v1 | 58.68% | 50.91% | 54.34% | 44.01% | 0.4121 | 1,323 | 746.3 |
+| **Progression only** | **70.13%** | **60.24%** | **64.73%** | **55.17%** | **0.4709** | 9,379 | **163.6** |
 
-Fixed progression gives a clear retrieval gain over append-only on LoCoMo: **+5.41 pp macro evidence recall** and roughly **45.5% fewer retrieval units**. The current adaptive controller does **not** generalize to LoCoMo: it over-splits short conversational turns, producing 746 retrieval units from 588 raw turns and reducing recall below append-only.
+Progression-only improves LoCoMo macro evidence recall by **+8.55 percentage points** over append-only and reduces the searchable memory units by about **72.2%**. The cost is a much larger retrieved payload because whole progressions are expanded at retrieval time.
 
-This failure is important. In the current real-data benchmark the adaptive controller's state vector is a deterministic lexical proxy (`0.5 * hashed_embedding`) rather than the semantic/state representation envisioned in the research design. LoCoMo's short turns make lexical state distance noisy, causing excessive SPLIT decisions. The next adaptive experiment therefore needs a better semantic state representation and calibrated/learned temporal policy rather than simply adding more hierarchy.
+Fixed temporal segmentation trades some of that recall for a much smaller payload. Adaptive v1 fails on LoCoMo because it over-splits short conversational turns: 746.3 retrieval units from 588.2 raw turns on average. This is strong evidence that the current per-event hashed lexical state proxy is too noisy for short utterances.
 
-Raw reproduced result summaries:
+### 3. What the current ablation establishes
+
+The real-data results currently support three separate conclusions:
+
+1. **Progression routing/grouping is useful.** Progression-only is the raw-recall leader on both LongMemEval-S and LoCoMo.
+2. **Temporal segmentation is not yet proven to improve retrieval quality by itself.** Its potential value is compactness and selective expansion, which must be measured at equal context budgets.
+3. **Adaptive v1 is not robust across memory regimes.** It behaves reasonably on session-scale LongMemEval histories but over-segments short LoCoMo turns. The next controller must include state smoothing / hysteresis and information-aware split calibration rather than simply increasing model complexity.
+
+Raw reproduced summaries:
 - `results/longmemeval_append_bm25_v1.json`
 - `results/locomo_append_bm25_v1.json`
 - `results/longmemeval_fixed_progression_v1.json`
 - `results/longmemeval_adaptive_progression_v1.json`
 - `results/locomo_fixed_progression_v1.json`
 - `results/locomo_adaptive_progression_v1.json`
+- `results/longmemeval_progression_only_v1.json`
+- `results/locomo_progression_only_v1.json`
 
-GitHub Actions provenance for the fixed/adaptive sweep: run `34555484115`, source commit `86e6b84744e37840db34156969c7861e4452b001`; tests passed **9/9**. The exact full JSON outputs are also retained as the Actions artifact for that run.
-
-## Progression-only ablation
-
-Commit `6a37be42be612d13c6146690f01055a1b4e23d22` adds a **progression-only** system: routing is enabled, but each progression remains one temporal unit. This isolates the contribution of progression organization from fixed or adaptive temporal segmentation. Its full-data benchmark is executed by the same GitHub Actions workflow and will be recorded here separately from the fixed/adaptive sweep.
+Progression-only GitHub Actions provenance: run `34555762273`, source commit `6a37be42be612d13c6146690f01055a1b4e23d22`; tests passed **9/9**. The exact full JSON outputs are retained as the Actions artifact for that run.
 
 ## Published reference targets
 
@@ -93,16 +103,16 @@ Primary references:
 
 1. **DONE** — dataset adapters + evidence-aware retrieval metrics on LongMemEval-S and LoCoMo.
 2. **DONE** — append-only lexical retrieval baseline.
-3. **DONE** — fixed-window progression retrieval.
-4. **DONE** — adaptive progression retrieval using the initial EXTEND/SPLIT controller.
-5. **RUNNING** — progression-only ablation to isolate routing from temporal segmentation.
-6. **NEXT** — budget-matched retrieval: compare systems at equal recalled character/token budgets rather than equal top-k units.
-7. **NEXT** — replace the lexical state proxy with semantic/state embeddings and calibrate or learn the temporal controller on development data only.
-8. **NEXT** — two-stage compact progression/segment index followed by evidence expansion, so structure can improve retrieval without paying the full segment payload cost.
-9. **NEXT** — paired statistical significance analysis and end-to-end reader/evaluator using one fixed answering model and the official benchmark evaluators.
-10. **LATER** — hierarchical consolidation, knowledge objects, reinforcement/decay, and hot/warm/cold memory.
+3. **DONE** — progression-only routing/grouping ablation.
+4. **DONE** — fixed-window progression retrieval.
+5. **DONE** — adaptive progression v1 using the initial EXTEND/SPLIT controller.
+6. **NEXT** — budget-matched retrieval: compare systems at equal recalled character budgets and report paired bootstrap confidence intervals / discrete paired tests.
+7. **NEXT** — adaptive v2 with smoothed state, short-event damping, minimum segment evidence, and split hysteresis; preserve v1 as an ablation.
+8. **NEXT** — two-stage compact progression/segment index followed by evidence expansion, so structure can improve retrieval without paying the full progression payload cost.
+9. **NEXT** — fixed reader + official LongMemEval/LoCoMo end-to-end QA evaluation under a common model and context budget.
+10. **LATER** — learned temporal policy, hierarchical consolidation, knowledge objects, reinforcement/decay, and hot/warm/cold memory.
 
-For every stage we record evidence coverage, answer accuracy/F1 where a reader is available, recalled context size, retrieval-unit/memory size, and eventually latency and paired significance tests.
+For every stage we record evidence coverage, answer accuracy/F1 where a reader is available, recalled context size, retrieval-unit/memory size, and paired statistical uncertainty.
 
 ## Reproducibility rule
 
