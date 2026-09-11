@@ -7,6 +7,7 @@ from pathlib import Path
 from progression_memory.evaluation.datasets import load_locomo, load_longmemeval
 from progression_memory.evaluation.progressions import build_progression_documents
 from progression_memory.evaluation.retrieval import RetrievalQuery, evaluate_retrieval
+from progression_memory.evaluation.two_stage import build_two_stage_queries
 
 SYSTEMS = (
     "append",
@@ -14,6 +15,7 @@ SYSTEMS = (
     "fixed_progression",
     "adaptive_progression",
     "adaptive_progression_v2",
+    "two_stage_v2",
 )
 
 
@@ -34,6 +36,9 @@ def _transform_queries(
             "avg_evidence_duplication_ratio": 1.0,
             "avg_raw_chars": sum(raw_chars) / max(1, len(raw_chars)),
         }
+
+    if system == "two_stage_v2":
+        return build_two_stage_queries(queries)
 
     if system == "progression_only":
         mode = "flat"
@@ -98,10 +103,16 @@ def run(
         raise ValueError(f"unsupported system: {system}")
     transformed, corpus_stats = _transform_queries(queries, system)
     result = evaluate_retrieval(transformed, cutoffs)
+    if system == "append":
+        granularity = base_granularity
+    elif system == "two_stage_v2":
+        granularity = f"{base_granularity}_after_structural_filter"
+    else:
+        granularity = "progression_segment"
     result.update({
         "dataset": dataset,
         "system": "append_bm25" if system == "append" else f"{system}_bm25",
-        "granularity": base_granularity if system == "append" else "progression_segment",
+        "granularity": granularity,
         "corpus_stats": corpus_stats,
     })
     return result
