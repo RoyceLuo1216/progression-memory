@@ -1,0 +1,161 @@
+{
+  "datasets": {
+    "locomo": {
+      "budgets": {
+        "1200": {
+          "all_evidence_recall": 0.43340060544904135,
+          "all_evidence_success_vs_append": {
+            "candidate_improved": 57,
+            "candidate_regressed": 224,
+            "discordant_pairs": 281,
+            "exact_two_sided_p": 1.4288690770556064e-24,
+            "paired_queries": 1982
+          },
+          "avg_retrieved_chars": 971.0893037336024,
+          "macro_evidence_recall": 0.46211782667383083,
+          "macro_recall_delta_vs_append": {
+            "ci_95": [-0.10547332194658128, -0.07448625247120531],
+            "mean_delta": -0.0898520700822298,
+            "paired_queries": 1982,
+            "probability_gt_zero": 0.0
+          }
+        },
+        "2400": {
+          "all_evidence_recall": 0.5302724520686175,
+          "all_evidence_success_vs_append": {
+            "candidate_improved": 49,
+            "candidate_regressed": 167,
+            "discordant_pairs": 216,
+            "exact_two_sided_p": 2.924799130221979e-16,
+            "paired_queries": 1982
+          },
+          "avg_retrieved_chars": 2177.2699293642786,
+          "macro_evidence_recall": 0.5673531320819375,
+          "macro_recall_delta_vs_append": {
+            "ci_95": [-0.0773159768448247, -0.05035720431339829],
+            "mean_delta": -0.06372748270638103,
+            "paired_queries": 1982,
+            "probability_gt_zero": 0.0
+          }
+        },
+        "4800": {
+          "all_evidence_recall": 0.6089808274470232,
+          "all_evidence_success_vs_append": {
+            "candidate_improved": 48,
+            "candidate_regressed": 108,
+            "discordant_pairs": 156,
+            "exact_two_sided_p": 1.7480260886077265e-06,
+            "paired_queries": 1982
+          },
+          "avg_retrieved_chars": 4573.946014127145,
+          "macro_evidence_recall": 0.6518342360449186,
+          "macro_recall_delta_vs_append": {
+            "ci_95": [-0.04638372335143273, -0.02307863120173918],
+            "mean_delta": -0.034697260704116516,
+            "paired_queries": 1982,
+            "probability_gt_zero": 0.0
+          }
+        }
+      },
+      "corpus_stats": {
+        "avg_document_compression_ratio": 1.7917483267519108,
+        "avg_evidence_duplication_ratio": 1.4012427686993527,
+        "avg_progressions": 155.0,
+        "avg_raw_chars": 24033.4,
+        "avg_raw_documents": 588.2,
+        "avg_retrieval_units": 339.7,
+        "avg_segment_size": 2.4688225335406364,
+        "avg_single_event_segment_fraction": 0.27092603705626617
+      },
+      "top8": {
+        "all_evidence_recall": 0.5610494450050454,
+        "any_evidence_recall": 0.6533804238143289,
+        "avg_retrieved_chars": 2945.462663975782,
+        "avg_retrieved_units": 8.0,
+        "macro_evidence_recall": 0.601951934297378,
+        "micro_evidence_recall": 0.4955595026642984,
+        "mrr": 0.4500828888568552
+      }
+    },
+    "longmemeval": {
+      "budgets": {
+        "100000": {
+          "all_evidence_recall": 0.8659574468085106,
+          "all_evidence_success_vs_append": {
+            "candidate_improved": 14,
+            "candidate_regressed": 18,
+            "discordant_pairs": 32,
+            "exact_two_sided_p": 0.5966148958541453,
+            "paired_queries": 470
+          },
+          "avg_retrieved_chars": 87267.08085106383,
+          "macro_evidence_recall": 0.9274113475177305,
+          "macro_recall_delta_vs_append": {
+            "ci_95": [-0.021241134751773052, 0.0032978723404255327],
+            "mean_delta": -0.008510638297872342,
+            "paired_queries": 470,
+            "probability_gt_zero": 0.073
+          }
+        },
+        "150000": {
+          "all_evidence_recall": 0.9191489361702128,
+          "all_evidence_success_vs_append": {
+            "candidate_improved": 7,
+            "candidate_regressed": 5,
+            "discordant_pairs": 12,
+            "exact_two_sided_p": 0.7744140625,
+            "paired_queries": 470
+          },
+          "avg_retrieved_chars": 137849.52127659574,
+          "macro_evidence_recall": 0.9557801418439719,
+          "macro_recall_delta_vs_append": {
+            "ci_95": [-0.01124113475177305, 0.006312056737588652],
+            "mean_delta": -0.0018794326241134756,
+            "paired_queries": 470,
+            "probability_gt_zero": 0.337
+          }
+        },
+        "200000": {
+          "all_evidence_recall": 0.9425531914893617,
+          "all_evidence_success_vs_append": {
+            "candidate_improved": 7,
+            "candidate_regressed": 3,
+            "discordant_pairs": 10,
+            "exact_two_sided_p": 0.34375,
+            "paired_queries": 470
+          },
+          "avg_retrieved_chars": 189449.4914893617,
+          "macro_evidence_recall": 0.9720921985815604,
+          "macro_recall_delta_vs_append": {
+            "ci_95": [-0.0012765957446808512, 0.012056737588652482],
+            "mean_delta": 0.0051773049645390075,
+            "paired_queries": 470,
+            "probability_gt_zero": 0.94
+          }
+        }
+      },
+      "corpus_stats": {
+        "avg_document_compression_ratio": 1.1394181785362103,
+        "avg_evidence_duplication_ratio": 1.0,
+        "avg_progressions": 39.988,
+        "avg_raw_chars": 493947.818,
+        "avg_raw_documents": 47.734,
+        "avg_retrieval_units": 41.894,
+        "avg_segment_size": 1.1735807354558851,
+        "avg_single_event_segment_fraction": 0.8824721468656296
+      },
+      "top8": {
+        "all_evidence_recall": 0.9340425531914893,
+        "any_evidence_recall": 0.9872340425531915,
+        "avg_retrieved_chars": 149693.95531914892,
+        "avg_retrieved_units": 8.0,
+        "macro_evidence_recall": 0.9676241134751775,
+        "micro_evidence_recall": 0.9595505617977528,
+        "mrr": 0.922256838905775
+      }
+    }
+  },
+  "source_commit": "7b1a17695c7f10693371bf1de1ba1a5eb5043d0b",
+  "source_run": 34618743057,
+  "system": "adaptive_progression_v2"
+}
