@@ -1,0 +1,43 @@
+import json
+from pathlib import Path
+
+from progression_memory.benchmarks.real_retrieval import run
+
+
+def test_locomo_adapter_and_bm25(tmp_path: Path) -> None:
+    fixture = [{
+        "sample_id": "conv-test",
+        "conversation": {
+            "speaker_a": "A", "speaker_b": "B",
+            "session_1_date_time": "2026-01-01",
+            "session_1": [
+                {"speaker": "A", "dia_id": "D1:1", "text": "I adopted a beagle named Scout."},
+                {"speaker": "B", "dia_id": "D1:2", "text": "That is great news."}
+            ],
+            "session_2_date_time": "2026-01-10",
+            "session_2": [{"speaker": "A", "dia_id": "D2:1", "text": "Scout loves the dog park."}]
+        },
+        "qa": [{"question": "Which beagle is mine?", "answer": "Scout", "evidence": ["D1:1"], "category": 1}]
+    }]
+    path = tmp_path / "locomo.json"
+    path.write_text(json.dumps(fixture), encoding="utf-8")
+    result = run("locomo", str(path), [1])
+    assert result["cutoffs"]["1"]["any_evidence_recall"] == 1.0
+
+
+def test_longmemeval_adapter_and_bm25(tmp_path: Path) -> None:
+    fixture = [{
+        "question_id": "q1", "question_type": "single-session-user",
+        "question": "What happened during my Lisbon trip?", "answer": "Lisbon",
+        "haystack_session_ids": ["s1", "s2"],
+        "haystack_dates": ["2026-01-01", "2026-02-01"],
+        "haystack_sessions": [
+            [{"role": "user", "content": "I bought a chair."}],
+            [{"role": "user", "content": "My trip to Lisbon was wonderful.", "has_answer": True}]
+        ],
+        "answer_session_ids": ["s2"]
+    }]
+    path = tmp_path / "lme.json"
+    path.write_text(json.dumps(fixture), encoding="utf-8")
+    result = run("longmemeval", str(path), [1])
+    assert result["cutoffs"]["1"]["all_evidence_recall"] == 1.0

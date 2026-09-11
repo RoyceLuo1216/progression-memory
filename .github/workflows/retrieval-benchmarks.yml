@@ -1,0 +1,44 @@
+name: retrieval-benchmarks
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [master]
+    paths:
+      - 'src/progression_memory/evaluation/**'
+      - 'src/progression_memory/benchmarks/real_retrieval.py'
+      - 'tests/test_real_retrieval.py'
+      - '.github/workflows/retrieval-benchmarks.yml'
+
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install package
+        run: pip install -e .[dev]
+      - name: Run tests
+        run: pytest -q
+      - name: Download public benchmarks
+        run: |
+          mkdir -p evaluation/data evaluation/results/ci
+          wget -q https://raw.githubusercontent.com/snap-research/locomo/main/data/locomo10.json -O evaluation/data/locomo10.json
+          wget -q https://huggingface.co/datasets/xiaowu0162/longmemeval-cleaned/resolve/main/longmemeval_s_cleaned.json -O evaluation/data/longmemeval_s_cleaned.json
+      - name: Benchmark append-only BM25
+        run: |
+          python -m progression_memory.benchmarks.real_retrieval --dataset locomo --data-path evaluation/data/locomo10.json --top-k 5,8,10 --output evaluation/results/ci/locomo_append_bm25.json
+          python -m progression_memory.benchmarks.real_retrieval --dataset longmemeval --data-path evaluation/data/longmemeval_s_cleaned.json --top-k 5,8,10 --output evaluation/results/ci/longmemeval_append_bm25.json
+      - name: Print benchmark summaries
+        run: |
+          echo '=== LOCOMO_RESULT ==='
+          cat evaluation/results/ci/locomo_append_bm25.json
+          echo '=== LONGMEMEVAL_RESULT ==='
+          cat evaluation/results/ci/longmemeval_append_bm25.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: retrieval-benchmark-results
+          path: evaluation/results/ci/*.json
