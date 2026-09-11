@@ -1,0 +1,25 @@
+{
+  "benchmark": "synthetic_irregular_phase_transitions",
+  "episodes": 45,
+  "true_boundaries": [12, 29],
+  "systems": [
+    {
+      "name": "fixed_14d",
+      "predicted_boundaries": [7, 14, 21, 28, 35, 42],
+      "precision": 0.16666666666666666,
+      "recall": 0.5,
+      "f1": 0.25,
+      "segment_count": 7,
+      "compression_ratio": 6.428571428571429
+    },
+    {
+      "name": "adaptive_linear",
+      "predicted_boundaries": [12, 29],
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "segment_count": 3,
+      "compression_ratio": 15.0
+    }
+  ]
+}
