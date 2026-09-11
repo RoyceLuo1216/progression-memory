@@ -1,0 +1,32 @@
+{
+  "benchmark_run": 34555484115,
+  "corpus_stats": {
+    "avg_document_compression_ratio": 1.1150651913192082,
+    "avg_evidence_duplication_ratio": 1.0321377441820585,
+    "avg_progressions": 40.61,
+    "avg_raw_chars": 493947.818,
+    "avg_raw_documents": 47.734,
+    "avg_retrieval_units": 43.048,
+    "unique_corpora": 500
+  },
+  "cutoffs": {
+    "5": {"all_evidence_recall": 0.8936170212765957, "any_evidence_recall": 0.9765957446808511, "avg_retrieved_chars": 96989.94468085107, "macro_evidence_recall": 0.943971631205674, "micro_evidence_recall": 0.9280898876404494, "mrr": 0.927675731478923},
+    "8": {
+      "all_evidence_recall": 0.9212765957446809,
+      "any_evidence_recall": 0.9829787234042553,
+      "avg_retrieved_chars": 144636.13617021276,
+      "macro_evidence_recall": 0.9582978723404257,
+      "micro_evidence_recall": 0.9483146067415731,
+      "mrr": 0.927675731478923,
+      "by_category_macro_recall": {"knowledge-update": 0.9930555555555556, "multi-session": 0.9381542699724518, "single-session-assistant": 1.0, "single-session-preference": 0.9, "single-session-user": 1.0, "temporal-reasoning": 0.9321522309711286}
+    },
+    "10": {"all_evidence_recall": 0.9361702127659575, "any_evidence_recall": 0.9893617021276596, "avg_retrieved_chars": 173708.6255319149, "macro_evidence_recall": 0.9678723404255319, "micro_evidence_recall": 0.9595505617977528, "mrr": 0.927675731478923}
+  },
+  "dataset": "longmemeval",
+  "eligible_query_count": 470,
+  "excluded_without_evidence": 30,
+  "granularity": "progression_segment",
+  "query_count": 500,
+  "source_commit": "86e6b84744e37840db34156969c7861e4452b001",
+  "system": "fixed_progression_bm25"
+}

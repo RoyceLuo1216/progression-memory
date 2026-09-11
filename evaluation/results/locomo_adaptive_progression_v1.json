@@ -1,0 +1,24 @@
+{
+  "benchmark_run": 34555484115,
+  "corpus_stats": {
+    "avg_document_compression_ratio": 0.789099272843667,
+    "avg_evidence_duplication_ratio": 1.3942484116953895,
+    "avg_progressions": 163.6,
+    "avg_raw_chars": 83692.6,
+    "avg_raw_documents": 588.2,
+    "avg_retrieval_units": 746.3,
+    "unique_corpora": 10
+  },
+  "cutoffs": {
+    "5": {"all_evidence_recall": 0.458627648839556, "any_evidence_recall": 0.5302724520686175, "avg_retrieved_chars": 831.077194752775, "macro_evidence_recall": 0.49024942235966074, "micro_evidence_recall": 0.3900532859680284, "mrr": 0.4121064088401813},
+    "8": {"all_evidence_recall": 0.5090817356205852, "any_evidence_recall": 0.5867810292633703, "avg_retrieved_chars": 1323.0519677093844, "macro_evidence_recall": 0.5433510918469587, "micro_evidence_recall": 0.44014209591474246, "mrr": 0.4121064088401813},
+    "10": {"all_evidence_recall": 0.5327951564076691, "any_evidence_recall": 0.6104944500504541, "avg_retrieved_chars": 1650.6664984863773, "macro_evidence_recall": 0.567473062899392, "micro_evidence_recall": 0.46323268206039075, "mrr": 0.4121064088401813}
+  },
+  "dataset": "locomo",
+  "eligible_query_count": 1982,
+  "excluded_without_evidence": 4,
+  "granularity": "progression_segment",
+  "query_count": 1986,
+  "source_commit": "86e6b84744e37840db34156969c7861e4452b001",
+  "system": "adaptive_progression_bm25"
+}
