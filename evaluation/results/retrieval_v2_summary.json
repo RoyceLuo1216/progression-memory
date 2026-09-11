@@ -1,0 +1,70 @@
+{
+  "architecture": "two_stage_retrieval_v2",
+  "implementation_commit": "326ea8f0d28af51dba45f1259c2686ae57a3127c",
+  "scaled_stage1_commit": "474c9bdbef0f97e3a739669181b77ec214c8a400",
+  "benchmark_run": 34626603557,
+  "stage1_policy": "adaptive:max(16,min(64,ceil(0.10*structural_units)))",
+  "locomo": {
+    "stage1_evidence_coverage": 0.7354264953003447,
+    "avg_stage1_selected_units": 35.28700906344411,
+    "avg_candidate_source_documents": 75.08006042296073,
+    "top8": {
+      "macro_evidence_recall": 0.5648678785853763,
+      "all_evidence_recall": 0.5272452068617558,
+      "mrr": 0.4083093075777238,
+      "avg_retrieved_chars": 1203.1725529767912
+    },
+    "budgets": {
+      "1200": {
+        "append_macro_recall": 0.5519698967560606,
+        "two_stage_macro_recall": 0.5505363600046632,
+        "delta": -0.0014335367513974985,
+        "ci95": [-0.007782342671343679, 0.004594925760415165]
+      },
+      "2400": {
+        "append_macro_recall": 0.6310806147883188,
+        "two_stage_macro_recall": 0.6354967488840689,
+        "delta": 0.004416134095750644,
+        "ci95": [-0.002099450611055051, 0.011004596927906715]
+      },
+      "4800": {
+        "append_macro_recall": 0.6865314967490354,
+        "two_stage_macro_recall": 0.6889671077240005,
+        "delta": 0.002435610974965163,
+        "ci95": [-0.0047787227908317725, 0.00991542934025275]
+      }
+    }
+  },
+  "longmemeval": {
+    "stage1_evidence_coverage": 0.9823758865248228,
+    "avg_stage1_selected_units": 16.0,
+    "avg_candidate_source_documents": 20.248,
+    "top8": {
+      "macro_evidence_recall": 0.9435460992907805,
+      "all_evidence_recall": 0.8872340425531915,
+      "mrr": 0.9261879432624113,
+      "avg_retrieved_chars": 101504.65957446808
+    },
+    "budgets": {
+      "100000": {
+        "append_macro_recall": 0.9359219858156029,
+        "two_stage_macro_recall": 0.9348936170212768,
+        "delta": -0.001028368794326241,
+        "ci95": [-0.005390070921985815, 0.003333333333333334]
+      },
+      "150000": {
+        "append_macro_recall": 0.9576595744680853,
+        "two_stage_macro_recall": 0.9570212765957447,
+        "delta": -0.0006382978723404258,
+        "ci95": [-0.00524822695035461, 0.003971631205673758]
+      },
+      "200000": {
+        "append_macro_recall": 0.9669148936170213,
+        "two_stage_macro_recall": 0.9717730496453901,
+        "delta": 0.004858156028368795,
+        "ci95": [-0.0014184397163120564, 0.012198581560283688]
+      }
+    }
+  },
+  "interpretation": "Selective source expansion removes nearly all matched-budget regression. Stage-1 structural candidate coverage is now the main bottleneck, especially on LoCoMo. Point-estimate gains over append-only are not statistically established because all paired bootstrap intervals cross zero."
+}

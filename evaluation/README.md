@@ -1,135 +1,127 @@
 # Evaluation and Benchmark Ledger
 
-This directory is the source of truth for progression-memory evaluation results. Results are split into **reproduced measurements** and **published external reference numbers**. A published number is never treated as an apples-to-apples comparison until the same dataset, reader model, retrieval budget, and evaluator are reproduced here.
+This directory is the source of truth for progression-memory evaluation. Reproduced measurements are kept separate from published external reference numbers. External QA scores are not compared numerically with retrieval recall until the same reader, context budget, and evaluator are reproduced.
 
-## Current reproduced results
+## 1. Synthetic temporal-boundary mechanism check
 
-### 1. Synthetic irregular-transition benchmark
+The synthetic benchmark contains 45 episodes with true boundaries at episodes 12 and 29.
 
-The v1 synthetic harness contains 45 episodes with true phase boundaries at episodes 12 and 29. It tests whether a temporal memory policy discovers state-dependent boundaries rather than imposing calendar windows.
+| System | Boundary precision | Boundary recall | Boundary F1 | Segments |
+|---|---:|---:|---:|---:|
+| Fixed 14-day windows | 0.1667 | 0.5000 | 0.2500 | 7 |
+| Adaptive linear controller | **1.0000** | **1.0000** | **1.0000** | **3** |
 
-| System | Boundary precision | Boundary recall | Boundary F1 | Segments | Episodes / segment |
+Raw result: `results/synthetic_v1.json`. This validates the mechanism only.
+
+## 2. Equal-top-k retrieval
+
+Full public LoCoMo and LongMemEval-S are run in GitHub Actions with the same dependency-free BM25/evidence-aware evaluation code. LongMemEval excludes 30 abstention questions, leaving 470 evidence-bearing questions; LoCoMo excludes four questions without annotated evidence.
+
+### LongMemEval-S — top-8
+
+| System | Macro evidence recall | All evidence | MRR@8 | Avg retrieved chars |
+|---|---:|---:|---:|---:|
+| Append-only BM25 | 94.11% | 88.72% | 0.9149 | **101,661** |
+| Fixed progression | 95.83% | 92.13% | 0.9263 | 144,636 |
+| Adaptive progression v1 | 96.77% | 94.04% | 0.9257 | 155,653 |
+| Adaptive progression v2 | 96.76% | 93.40% | 0.9223 | 149,694 |
+| Progression only | **97.16%** | **94.89%** | 0.9229 | 173,672 |
+| Two-stage retrieval v2 | 94.35% | 88.72% | **0.9262** | 101,505 |
+
+The two-stage system intentionally measures the final raw-source ranking rather than giving evidence credit to structural index nodes. Its top-8 recall therefore looks much closer to append-only than to coarse progression retrieval, while retaining the progression index as a candidate-selection layer.
+
+### LoCoMo — top-8
+
+| System | Macro evidence recall | All evidence | MRR@8 | Avg retrieved chars | Avg structural units |
 |---|---:|---:|---:|---:|---:|
-| Fixed 14-day windows | 0.1667 | 0.5000 | 0.2500 | 7 | 6.43 |
-| Adaptive linear controller | **1.0000** | **1.0000** | **1.0000** | **3** | **15.00** |
+| Append-only BM25 | 56.18% | 52.67% | 0.4047 | **1,172** | 588.2 raw turns |
+| Fixed progression | 61.58% | 57.62% | 0.4529 | 3,546 | 320.5 |
+| Adaptive progression v1 | 54.34% | 50.91% | 0.4003 | 1,323 | 746.3 |
+| Adaptive progression v2 | 60.20% | 56.10% | **0.4501** | 2,945 | 339.7 |
+| Progression only | **64.73%** | **60.24%** | **0.4572** | 9,379 | 163.6 |
+| Two-stage retrieval v2 | 56.49% | 52.72% | 0.4083 | 1,203 | 339.7 index units |
 
-Raw result: `results/synthetic_v1.json`. This is mechanism validation, not end-to-end LongMemEval/LoCoMo QA.
+Adaptive v2 remains the better raw structural-ranking system. Two-stage retrieval deliberately gives up whole-segment evidence credit in exchange for source-level payload control.
 
-### 2. Equal-top-k real-data retrieval
+## 3. Adaptive segmentation v2
 
-Full public LoCoMo and LongMemEval-S are downloaded during GitHub Actions. All systems use the same dependency-free BM25 retriever and evidence-aware metrics. LongMemEval excludes 30 abstention questions, leaving 470 evidence-bearing questions; LoCoMo excludes four questions without annotated evidence.
+Adaptive v2 added confidence-aware change damping, minimum segment evidence, and split hysteresis without changing the original eight-dimensional formal feature vector.
 
-Progression systems use deterministic hashed lexical vectors in this benchmark. Every progression/segment retains provenance links to source evidence.
+On LoCoMo it reduces retrieval units from **746.3 to 339.7 (-54.5%)**, increases average segment size from 1.12 to 2.47 events, and lowers the single-event-segment fraction from **93.3% to 27.1%**. Top-8 macro evidence recall improves **54.34% -> 60.20%**.
 
-#### LongMemEval-S — top-8
+On LongMemEval it essentially preserves macro top-8 recall (96.77% -> 96.76%) while reducing average top-8 payload from about 155.7k to 149.7k characters.
 
-| System | Any evidence | All evidence | Macro evidence recall | Micro evidence recall | MRR@8 | Avg retrieved chars | Avg retrieval units |
-|---|---:|---:|---:|---:|---:|---:|---:|
-| Append-only BM25 | 97.87% | 88.72% | 94.11% | 91.91% | 0.9149 | **101,661** | 47.73 |
-| Fixed progression | 98.30% | 92.13% | 95.83% | 94.83% | **0.9263** | 144,636 | 43.05 |
-| Adaptive progression v1 | 98.51% | **94.04%** | 96.77% | 96.18% | 0.9257 | 155,653 | 42.52 |
-| Adaptive progression v2 | **98.72%** | 93.40% | 96.76% | 95.96% | 0.9223 | **149,694** | 41.89 |
-| **Progression only** | 98.51% | **94.89%** | **97.16%** | **96.63%** | 0.9229 | 173,672 | **40.61** |
+Compact result: `results/adaptive_v2_summary.json`. Provenance run: `34618743057`.
 
-Adaptive v2 essentially preserves v1's LongMemEval macro recall (96.76% vs 96.77%) while reducing the average top-8 payload by about 6.0k characters and slightly reducing the number of retrieval units. The all-evidence score is 0.64 pp lower than v1, so this is not an unconditional top-k improvement.
+## 4. Two-stage retrieval v2
 
-#### LongMemEval-S — hypothesis-relevant categories at top-8
+The v2 retrieval path separates structural search from reader payload:
 
-| Category | Append-only | Fixed progression | Adaptive v1 | Adaptive v2 | Progression only |
-|---|---:|---:|---:|---:|---:|
-| Temporal reasoning | 91.56% | 93.22% | 95.18% | **95.55%** | **95.58%** |
-| Multi-session | 89.68% | 93.82% | **94.99%** | **94.99%** | **96.09%** |
-| Knowledge update | 99.31% | 99.31% | **100.00%** | 99.31% | **100.00%** |
+1. Build compact adaptive-v2 progression/segment index units.
+2. Rank structural units with BM25.
+3. Expand only raw source documents under selected units.
+4. De-duplicate raw memories that appear under multiple structures.
+5. Re-rank those raw sources with BM25.
+6. Charge evidence credit and context budget only to raw source text actually exposed to the reader.
 
-#### LoCoMo — top-8
+The first implementation used a fixed 16-unit Stage-1 candidate set. That exposed Stage 1 as a recall ceiling on LoCoMo, with only 66.66% average ground-truth evidence coverage. Commit `474c9bdbef0f97e3a739669181b77ec214c8a400` therefore scales candidate breadth as `max(16, min(64, ceil(0.10 * structural_units)))`. This increases LoCoMo Stage-1 evidence coverage to **73.54%**, with 35.29 structural candidates and 75.08 candidate source documents on average.
 
-| System | Any evidence | All evidence | Macro evidence recall | Micro evidence recall | MRR@8 | Avg retrieved chars | Avg retrieval units |
-|---|---:|---:|---:|---:|---:|---:|---:|
-| Append-only BM25 | 60.60% | 52.67% | 56.18% | 45.72% | 0.4047 | **1,172** | 588.2 |
-| Fixed progression | 66.55% | 57.62% | 61.58% | 50.94% | 0.4529 | 3,546 | 320.5 |
-| Adaptive progression v1 | 58.68% | 50.91% | 54.34% | 44.01% | 0.4003 | 1,323 | 746.3 |
-| **Adaptive progression v2** | 65.34% | 56.10% | **60.20%** | **49.56%** | **0.4501** | 2,945 | **339.7** |
-| Progression only | **70.13%** | **60.24%** | **64.73%** | **55.17%** | **0.4572** | 9,379 | 163.6 |
+### LoCoMo — equal character budgets
 
-Adaptive v2 fixes the principal structural failure of v1 on LoCoMo. Average retrieval units fall from **746.3 to 339.7 (-54.5%)**, average segment size rises from 1.12 to 2.47 events, and the single-event-segment fraction falls from **93.3% to 27.1%**. At the same time, top-8 macro evidence recall rises by **+5.86 pp** (54.34% -> 60.20%) and MRR@8 rises from 0.4003 to 0.4501.
-
-This validates the confidence-aware damping/minimum-evidence/hysteresis idea as a segmentation stabilization mechanism. It does **not** yet establish context efficiency because the stabilized segments are larger.
-
-**MRR correction:** commit `947381757156ec5a9251485ea8aebfeb99ce6af6` corrected MRR so `MRR@k` only credits evidence within the requested cutoff. Recall metrics were unaffected.
-
-### 3. Equal-character-budget retrieval
-
-The budget benchmark applies an identical **strict ranked-prefix whole-unit character budget** to every system. A retrieval unit is included only if its full text fits in the remaining budget. It reports paired 2,000-sample bootstrap confidence intervals for per-question macro evidence recall and exact paired all-evidence tests against append-only.
-
-Initial v1 provenance: run `34608897574`, source commit `947381757156ec5a9251485ea8aebfeb99ce6af6`.
-
-Adaptive-v2 provenance: run `34618743057`, source commit `7b1a17695c7f10693371bf1de1ba1a5eb5043d0b`. Compact result: `results/adaptive_v2_summary.json`.
-
-#### LoCoMo — matched budgets
-
-| Budget | Append | Adaptive v1 | Adaptive v2 | V2 Δ vs append (95% CI) |
+| Budget | Append | Adaptive v2 whole-segment | Two-stage v2 | Two-stage Δ vs append (95% CI) |
 |---:|---:|---:|---:|---:|
-| 1,200 chars | **55.20%** | 52.52% | 46.21% | **-8.99 pp** [-10.55, -7.45] |
-| 2,400 chars | **63.11%** | 60.78% | 56.74% | **-6.37 pp** [-7.73, -5.04] |
-| 4,800 chars | **68.65%** | 66.42% | 65.18% | **-3.47 pp** [-4.64, -2.31] |
+| 1,200 chars | **55.20%** | 46.21% | 55.05% | -0.14 pp [-0.78, +0.46] |
+| 2,400 chars | 63.11% | 56.74% | **63.55%** | +0.44 pp [-0.21, +1.10] |
+| 4,800 chars | 68.65% | 65.18% | **68.90%** | +0.24 pp [-0.48, +0.99] |
 
-V2 substantially improves raw LoCoMo structure and ranking, but performs worse than v1 at strict whole-unit budgets. This is a useful failure: once v2 stops over-splitting, its larger segments become harder to admit atomically. The result isolates the next bottleneck as **retrieval-unit expansion policy rather than segmentation instability**.
+This is the main Retrieval-v2 result: selective source expansion eliminates almost all of the LoCoMo context-efficiency regression caused by larger Adaptive-v2 segments. The 2.4k and 4.8k point estimates exceed append-only, but both confidence intervals cross zero, so these are **not statistically established wins**.
 
-#### LongMemEval-S — matched budgets
+### LongMemEval-S — equal character budgets
 
-| Budget | Append | Adaptive v1 | Adaptive v2 | V2 Δ vs append (95% CI) |
+| Budget | Append | Adaptive v2 whole-segment | Two-stage v2 | Two-stage Δ vs append (95% CI) |
 |---:|---:|---:|---:|---:|
-| 100k chars | **93.59%** | 89.15% | 92.74% | **-0.85 pp** [-2.12, +0.33] |
-| 150k chars | **95.77%** | 94.15% | 95.58% | **-0.19 pp** [-1.12, +0.63] |
-| 200k chars | 96.69% | 97.02% | **97.21%** | **+0.52 pp** [-0.13, +1.21] |
+| 100k | **93.59%** | 92.74% | 93.49% | -0.10 pp [-0.54, +0.33] |
+| 150k | **95.77%** | 95.58% | 95.70% | -0.06 pp [-0.52, +0.40] |
+| 200k | 96.69% | **97.21%** | 97.18% | +0.49 pp [-0.14, +1.22] |
 
-On LongMemEval, v2 nearly closes the matched-budget gap at 100k/150k and has a +0.52 pp point estimate over append-only at 200k. However, every v2 confidence interval still crosses zero; the 200k all-evidence exact paired test is also non-significant (`p=0.344`). We therefore do **not** claim a statistically established win.
+Two-stage retrieval essentially matches append-only at 100k/150k, remains positive at 200k, and improves MRR under all three LongMemEval budgets. Again, the confidence intervals cross zero.
 
-### 4. What adaptive v2 establishes
+Retrieval-v2 implementation provenance: commit `326ea8f0d28af51dba45f1259c2686ae57a3127c`; scaled Stage-1 policy: `474c9bdbef0f97e3a739669181b77ec214c8a400`; successful benchmark run: `34626603557`. Compact result: `results/retrieval_v2_summary.json`.
 
-The v2 experiment sharpens the architecture story:
+## 5. Current interpretation
 
-1. **The v1 LoCoMo failure was substantially a segmentation-stability problem.** Confidence-aware damping and hysteresis cut retrieval units by 54.5% while improving raw recall by 5.86 pp.
-2. **Stabilizing segments alone cannot solve context efficiency.** Larger, better-formed segments are penalized by strict whole-unit admission, especially under LoCoMo's small budgets.
-3. **LongMemEval becomes much more competitive under equal budgets.** V2 reduces the 100k deficit from -4.44 pp to -0.85 pp and the 150k deficit from -1.61 pp to -0.19 pp, while reaching a non-significant +0.52 pp at 200k.
-4. **The next controlled experiment must decouple structural indexing from reader payload.** We should rank compact progression/segment representations, then expand and rerank only source episodes that fit the final reader budget.
-5. **Only after that flat two-stage baseline should hierarchy/DAG retrieval be added.** This lets the DAG be evaluated as an incremental routing advantage rather than conflating hierarchy with selective expansion.
+The current evidence supports the following architecture story:
 
-The complete CI artifacts retain all top-k and budget JSON outputs.
+1. **Progression grouping carries useful signal.** Coarse progression retrieval remains the raw top-k recall leader.
+2. **Adaptive v2 fixes the main segmentation-stability failure.** It substantially reduces LoCoMo over-segmentation while improving raw retrieval quality.
+3. **Two-stage retrieval fixes the payload problem.** Selective source expansion makes structured retrieval approximately budget-neutral versus append-only instead of strongly worse.
+4. **Stage-1 candidate coverage is now the main retrieval bottleneck.** LoCoMo structural coverage is 73.54%, versus 98.24% on LongMemEval. Improving structured candidate routing is therefore the next target.
+5. **The DAG should now be evaluated as an incremental Stage-1 routing mechanism.** It must use the same source-level Stage-2 reranker so hierarchy is the only new variable.
 
 ## Published reference targets
 
-These are external paper results used only as targets until reproduced under a common reader/evaluator setup.
-
 | System | LongMemEval-S | LoCoMo | Notes |
 |---|---:|---:|---|
-| TiMem | 76.88% | 75.30% | Published end-to-end QA; reports 52.20% lower recalled memory length on LoCoMo. |
-| Temporal Semantic Memory | 74.8% reported setup | 76.69% reported setup | Published end-to-end QA under its reported setup. |
-| HeLa-Mem | 65.4% reported setup | - | Published end-to-end QA under its reported setup. |
+| TiMem | 76.88% | 75.30% | Published end-to-end QA; not retrieval recall. |
+| Temporal Semantic Memory | 74.8% reported setup | 76.69% reported setup | Published end-to-end QA. |
+| HeLa-Mem | 65.4% reported setup | - | Published end-to-end QA. |
 
-These percentages are **end-to-end QA scores, not retrieval recall**, and must not be numerically compared to the retrieval tables above.
-
-Primary references:
-- TiMem: https://aclanthology.org/2026.findings-acl.1091/
-- LongMemEval: https://github.com/xiaowu0162/LongMemEval
-- LoCoMo: https://github.com/snap-research/locomo
+Primary references: TiMem (Findings ACL 2026), LongMemEval public benchmark, and Snap Research LoCoMo. These external percentages must not be directly compared with the retrieval numbers above.
 
 ## Evaluation roadmap
 
-1. **DONE** — dataset adapters + evidence-aware retrieval metrics.
-2. **DONE** — append-only lexical baseline.
+1. **DONE** — dataset adapters and evidence-aware retrieval metrics.
+2. **DONE** — append-only BM25 baseline.
 3. **DONE** — progression-only routing/grouping ablation.
-4. **DONE** — fixed-window progression retrieval.
-5. **DONE** — adaptive progression v1.
-6. **DONE** — strict equal-character-budget retrieval + paired uncertainty/significance.
-7. **DONE** — adaptive v2 confidence-aware damping, minimum evidence, and hysteresis.
-8. **NEXT** — two-stage compact progression/segment index followed by budgeted source-evidence expansion.
-9. **NEXT** — DAG/hierarchical structured retrieval on top of the two-stage baseline, with an explicit flat-vs-DAG ablation.
-10. **NEXT** — fixed reader + official LongMemEval/LoCoMo end-to-end QA evaluation under one model and context budget.
-11. **LATER** — learned temporal policy, consolidation/knowledge objects, reinforcement/decay, and hot/warm/cold memory.
-
-For every stage we record evidence coverage, recalled context size, memory/index size, paired uncertainty, and answer accuracy/F1 once a fixed reader is available.
+4. **DONE** — fixed-window and adaptive-v1 progression retrieval.
+5. **DONE** — strict equal-character-budget evaluation and paired uncertainty.
+6. **DONE** — adaptive segmentation v2.
+7. **DONE** — two-stage compact structural index -> source-evidence expansion.
+8. **NEXT** — DAG v1 and hierarchical candidate routing, benchmarked against flat two-stage retrieval.
+9. **NEXT** — graph-aware progression decider with `CREATE_CHILD`, multi-parent support, and graph-aware candidates.
+10. **NEXT** — fixed-reader end-to-end LongMemEval/LoCoMo QA.
+11. **LATER** — LLM progression decider, learned temporal policy, higher-level consolidation, knowledge objects, and hot/warm/cold lifecycle.
 
 ## Reproducibility rule
 
-A row is labeled `reproduced` only if it was generated from code in this repository in the current evaluation pipeline. External paper scores remain `published reference` values until independently reproduced.
+A row is labeled reproduced only when it was generated by code in this repository. Every architecture change is benchmarked and recorded before the next stage is introduced.
