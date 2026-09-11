@@ -2,30 +2,55 @@
 
 Research implementation for progression-aware long-term memory in LLM agents.
 
-The system organizes episodic evidence into hierarchical, evolving user synopses called **progressions**. Initial milestones focus on:
+The system organizes episodic evidence into evolving user synopses called **progressions** and
+maintains a reversible temporal hierarchy over the evidence.
 
-1. idempotent episode ingestion,
-2. progression DAG storage,
-3. active progression caching and routing,
-4. progression synopsis updates,
-5. fixed vs. adaptive temporal segmentation,
-6. hierarchical consolidation,
-7. hot / warm / cold memory tiers.
+## Implemented v1 slice
 
-## Initial architecture
+- idempotent episode ingestion and evidence versioning;
+- progression statistics and evidence-preserving storage;
+- active progression cache;
+- deterministic progression routing (`ATTACH`, `CREATE`, `MULTI_ATTACH`, `STATIC`);
+- adaptive temporal segmentation with `EXTEND` / `SPLIT`;
+- rule-based and lightweight linear temporal controllers;
+- fixed-window temporal abstraction baseline;
+- deterministic synthetic benchmark for phase-boundary detection and compression;
+- tests for idempotency, routing, segmentation invariants, and benchmark behavior.
+
+## Architecture
 
 ```text
-Interaction
-  -> structured episode extraction
-  -> active progression cache
+Episode
   -> progression routing
-  -> progression DAG
-  -> synopsis/current-state update
-  -> temporal segmentation
-  -> background consolidation
-  -> hot/warm/cold storage
+  -> progression store
+  -> temporal controller
+       -> EXTEND current segment
+       -> SPLIT into a new segment
+  -> evidence-backed temporal segments
 ```
 
-## Development principle
+Every episode attached to a progression belongs to exactly one finest-level temporal segment.
+Source episodes are never destructively overwritten by segmentation.
 
-Each addition should be evaluated as an ablation against the same LoCoMo / LongMemEval evaluation harness.
+## Run tests
+
+```bash
+python -m pytest
+```
+
+## Run the first benchmark
+
+```bash
+python -m progression_memory.benchmarks.synthetic
+```
+
+The synthetic benchmark compares a fixed 14-day baseline against the initial adaptive linear
+controller on irregular state transitions. It reports boundary precision/recall/F1, segment
+count, and the episode-to-segment compression ratio.
+
+## Next benchmark integration
+
+This local deterministic harness is intentionally small. The next step is to plug the same
+ablation interface into LoCoMo / LongMemEval so progression representation and temporal
+segmentation can be measured against downstream retrieval/reasoning quality as well as memory
+growth and latency.

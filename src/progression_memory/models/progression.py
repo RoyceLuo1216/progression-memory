@@ -13,7 +13,7 @@ class StorageTier(StrEnum):
 
 
 class Progression(BaseModel):
-    """Persistent hierarchical synopsis of an evolving user process or life area."""
+    """Persistent synopsis of an evolving user process or life area."""
 
     id: str
     title: str
@@ -30,9 +30,14 @@ class Progression(BaseModel):
     activity: float = 0.0
     volatility: float = 0.0
     continuity: float = 0.0
+    persistence: float = 0.0
     importance: float = 0.0
+    event_frequency: float = 0.0
+    contradiction_rate: float = 0.0
+    retrieval_count: int = 0
 
     episode_ids: list[str] = Field(default_factory=list)
+    segment_ids: list[str] = Field(default_factory=list)
     latest_episode_id: str | None = None
 
     parent_ids: list[str] = Field(default_factory=list)
