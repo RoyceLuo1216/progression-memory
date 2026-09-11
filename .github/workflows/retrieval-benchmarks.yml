@@ -13,7 +13,7 @@ on:
 jobs:
   benchmark:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -28,16 +28,28 @@ jobs:
           mkdir -p evaluation/data evaluation/results/ci
           wget -q https://raw.githubusercontent.com/snap-research/locomo/main/data/locomo10.json -O evaluation/data/locomo10.json
           wget -q https://huggingface.co/datasets/xiaowu0162/longmemeval-cleaned/resolve/main/longmemeval_s_cleaned.json -O evaluation/data/longmemeval_s_cleaned.json
-      - name: Benchmark append-only BM25
+      - name: Benchmark retrieval systems
         run: |
-          python -m progression_memory.benchmarks.real_retrieval --dataset locomo --data-path evaluation/data/locomo10.json --top-k 5,8,10 --output evaluation/results/ci/locomo_append_bm25.json
-          python -m progression_memory.benchmarks.real_retrieval --dataset longmemeval --data-path evaluation/data/longmemeval_s_cleaned.json --top-k 5,8,10 --output evaluation/results/ci/longmemeval_append_bm25.json
+          for system in append fixed_progression adaptive_progression; do
+            python -m progression_memory.benchmarks.real_retrieval \
+              --dataset locomo \
+              --data-path evaluation/data/locomo10.json \
+              --system "$system" \
+              --top-k 5,8,10 \
+              --output "evaluation/results/ci/locomo_${system}.json"
+            python -m progression_memory.benchmarks.real_retrieval \
+              --dataset longmemeval \
+              --data-path evaluation/data/longmemeval_s_cleaned.json \
+              --system "$system" \
+              --top-k 5,8,10 \
+              --output "evaluation/results/ci/longmemeval_${system}.json"
+          done
       - name: Print benchmark summaries
         run: |
-          echo '=== LOCOMO_RESULT ==='
-          cat evaluation/results/ci/locomo_append_bm25.json
-          echo '=== LONGMEMEVAL_RESULT ==='
-          cat evaluation/results/ci/longmemeval_append_bm25.json
+          for result in evaluation/results/ci/*.json; do
+            echo "=== ${result} ==="
+            cat "$result"
+          done
       - uses: actions/upload-artifact@v4
         with:
           name: retrieval-benchmark-results
