@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections import OrderedDict
+import math
 
 from progression_memory.evaluation.progressions import build_progression_documents
 from progression_memory.evaluation.retrieval import (
@@ -10,7 +11,9 @@ from progression_memory.evaluation.retrieval import (
     tokenize,
 )
 
-DEFAULT_STAGE1_CANDIDATES = 16
+MIN_STAGE1_CANDIDATES = 16
+MAX_STAGE1_CANDIDATES = 64
+STAGE1_CORPUS_FRACTION = 0.10
 
 
 def _compact_index_text(document: RetrievalDocument) -> str:
@@ -43,7 +46,7 @@ def _sources_for_segment(
 def build_two_stage_queries(
     queries: list[RetrievalQuery],
     *,
-    stage1_candidates: int = DEFAULT_STAGE1_CANDIDATES,
+    stage1_candidates: int | None = None,
 ) -> tuple[list[RetrievalQuery], dict[str, object]]:
     """Restrict raw retrieval to sources under top-ranked compact memory regions.
 
@@ -55,7 +58,7 @@ def build_two_stage_queries(
     reranks only raw source memories, so final evidence credit and reader-context cost
     are both measured exclusively on text actually exposed to the reader.
     """
-    if stage1_candidates < 1:
+    if stage1_candidates is not None and stage1_candidates < 1:
         raise ValueError("stage1_candidates must be positive")
 
     structure_cache: dict[
@@ -99,10 +102,15 @@ def build_two_stage_queries(
             structure_cache[key] = cached
 
         index_documents, raw_documents, _ = cached
-        stage1 = BM25Index(index_documents).retrieve(
-            query.text,
-            min(stage1_candidates, len(index_documents)),
-        )
+        if stage1_candidates is None:
+            proportional = math.ceil(STAGE1_CORPUS_FRACTION * len(index_documents))
+            candidate_limit = min(
+                len(index_documents),
+                max(MIN_STAGE1_CANDIDATES, min(MAX_STAGE1_CANDIDATES, proportional)),
+            )
+        else:
+            candidate_limit = min(stage1_candidates, len(index_documents))
+        stage1 = BM25Index(index_documents).retrieve(query.text, candidate_limit)
 
         # Ordered de-duplication matters because a raw episode may support multiple
         # progression segments. Multi-membership must not consume context twice.
@@ -154,6 +162,11 @@ def build_two_stage_queries(
     stats: dict[str, object] = {
         "unique_corpora": len(structure_cache),
         "stage1_candidate_limit": stage1_candidates,
+        "stage1_candidate_policy": (
+            f"fixed:{stage1_candidates}"
+            if stage1_candidates is not None
+            else "adaptive:max(16,min(64,ceil(0.10*structural_units)))"
+        ),
         "avg_stage1_selected_units": (
             sum(selected_stage1_counts) / max(1, len(selected_stage1_counts))
         ),
