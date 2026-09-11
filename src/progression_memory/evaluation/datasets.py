@@ -81,12 +81,18 @@ def load_longmemeval(path: str | Path) -> list[RetrievalQuery]:
                     metadata={"question_id": str(item["question_id"])},
                 )
             )
+        question_id = str(item["question_id"])
+        evidence_ids = (
+            frozenset()
+            if question_id.endswith("_abs")
+            else frozenset(str(x) for x in item.get("answer_session_ids", []))
+        )
         queries.append(
             RetrievalQuery(
-                id=str(item["question_id"]),
+                id=question_id,
                 text=str(item["question"]),
                 answer=str(item.get("answer", "")),
-                evidence_ids=frozenset(str(x) for x in item.get("answer_session_ids", [])),
+                evidence_ids=evidence_ids,
                 documents=tuple(docs),
                 category=str(item.get("question_type", "unknown")),
             )

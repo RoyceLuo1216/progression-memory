@@ -41,3 +41,18 @@ def test_longmemeval_adapter_and_bm25(tmp_path: Path) -> None:
     path.write_text(json.dumps(fixture), encoding="utf-8")
     result = run("longmemeval", str(path), [1])
     assert result["cutoffs"]["1"]["all_evidence_recall"] == 1.0
+
+
+def test_longmemeval_abstention_excluded_from_retrieval(tmp_path: Path) -> None:
+    fixture = [{
+        "question_id": "q_abs", "question_type": "single-session-user",
+        "question": "What is my missing fact?", "answer": "unknown",
+        "haystack_session_ids": ["s1"], "haystack_dates": ["2026-01-01"],
+        "haystack_sessions": [[{"role": "user", "content": "unrelated"}]],
+        "answer_session_ids": ["s1"]
+    }]
+    path = tmp_path / "lme_abs.json"
+    path.write_text(json.dumps(fixture), encoding="utf-8")
+    result = run("longmemeval", str(path), [1])
+    assert result["eligible_query_count"] == 0
+    assert result["excluded_without_evidence"] == 1
