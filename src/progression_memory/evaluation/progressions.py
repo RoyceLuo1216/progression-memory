@@ -12,6 +12,7 @@ from progression_memory.models.episode import Episode
 from progression_memory.models.progression import Progression
 from progression_memory.routing.router import HeuristicProgressionRouter, RouteAction, cosine_similarity
 from progression_memory.storage.progression_store import ProgressionStore
+from progression_memory.temporal.controller import HysteresisLinearTemporalController
 from progression_memory.temporal.segmenter import AdaptiveTemporalSegmenter, FixedWindowTemporalSegmenter
 
 _ENTITY_RE = re.compile(r"\b[A-Z][a-z]{2,}\b")
@@ -77,7 +78,7 @@ def _refresh_progression_embedding(store: ProgressionStore, progression_id: str)
 def build_progression_documents(
     documents: tuple[RetrievalDocument, ...],
     *,
-    mode: Literal["flat", "fixed", "adaptive"],
+    mode: Literal["flat", "fixed", "adaptive", "adaptive_v2"],
     attach_threshold: float = 0.62,
 ) -> tuple[tuple[RetrievalDocument, ...], dict[str, float | int]]:
     """Route raw memories into progressions and expose evidence-backed retrieval units."""
@@ -85,10 +86,11 @@ def build_progression_documents(
     store = ProgressionStore()
     router = HeuristicProgressionRouter(attach_threshold=attach_threshold)
     if mode == "flat":
-        # One segment per progression isolates progression routing from temporal segmentation.
         segmenter = FixedWindowTemporalSegmenter(window=timedelta(days=365000))
     elif mode == "fixed":
         segmenter = FixedWindowTemporalSegmenter(window=timedelta(days=14))
+    elif mode == "adaptive_v2":
+        segmenter = AdaptiveTemporalSegmenter(HysteresisLinearTemporalController())
     else:
         segmenter = AdaptiveTemporalSegmenter()
     source_by_episode: dict[str, RetrievalDocument] = {}
@@ -106,6 +108,10 @@ def build_progression_documents(
             novelty = max(0.0, min(1.0, 1.0 - best_semantic))
         else:
             novelty = 1.0
+        metadata = dict(document.metadata)
+        if mode == "adaptive_v2":
+            lexical_terms = len(tokenize(document.text))
+            metadata["state_confidence"] = min(1.0, max(0.25, lexical_terms / 12.0))
         episode = Episode(
             id=f"episode:{ordinal}:{document.id}",
             summary=document.text,
@@ -116,7 +122,7 @@ def build_progression_documents(
             importance=0.5,
             novelty=novelty,
             source_pointer=document.id,
-            metadata=document.metadata,
+            metadata=metadata,
         )
         store.ingest_episode(episode)
         source_by_episode[episode.id] = document
@@ -141,10 +147,12 @@ def build_progression_documents(
                 _refresh_progression_embedding(store, progression_id)
 
     output: list[RetrievalDocument] = []
+    segment_sizes: list[int] = []
     for progression in store.progressions.values():
         for segment_id in progression.segment_ids:
             segment = store.segments[segment_id]
             sources = [source_by_episode[eid] for eid in segment.episode_ids]
+            segment_sizes.append(len(segment.episode_ids))
             evidence_ids: set[str] = set()
             for source in sources:
                 evidence_ids.update(source.evidence_ids or {source.id})
@@ -172,5 +180,9 @@ def build_progression_documents(
         "raw_chars": raw_chars,
         "segment_chars": segment_chars,
         "evidence_duplication_ratio": segment_chars / max(1, raw_chars),
+        "avg_segment_size": sum(segment_sizes) / max(1, len(segment_sizes)),
+        "single_event_segment_fraction": (
+            sum(size == 1 for size in segment_sizes) / max(1, len(segment_sizes))
+        ),
     }
     return tuple(output), stats

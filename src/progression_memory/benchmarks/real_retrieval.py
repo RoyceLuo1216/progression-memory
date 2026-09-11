@@ -8,7 +8,13 @@ from progression_memory.evaluation.datasets import load_locomo, load_longmemeval
 from progression_memory.evaluation.progressions import build_progression_documents
 from progression_memory.evaluation.retrieval import RetrievalQuery, evaluate_retrieval
 
-SYSTEMS = ("append", "progression_only", "fixed_progression", "adaptive_progression")
+SYSTEMS = (
+    "append",
+    "progression_only",
+    "fixed_progression",
+    "adaptive_progression",
+    "adaptive_progression_v2",
+)
 
 
 def _transform_queries(
@@ -33,6 +39,8 @@ def _transform_queries(
         mode = "flat"
     elif system == "fixed_progression":
         mode = "fixed"
+    elif system == "adaptive_progression_v2":
+        mode = "adaptive_v2"
     else:
         mode = "adaptive"
     cache: dict[int, tuple[tuple, dict[str, float | int]]] = {}
@@ -57,7 +65,7 @@ def _transform_queries(
     def avg(name: str) -> float:
         return sum(float(row[name]) for row in stat_rows) / max(1, len(stat_rows))
 
-    return transformed, {
+    result: dict[str, object] = {
         "unique_corpora": len(cache),
         "avg_raw_documents": avg("raw_document_count"),
         "avg_retrieval_units": avg("segment_count"),
@@ -66,6 +74,10 @@ def _transform_queries(
         "avg_evidence_duplication_ratio": avg("evidence_duplication_ratio"),
         "avg_raw_chars": avg("raw_chars"),
     }
+    if stat_rows and "avg_segment_size" in stat_rows[0]:
+        result["avg_segment_size"] = avg("avg_segment_size")
+        result["avg_single_event_segment_fraction"] = avg("single_event_segment_fraction")
+    return transformed, result
 
 
 def run(

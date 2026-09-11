@@ -6,10 +6,12 @@ on:
     branches: [master]
     paths:
       - 'src/progression_memory/evaluation/**'
+      - 'src/progression_memory/temporal/**'
       - 'src/progression_memory/benchmarks/real_retrieval.py'
       - 'src/progression_memory/benchmarks/budget_retrieval.py'
       - 'tests/test_real_retrieval.py'
       - 'tests/test_budget_retrieval.py'
+      - 'tests/test_temporal_segmentation.py'
       - '.github/workflows/retrieval-benchmarks.yml'
 
 jobs:
@@ -32,7 +34,7 @@ jobs:
           wget -q https://huggingface.co/datasets/xiaowu0162/longmemeval-cleaned/resolve/main/longmemeval_s_cleaned.json -O evaluation/data/longmemeval_s_cleaned.json
       - name: Benchmark top-k retrieval systems
         run: |
-          for system in append progression_only fixed_progression adaptive_progression; do
+          for system in append progression_only fixed_progression adaptive_progression adaptive_progression_v2; do
             python -m progression_memory.benchmarks.real_retrieval \
               --dataset locomo \
               --data-path evaluation/data/locomo10.json \
