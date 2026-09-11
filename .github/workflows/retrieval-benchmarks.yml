@@ -7,13 +7,15 @@ on:
     paths:
       - 'src/progression_memory/evaluation/**'
       - 'src/progression_memory/benchmarks/real_retrieval.py'
+      - 'src/progression_memory/benchmarks/budget_retrieval.py'
       - 'tests/test_real_retrieval.py'
+      - 'tests/test_budget_retrieval.py'
       - '.github/workflows/retrieval-benchmarks.yml'
 
 jobs:
   benchmark:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -28,7 +30,7 @@ jobs:
           mkdir -p evaluation/data evaluation/results/ci
           wget -q https://raw.githubusercontent.com/snap-research/locomo/main/data/locomo10.json -O evaluation/data/locomo10.json
           wget -q https://huggingface.co/datasets/xiaowu0162/longmemeval-cleaned/resolve/main/longmemeval_s_cleaned.json -O evaluation/data/longmemeval_s_cleaned.json
-      - name: Benchmark retrieval systems
+      - name: Benchmark top-k retrieval systems
         run: |
           for system in append progression_only fixed_progression adaptive_progression; do
             python -m progression_memory.benchmarks.real_retrieval \
@@ -44,11 +46,25 @@ jobs:
               --top-k 5,8,10 \
               --output "evaluation/results/ci/longmemeval_${system}.json"
           done
-      - name: Print benchmark summaries
+      - name: Benchmark equal character budgets
+        run: |
+          python -m progression_memory.benchmarks.budget_retrieval \
+            --dataset locomo \
+            --data-path evaluation/data/locomo10.json \
+            --char-budgets 1200,2400,4800 \
+            --bootstrap-samples 2000 \
+            --output evaluation/results/ci/locomo_budget_matched.json
+          python -m progression_memory.benchmarks.budget_retrieval \
+            --dataset longmemeval \
+            --data-path evaluation/data/longmemeval_s_cleaned.json \
+            --char-budgets 100000,150000,200000 \
+            --bootstrap-samples 2000 \
+            --output evaluation/results/ci/longmemeval_budget_matched.json
+      - name: Print result files
         run: |
           for result in evaluation/results/ci/*.json; do
             echo "=== ${result} ==="
-            cat "$result"
+            python -c 'import json,sys; d=json.load(open(sys.argv[1])); print(json.dumps(d, sort_keys=True)[:12000])' "$result"
           done
       - uses: actions/upload-artifact@v4
         with:
