@@ -65,7 +65,7 @@ def test_progression_systems_preserve_evidence(tmp_path: Path) -> None:
     }]
     path = tmp_path / "locomo.json"
     path.write_text(json.dumps(fixture), encoding="utf-8")
-    for system in ("fixed_progression", "adaptive_progression"):
+    for system in ("progression_only", "fixed_progression", "adaptive_progression"):
         result = run("locomo", str(path), [5], system)
         assert result["cutoffs"]["5"]["all_evidence_recall"] == 1.0
         assert result["corpus_stats"]["avg_retrieval_units"] >= 1

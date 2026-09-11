@@ -77,22 +77,20 @@ def _refresh_progression_embedding(store: ProgressionStore, progression_id: str)
 def build_progression_documents(
     documents: tuple[RetrievalDocument, ...],
     *,
-    mode: Literal["fixed", "adaptive"],
+    mode: Literal["flat", "fixed", "adaptive"],
     attach_threshold: float = 0.62,
 ) -> tuple[tuple[RetrievalDocument, ...], dict[str, float | int]]:
-    """Route raw memories into progressions and expose temporal segments as retrieval units.
-
-    This intentionally uses deterministic hashed lexical vectors so the benchmark can run without
-    an external embedding API. It exercises the repository's real router/store/segmenter path.
-    """
+    """Route raw memories into progressions and expose evidence-backed retrieval units."""
 
     store = ProgressionStore()
     router = HeuristicProgressionRouter(attach_threshold=attach_threshold)
-    segmenter = (
-        FixedWindowTemporalSegmenter(window=timedelta(days=14))
-        if mode == "fixed"
-        else AdaptiveTemporalSegmenter()
-    )
+    if mode == "flat":
+        # One segment per progression isolates progression routing from temporal segmentation.
+        segmenter = FixedWindowTemporalSegmenter(window=timedelta(days=365000))
+    elif mode == "fixed":
+        segmenter = FixedWindowTemporalSegmenter(window=timedelta(days=14))
+    else:
+        segmenter = AdaptiveTemporalSegmenter()
     source_by_episode: dict[str, RetrievalDocument] = {}
     created = 0
 

@@ -8,7 +8,7 @@ from progression_memory.evaluation.datasets import load_locomo, load_longmemeval
 from progression_memory.evaluation.progressions import build_progression_documents
 from progression_memory.evaluation.retrieval import RetrievalQuery, evaluate_retrieval
 
-SYSTEMS = ("append", "fixed_progression", "adaptive_progression")
+SYSTEMS = ("append", "progression_only", "fixed_progression", "adaptive_progression")
 
 
 def _transform_queries(
@@ -29,7 +29,12 @@ def _transform_queries(
             "avg_raw_chars": sum(raw_chars) / max(1, len(raw_chars)),
         }
 
-    mode = "fixed" if system == "fixed_progression" else "adaptive"
+    if system == "progression_only":
+        mode = "flat"
+    elif system == "fixed_progression":
+        mode = "fixed"
+    else:
+        mode = "adaptive"
     cache: dict[int, tuple[tuple, dict[str, float | int]]] = {}
     transformed: list[RetrievalQuery] = []
     for query in queries:
