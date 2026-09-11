@@ -1,0 +1,36 @@
+{
+  "benchmark_run": 34555086472,
+  "source_commit": "b2d5663c9f4b9645939e5c8a3d638f9f13260d3d",
+  "dataset": "locomo",
+  "system": "append_bm25",
+  "query_count": 1986,
+  "eligible_query_count": 1982,
+  "excluded_without_evidence": 4,
+  "granularity": "turn",
+  "cutoffs": {
+    "5": {
+      "all_evidence_recall": 0.47426841574167505,
+      "any_evidence_recall": 0.5459132189707366,
+      "macro_evidence_recall": 0.5052115536304118,
+      "micro_evidence_recall": 0.4035523978685613,
+      "mrr": 0.41622154682759016,
+      "avg_retrieved_chars": 745.6488395560041
+    },
+    "8": {
+      "all_evidence_recall": 0.5267406659939455,
+      "any_evidence_recall": 0.6059535822401615,
+      "macro_evidence_recall": 0.5617557423753594,
+      "micro_evidence_recall": 0.4571936056838366,
+      "mrr": 0.41622154682759016,
+      "avg_retrieved_chars": 1172.0948536831484
+    },
+    "10": {
+      "all_evidence_recall": 0.5494450050454087,
+      "any_evidence_recall": 0.6311806256306761,
+      "macro_evidence_recall": 0.5860582310068085,
+      "micro_evidence_recall": 0.4827708703374778,
+      "mrr": 0.41622154682759016,
+      "avg_retrieved_chars": 1454.936427850656
+    }
+  }
+}

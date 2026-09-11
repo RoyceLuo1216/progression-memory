@@ -1,0 +1,36 @@
+{
+  "benchmark_run": 34555086472,
+  "source_commit": "b2d5663c9f4b9645939e5c8a3d638f9f13260d3d",
+  "dataset": "longmemeval",
+  "system": "append_bm25",
+  "query_count": 500,
+  "eligible_query_count": 470,
+  "excluded_without_evidence": 30,
+  "granularity": "session",
+  "cutoffs": {
+    "5": {
+      "all_evidence_recall": 0.8319148936170213,
+      "any_evidence_recall": 0.9723404255319149,
+      "macro_evidence_recall": 0.9164184397163123,
+      "micro_evidence_recall": 0.8808988764044944,
+      "mrr": 0.9164337709988524,
+      "avg_retrieved_chars": 64632.61276595745
+    },
+    "8": {
+      "all_evidence_recall": 0.8872340425531915,
+      "any_evidence_recall": 0.9787234042553191,
+      "macro_evidence_recall": 0.9410638297872344,
+      "micro_evidence_recall": 0.9191011235955057,
+      "mrr": 0.9164337709988524,
+      "avg_retrieved_chars": 101660.50638297873
+    },
+    "10": {
+      "all_evidence_recall": 0.9063829787234042,
+      "any_evidence_recall": 0.9851063829787234,
+      "macro_evidence_recall": 0.9519148936170213,
+      "micro_evidence_recall": 0.9348314606741573,
+      "mrr": 0.9164337709988524,
+      "avg_retrieved_chars": 126080.3914893617
+    }
+  }
+}
