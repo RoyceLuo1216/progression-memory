@@ -1,0 +1,82 @@
+{
+  "architecture": "dag_two_stage_v1",
+  "benchmark_run": 34644525092,
+  "hierarchy": "progression_parent -> adaptive_v2_segment_child -> raw_source",
+  "implementation_commit": "5f2e8091d584875cb0cb7414ff6d89277b45bd2d",
+  "interpretation": "DAG v1 is a valid incremental hierarchy ablation but only marginally changes candidate coverage/final retrieval. LongMemEval improves slightly; LoCoMo is effectively flat. Parent-index storage overhead is too high on LoCoMo (~1.60x raw total structural index), so the next hierarchy iteration should compact parent representations and improve parent-aware candidate diversification before adding more graph complexity.",
+  "locomo": {
+    "avg_candidate_source_documents": 75.13645518630413,
+    "avg_index_to_raw_char_ratio": 1.595998929415504,
+    "avg_stage1_selected_units": 35.28700906344411,
+    "avg_total_index_chars": 133573.3,
+    "budgets": {
+      "1200": {
+        "append_macro_recall": 0.5519698967560606,
+        "dag_ci95_vs_append": [-0.007945517594861692, 0.003925207822786027],
+        "dag_delta_vs_append": -0.001875010010731505,
+        "dag_macro_recall": 0.5500948867453291,
+        "flat_two_stage_macro_recall": 0.5505363600046632
+      },
+      "2400": {
+        "append_macro_recall": 0.6310806147883188,
+        "dag_ci95_vs_append": [-0.0018275591434017255, 0.010918857956906272],
+        "dag_delta_vs_append": 0.004277138033148005,
+        "dag_macro_recall": 0.6353577528214663,
+        "flat_two_stage_macro_recall": 0.6354967488840689
+      },
+      "4800": {
+        "append_macro_recall": 0.6865314967490354,
+        "dag_ci95_vs_append": [-0.004830272169412668, 0.009292561626063138],
+        "dag_delta_vs_append": 0.0022539691961547485,
+        "dag_macro_recall": 0.6887854659451899,
+        "flat_two_stage_macro_recall": 0.6889671077240005
+      }
+    },
+    "flat_stage1_evidence_coverage": 0.7354264953003447,
+    "stage1_evidence_coverage": 0.7365397679856295,
+    "top8": {
+      "all_evidence_recall": 0.5262361251261353,
+      "avg_retrieved_chars": 1205.612008072654,
+      "macro_evidence_recall": 0.5640479996751846,
+      "mrr": 0.41016709913026805
+    }
+  },
+  "longmemeval": {
+    "avg_candidate_source_documents": 20.282,
+    "avg_index_to_raw_char_ratio": 0.591950192601114,
+    "avg_stage1_selected_units": 16.0,
+    "avg_total_index_chars": 292392.506,
+    "budgets": {
+      "100000": {
+        "append_macro_recall": 0.9359219858156029,
+        "dag_ci95_vs_append": [-0.003971631205673759, 0.008014184397163119],
+        "dag_delta_vs_append": 0.001524822695035461,
+        "dag_macro_recall": 0.9374468085106384,
+        "flat_two_stage_macro_recall": 0.9348936170212768
+      },
+      "150000": {
+        "append_macro_recall": 0.9576595744680853,
+        "dag_ci95_vs_append": [-0.004468085106382979, 0.00553191489361702],
+        "dag_delta_vs_append": 0.0004255319148936167,
+        "dag_macro_recall": 0.9580851063829787,
+        "flat_two_stage_macro_recall": 0.9570212765957447
+      },
+      "200000": {
+        "append_macro_recall": 0.9669148936170213,
+        "dag_ci95_vs_append": [0.0, 0.013120567375886523],
+        "dag_delta_vs_append": 0.006028368794326241,
+        "dag_macro_recall": 0.9729432624113475,
+        "flat_two_stage_macro_recall": 0.9717730496453901
+      }
+    },
+    "flat_stage1_evidence_coverage": 0.9823758865248228,
+    "stage1_evidence_coverage": 0.9839716312056738,
+    "top8": {
+      "all_evidence_recall": 0.8872340425531915,
+      "avg_retrieved_chars": 101498.2,
+      "macro_evidence_recall": 0.9435460992907805,
+      "mrr": 0.9262259371833839
+    }
+  },
+  "ranking": "RRF(child_rank + 0.35*parent_rank), k=60"
+}
