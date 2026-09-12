@@ -38,7 +38,7 @@ jobs:
           wget -q https://huggingface.co/datasets/xiaowu0162/longmemeval-cleaned/resolve/main/longmemeval_s_cleaned.json -O evaluation/data/longmemeval_s_cleaned.json
       - name: Benchmark top-k retrieval systems
         run: |
-          for system in append progression_only fixed_progression adaptive_progression adaptive_progression_v2 two_stage_v2 dag_two_stage_v1; do
+          for system in append progression_only fixed_progression adaptive_progression adaptive_progression_v2 two_stage_v2 dag_two_stage_v1 dag_two_stage_v2; do
             python -m progression_memory.benchmarks.real_retrieval \
               --dataset locomo \
               --data-path evaluation/data/locomo10.json \

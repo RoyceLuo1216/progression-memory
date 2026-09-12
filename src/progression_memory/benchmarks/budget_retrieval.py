@@ -19,6 +19,39 @@ def _load_queries(dataset: str, data_path: str):
     raise ValueError(f"unsupported dataset: {dataset}")
 
 
+def _compare_against(
+    rows: dict[str, dict[str, list[dict[str, object]]]],
+    budget_values: list[int],
+    system_names: tuple[str, ...],
+    *,
+    baseline: str,
+    candidates: Iterable[str],
+    bootstrap_samples: int,
+    seed: int,
+    seed_offset: int = 0,
+) -> dict[str, dict[str, object]]:
+    comparisons: dict[str, dict[str, object]] = {
+        str(budget): {} for budget in budget_values
+    }
+    if baseline not in system_names:
+        return comparisons
+
+    candidate_names = tuple(
+        name for name in candidates if name in system_names and name != baseline
+    )
+    for budget_index, budget in enumerate(budget_values):
+        budget_key = str(budget)
+        baseline_rows = rows[baseline][budget_key]
+        for system_index, system in enumerate(candidate_names):
+            comparisons[budget_key][system] = compare_query_outcomes(
+                baseline_rows,
+                rows[system][budget_key],
+                bootstrap_samples=bootstrap_samples,
+                seed=seed + seed_offset + budget_index * 100 + system_index,
+            )
+    return comparisons
+
+
 def run(
     dataset: str,
     data_path: str,
@@ -38,7 +71,9 @@ def run(
         raise ValueError(f"unsupported systems: {unknown}")
 
     corpus_stats: dict[str, object] = {}
-    metrics: dict[str, dict[str, dict[str, object]]] = {str(b): {} for b in budget_values}
+    metrics: dict[str, dict[str, dict[str, object]]] = {
+        str(b): {} for b in budget_values
+    }
     rows: dict[str, dict[str, list[dict[str, object]]]] = {}
 
     for system in system_names:
@@ -56,20 +91,28 @@ def run(
             rows[system][budget_key] = list(payload.pop("per_query"))
             metrics[budget_key][system] = payload
 
-    comparisons: dict[str, dict[str, object]] = {str(b): {} for b in budget_values}
-    if "append" in system_names:
-        for budget_index, budget in enumerate(budget_values):
-            budget_key = str(budget)
-            baseline_rows = rows["append"][budget_key]
-            for system_index, system in enumerate(system_names):
-                if system == "append":
-                    continue
-                comparisons[budget_key][system] = compare_query_outcomes(
-                    baseline_rows,
-                    rows[system][budget_key],
-                    bootstrap_samples=bootstrap_samples,
-                    seed=seed + budget_index * 100 + system_index,
-                )
+    comparisons_vs_append = _compare_against(
+        rows,
+        budget_values,
+        system_names,
+        baseline="append",
+        candidates=system_names,
+        bootstrap_samples=bootstrap_samples,
+        seed=seed,
+    )
+    dag_systems = tuple(
+        name for name in system_names if name.startswith("dag_two_stage_")
+    )
+    comparisons_vs_two_stage = _compare_against(
+        rows,
+        budget_values,
+        system_names,
+        baseline="two_stage_v2",
+        candidates=dag_systems,
+        bootstrap_samples=bootstrap_samples,
+        seed=seed,
+        seed_offset=10000,
+    )
 
     return {
         "dataset": dataset,
@@ -81,7 +124,8 @@ def run(
         "budgets": {
             key: {
                 "systems": metrics[key],
-                "comparisons_vs_append": comparisons[key],
+                "comparisons_vs_append": comparisons_vs_append[key],
+                "comparisons_vs_two_stage_v2": comparisons_vs_two_stage[key],
             }
             for key in metrics
         },

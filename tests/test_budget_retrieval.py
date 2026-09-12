@@ -1,3 +1,4 @@
+from progression_memory.benchmarks import budget_retrieval
 from progression_memory.evaluation.retrieval import (
     RetrievalDocument,
     RetrievalQuery,
@@ -9,18 +10,10 @@ from progression_memory.evaluation.statistics import exact_mcnemar, paired_boots
 
 def _query() -> RetrievalQuery:
     docs = (
-        RetrievalDocument(
-            id="d1", text="target target target", evidence_ids=frozenset({"x"})
-        ),
+        RetrievalDocument(id="d1", text="target target target", evidence_ids=frozenset({"x"})),
         RetrievalDocument(id="d2", text="target", evidence_ids=frozenset({"e"})),
     )
-    return RetrievalQuery(
-        id="q",
-        text="target",
-        evidence_ids=frozenset({"e"}),
-        documents=docs,
-        category="test",
-    )
+    return RetrievalQuery(id="q", text="target", evidence_ids=frozenset({"e"}), documents=docs, category="test")
 
 
 def test_mrr_is_truncated_at_cutoff() -> None:
@@ -31,16 +24,8 @@ def test_mrr_is_truncated_at_cutoff() -> None:
 
 def test_character_budget_is_strict_ranked_prefix() -> None:
     doc = RetrievalDocument(id="e", text="target", evidence_ids=frozenset({"e"}))
-    query = RetrievalQuery(
-        id="q",
-        text="target",
-        evidence_ids=frozenset({"e"}),
-        documents=(doc,),
-        category="x",
-    )
-    result = evaluate_retrieval_by_char_budget(
-        [query], [5, 6], include_per_query=True
-    )
+    query = RetrievalQuery(id="q", text="target", evidence_ids=frozenset({"e"}), documents=(doc,), category="x")
+    result = evaluate_retrieval_by_char_budget([query], [5, 6], include_per_query=True)
     assert result["budgets"]["5"]["macro_evidence_recall"] == 0.0
     assert result["budgets"]["5"]["avg_retrieved_chars"] == 0.0
     assert result["budgets"]["6"]["macro_evidence_recall"] == 1.0
@@ -63,3 +48,16 @@ def test_exact_mcnemar_counts_discordant_pairs() -> None:
     assert result["candidate_improved"] == 3
     assert result["candidate_regressed"] == 0
     assert result["exact_two_sided_p"] == 0.25
+
+
+def test_budget_report_compares_dag_directly_against_flat_two_stage(monkeypatch) -> None:
+    raw_doc = RetrievalDocument(id="d", text="target", evidence_ids=frozenset({"e"}))
+    query = RetrievalQuery(id="q", text="target", evidence_ids=frozenset({"e"}), documents=(raw_doc,), category="test")
+    monkeypatch.setattr(budget_retrieval, "_load_queries", lambda *_: [query])
+    monkeypatch.setattr(budget_retrieval, "_transform_queries", lambda queries, system: (queries, {"system": system}))
+    result = budget_retrieval.run(
+        "locomo", "unused", [100], systems=("append", "two_stage_v2", "dag_two_stage_v2"), bootstrap_samples=10
+    )
+    budget = result["budgets"]["100"]
+    assert "dag_two_stage_v2" in budget["comparisons_vs_append"]
+    assert "dag_two_stage_v2" in budget["comparisons_vs_two_stage_v2"]

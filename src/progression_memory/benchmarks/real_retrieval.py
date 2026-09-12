@@ -4,7 +4,10 @@ import argparse
 import json
 from pathlib import Path
 
-from progression_memory.evaluation.dag_retrieval import build_dag_two_stage_queries
+from progression_memory.evaluation.dag_retrieval import (
+    build_dag_two_stage_queries,
+    build_dag_two_stage_v2_queries,
+)
 from progression_memory.evaluation.datasets import load_locomo, load_longmemeval
 from progression_memory.evaluation.progressions import build_progression_documents
 from progression_memory.evaluation.retrieval import RetrievalQuery, evaluate_retrieval
@@ -18,6 +21,7 @@ SYSTEMS = (
     "adaptive_progression_v2",
     "two_stage_v2",
     "dag_two_stage_v1",
+    "dag_two_stage_v2",
 )
 
 
@@ -43,6 +47,8 @@ def _transform_queries(
         return build_two_stage_queries(queries)
     if system == "dag_two_stage_v1":
         return build_dag_two_stage_queries(queries)
+    if system == "dag_two_stage_v2":
+        return build_dag_two_stage_v2_queries(queries)
 
     if system == "progression_only":
         mode = "flat"
@@ -85,7 +91,9 @@ def _transform_queries(
     }
     if stat_rows and "avg_segment_size" in stat_rows[0]:
         result["avg_segment_size"] = avg("avg_segment_size")
-        result["avg_single_event_segment_fraction"] = avg("single_event_segment_fraction")
+        result["avg_single_event_segment_fraction"] = avg(
+            "single_event_segment_fraction"
+        )
     return transformed, result
 
 
@@ -109,7 +117,7 @@ def run(
     result = evaluate_retrieval(transformed, cutoffs)
     if system == "append":
         granularity = base_granularity
-    elif system in {"two_stage_v2", "dag_two_stage_v1"}:
+    elif system in {"two_stage_v2", "dag_two_stage_v1", "dag_two_stage_v2"}:
         granularity = f"{base_granularity}_after_structural_filter"
     else:
         granularity = "progression_segment"
