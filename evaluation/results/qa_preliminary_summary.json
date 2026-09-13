@@ -1,0 +1,57 @@
+{
+  "architecture": "end_to_end_qa_pipeline_v1",
+  "implementation_commits": [
+    "f4456e6890b7212df3852356cc6e63cf59ed4858",
+    "c426af25b1fe16724454e948a1af1d900ba69164",
+    "95781a65075133fa88cf296fd9bd752828033e87",
+    "3af82de3c2446f34f614158ec8fb3807837628a5"
+  ],
+  "benchmark_run": 34736775986,
+  "reader": "extractive_bm25",
+  "warning": "This is a deterministic extractive-reader ablation, not the official LLM-reader/LLM-judge QA score used by LongMemEval or the published memory papers.",
+  "locomo": {
+    "sample_size": 180,
+    "char_budget": 4800,
+    "append": {
+      "answer_contains": 0.022222222222222223,
+      "token_f1": 0.03247015757055445,
+      "retrieval_recall": 0.6021320346320347,
+      "avg_context_chars": 4718.083333333333
+    },
+    "two_stage_v2": {
+      "answer_contains": 0.022222222222222223,
+      "token_f1": 0.03266656610029631,
+      "retrieval_recall": 0.5958820346320347,
+      "avg_context_chars": 4682.905555555555
+    },
+    "dag_two_stage_v2": {
+      "answer_contains": 0.022222222222222223,
+      "token_f1": 0.03266656610029631,
+      "retrieval_recall": 0.6090301827801828,
+      "avg_context_chars": 4702.422222222222
+    }
+  },
+  "longmemeval": {
+    "sample_size": 180,
+    "char_budget": 100000,
+    "append": {
+      "answer_contains": 0.17222222222222222,
+      "token_f1": 0.09315761565594806,
+      "retrieval_recall": 0.8732407407407407,
+      "avg_context_chars": 92921.00555555556
+    },
+    "two_stage_v2": {
+      "answer_contains": 0.16666666666666666,
+      "token_f1": 0.09060287729233014,
+      "retrieval_recall": 0.8707407407407408,
+      "avg_context_chars": 93297.36666666667
+    },
+    "dag_two_stage_v2": {
+      "answer_contains": 0.17222222222222222,
+      "token_f1": 0.09313564673153607,
+      "retrieval_recall": 0.8707407407407408,
+      "avg_context_chars": 93346.42222222222
+    }
+  },
+  "interpretation": "The pipeline is functioning and exports official-format LongMemEval hypotheses. Under the deliberately weak extractive reader, final QA is reader-limited and the three memory systems are nearly tied. DAG-v2 slightly improves LoCoMo evidence recall on the stratified sample, but a real LLM reader and the official LongMemEval judge are required before comparing against published TiMem/TSM/HeLa QA scores."
+}
