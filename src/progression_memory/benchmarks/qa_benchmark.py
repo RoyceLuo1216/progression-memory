@@ -23,6 +23,7 @@ QA_SYSTEMS = (
     "two_stage_v2",
     "dag_two_stage_v1",
     "dag_two_stage_v2",
+    "hierarchical_beam_v2",
 )
 QA_READERS = ("extractive_bm25", "multi_evidence_extractive")
 CONTEXT_STRATEGIES = ("flat", "evidence_pack")
@@ -36,22 +37,17 @@ def _load(dataset: str, path: str) -> list[RetrievalQuery]:
     raise ValueError(dataset)
 
 
-def _stable_sample(
-    queries: list[RetrievalQuery],
-    sample_size: int | None,
-) -> list[RetrievalQuery]:
+def _stable_sample(queries: list[RetrievalQuery], sample_size: int | None) -> list[RetrievalQuery]:
     if sample_size is None or sample_size >= len(queries):
         return queries
     if sample_size < 1:
         raise ValueError("sample_size must be positive")
-
     by_category: defaultdict[str, list[RetrievalQuery]] = defaultdict(list)
     for query in queries:
         by_category[query.category].append(query)
     categories = sorted(by_category)
     for rows in by_category.values():
         rows.sort(key=lambda query: hashlib.sha256(query.id.encode("utf-8")).hexdigest())
-
     selected: list[RetrievalQuery] = []
     cursor = {category: 0 for category in categories}
     while len(selected) < sample_size:
@@ -78,18 +74,10 @@ def _reader(name: str):
     raise ValueError(f"unsupported reader: {name}")
 
 
-def run(
-    dataset: str,
-    data_path: str,
-    *,
-    systems: tuple[str, ...] = QA_SYSTEMS,
-    top_k: int | None = None,
-    char_budget: int | None = None,
-    sample_size: int | None = None,
-    hypotheses_dir: str | None = None,
-    reader_name: str = "extractive_bm25",
-    context_strategy: str = "flat",
-) -> dict[str, object]:
+def run(dataset: str, data_path: str, *, systems: tuple[str, ...] = QA_SYSTEMS,
+        top_k: int | None = None, char_budget: int | None = None,
+        sample_size: int | None = None, hypotheses_dir: str | None = None,
+        reader_name: str = "extractive_bm25", context_strategy: str = "flat") -> dict[str, object]:
     unknown = [system for system in systems if system not in QA_SYSTEMS]
     if unknown:
         raise ValueError(f"unsupported QA systems: {unknown}")
@@ -97,15 +85,9 @@ def run(
         raise ValueError(f"unsupported QA reader: {reader_name}")
     if context_strategy not in CONTEXT_STRATEGIES:
         raise ValueError(f"unsupported context strategy: {context_strategy}")
-
     base_queries = _stable_sample(_load(dataset, data_path), sample_size)
     reader = _reader(reader_name)
-    config = QARunConfig(
-        top_k=top_k,
-        char_budget=char_budget,
-        context_strategy=context_strategy,
-    )
-
+    config = QARunConfig(top_k=top_k, char_budget=char_budget, context_strategy=context_strategy)
     results: dict[str, object] = {}
     for system in systems:
         transformed, corpus_stats = _transform_queries(base_queries, system)
@@ -114,26 +96,13 @@ def run(
         qa["corpus_stats"] = corpus_stats
         results[system] = qa
         if hypotheses_dir and dataset == "longmemeval":
-            write_longmemeval_hypotheses(
-                qa,
-                Path(hypotheses_dir) / f"{system}.{reader.name}.{context_strategy}.jsonl",
-            )
-
+            write_longmemeval_hypotheses(qa, Path(hypotheses_dir) / f"{system}.{reader.name}.{context_strategy}.jsonl")
     return {
-        "dataset": dataset,
-        "reader": reader.name,
-        "sample_size": len(base_queries),
+        "dataset": dataset, "reader": reader.name, "sample_size": len(base_queries),
         "systems": list(systems),
-        "context_policy": {
-            "top_k": top_k,
-            "char_budget": char_budget,
-            "context_strategy": context_strategy,
-        },
+        "context_policy": {"top_k": top_k, "char_budget": char_budget, "context_strategy": context_strategy},
         "results": results,
-        "note": (
-            "Deterministic reader/context ablation. Not directly comparable to "
-            "published LLM-reader / LLM-judge QA accuracy."
-        ),
+        "note": "Deterministic reader/context ablation. Not directly comparable to published LLM-reader / LLM-judge QA accuracy.",
     }
 
 
@@ -150,18 +119,10 @@ def main() -> None:
     parser.add_argument("--context-strategy", choices=CONTEXT_STRATEGIES, default="flat")
     parser.add_argument("--output")
     args = parser.parse_args()
-
-    result = run(
-        args.dataset,
-        args.data_path,
-        systems=tuple(value for value in args.systems.split(",") if value),
-        top_k=args.top_k,
-        char_budget=args.char_budget,
-        sample_size=args.sample_size,
-        hypotheses_dir=args.hypotheses_dir,
-        reader_name=args.reader,
-        context_strategy=args.context_strategy,
-    )
+    result = run(args.dataset, args.data_path, systems=tuple(v for v in args.systems.split(",") if v),
+                 top_k=args.top_k, char_budget=args.char_budget, sample_size=args.sample_size,
+                 hypotheses_dir=args.hypotheses_dir, reader_name=args.reader,
+                 context_strategy=args.context_strategy)
     payload = json.dumps(result, indent=2, sort_keys=True)
     print(payload)
     if args.output:
