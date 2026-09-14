@@ -37,35 +37,34 @@ jobs:
           mkdir -p evaluation/data evaluation/results/ci
           wget -q https://raw.githubusercontent.com/snap-research/locomo/main/data/locomo10.json -O evaluation/data/locomo10.json
           wget -q https://huggingface.co/datasets/xiaowu0162/longmemeval-cleaned/resolve/main/longmemeval_s_cleaned.json -O evaluation/data/longmemeval_s_cleaned.json
-      - name: Benchmark top-k hierarchy ablations
+      - name: Benchmark top-k hierarchy v2
         run: |
-          for system in two_stage_v2 dag_two_stage_v2 hierarchical_beam_v1; do
+          for dataset in locomo longmemeval; do
+            if [ "$dataset" = "locomo" ]; then
+              data_path=evaluation/data/locomo10.json
+            else
+              data_path=evaluation/data/longmemeval_s_cleaned.json
+            fi
             python -m progression_memory.benchmarks.real_retrieval \
-              --dataset locomo \
-              --data-path evaluation/data/locomo10.json \
-              --system "$system" \
+              --dataset "$dataset" \
+              --data-path "$data_path" \
+              --system hierarchical_beam_v2 \
               --top-k 5,8,10 \
-              --output "evaluation/results/ci/locomo_${system}.json"
-            python -m progression_memory.benchmarks.real_retrieval \
-              --dataset longmemeval \
-              --data-path evaluation/data/longmemeval_s_cleaned.json \
-              --system "$system" \
-              --top-k 5,8,10 \
-              --output "evaluation/results/ci/longmemeval_${system}.json"
+              --output "evaluation/results/ci/${dataset}_hierarchical_beam_v2.json"
           done
       - name: Benchmark equal character budgets
         run: |
           python -m progression_memory.benchmarks.budget_retrieval \
             --dataset locomo \
             --data-path evaluation/data/locomo10.json \
-            --systems append,two_stage_v2,dag_two_stage_v2,hierarchical_beam_v1 \
+            --systems append,two_stage_v2,dag_two_stage_v2,hierarchical_beam_v2 \
             --char-budgets 1200,2400,4800 \
             --bootstrap-samples 2000 \
             --output evaluation/results/ci/locomo_budget_matched.json
           python -m progression_memory.benchmarks.budget_retrieval \
             --dataset longmemeval \
             --data-path evaluation/data/longmemeval_s_cleaned.json \
-            --systems append,two_stage_v2,dag_two_stage_v2,hierarchical_beam_v1 \
+            --systems append,two_stage_v2,dag_two_stage_v2,hierarchical_beam_v2 \
             --char-budgets 100000,150000,200000 \
             --bootstrap-samples 2000 \
             --output evaluation/results/ci/longmemeval_budget_matched.json
