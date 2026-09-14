@@ -16,6 +16,7 @@ on:
       - 'tests/test_two_stage_retrieval.py'
       - 'tests/test_progression_graph.py'
       - 'tests/test_dag_retrieval.py'
+      - 'tests/test_hierarchical_retrieval.py'
       - '.github/workflows/retrieval-benchmarks.yml'
 
 jobs:
@@ -38,7 +39,7 @@ jobs:
           wget -q https://huggingface.co/datasets/xiaowu0162/longmemeval-cleaned/resolve/main/longmemeval_s_cleaned.json -O evaluation/data/longmemeval_s_cleaned.json
       - name: Benchmark top-k hierarchy ablations
         run: |
-          for system in two_stage_v2 dag_two_stage_v1 dag_two_stage_v2; do
+          for system in two_stage_v2 dag_two_stage_v2 hierarchical_beam_v1; do
             python -m progression_memory.benchmarks.real_retrieval \
               --dataset locomo \
               --data-path evaluation/data/locomo10.json \
@@ -57,14 +58,14 @@ jobs:
           python -m progression_memory.benchmarks.budget_retrieval \
             --dataset locomo \
             --data-path evaluation/data/locomo10.json \
-            --systems append,two_stage_v2,dag_two_stage_v1,dag_two_stage_v2 \
+            --systems append,two_stage_v2,dag_two_stage_v2,hierarchical_beam_v1 \
             --char-budgets 1200,2400,4800 \
             --bootstrap-samples 2000 \
             --output evaluation/results/ci/locomo_budget_matched.json
           python -m progression_memory.benchmarks.budget_retrieval \
             --dataset longmemeval \
             --data-path evaluation/data/longmemeval_s_cleaned.json \
-            --systems append,two_stage_v2,dag_two_stage_v1,dag_two_stage_v2 \
+            --systems append,two_stage_v2,dag_two_stage_v2,hierarchical_beam_v1 \
             --char-budgets 100000,150000,200000 \
             --bootstrap-samples 2000 \
             --output evaluation/results/ci/longmemeval_budget_matched.json

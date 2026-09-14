@@ -9,6 +9,7 @@ from progression_memory.evaluation.dag_retrieval import (
     build_dag_two_stage_v2_queries,
 )
 from progression_memory.evaluation.datasets import load_locomo, load_longmemeval
+from progression_memory.evaluation.hierarchical_retrieval import build_hierarchical_beam_queries
 from progression_memory.evaluation.progressions import build_progression_documents
 from progression_memory.evaluation.retrieval import RetrievalQuery, evaluate_retrieval
 from progression_memory.evaluation.two_stage import build_two_stage_queries
@@ -22,6 +23,7 @@ SYSTEMS = (
     "two_stage_v2",
     "dag_two_stage_v1",
     "dag_two_stage_v2",
+    "hierarchical_beam_v1",
 )
 
 
@@ -49,6 +51,8 @@ def _transform_queries(
         return build_dag_two_stage_queries(queries)
     if system == "dag_two_stage_v2":
         return build_dag_two_stage_v2_queries(queries)
+    if system == "hierarchical_beam_v1":
+        return build_hierarchical_beam_queries(queries)
 
     if system == "progression_only":
         mode = "flat"
@@ -117,7 +121,7 @@ def run(
     result = evaluate_retrieval(transformed, cutoffs)
     if system == "append":
         granularity = base_granularity
-    elif system in {"two_stage_v2", "dag_two_stage_v1", "dag_two_stage_v2"}:
+    elif system in {"two_stage_v2", "dag_two_stage_v1", "dag_two_stage_v2", "hierarchical_beam_v1"}:
         granularity = f"{base_granularity}_after_structural_filter"
     else:
         granularity = "progression_segment"
