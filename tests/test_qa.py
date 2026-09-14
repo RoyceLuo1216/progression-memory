@@ -130,7 +130,7 @@ def test_multi_evidence_reader_can_return_multiple_sources() -> None:
         ),
     )
     answer = MultiEvidenceExtractiveReader(max_spans=4).answer(
-        "Which cities did I visit?", context
+        "Which cities were visited?", context
     )
     assert "Montreal" in answer
     assert "Vancouver" in answer
