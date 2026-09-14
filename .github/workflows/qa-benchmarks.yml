@@ -31,33 +31,57 @@ jobs:
           mkdir -p evaluation/data evaluation/results/qa evaluation/results/qa/hypotheses
           wget -q https://raw.githubusercontent.com/snap-research/locomo/main/data/locomo10.json -O evaluation/data/locomo10.json
           wget -q https://huggingface.co/datasets/xiaowu0162/longmemeval-cleaned/resolve/main/longmemeval_s_cleaned.json -O evaluation/data/longmemeval_s_cleaned.json
-      - name: Run LoCoMo QA ablation
+      - name: Run LoCoMo QA architecture ablations
         run: |
           python -m progression_memory.benchmarks.qa_benchmark \
-            --dataset locomo \
-            --data-path evaluation/data/locomo10.json \
+            --dataset locomo --data-path evaluation/data/locomo10.json \
             --systems append,two_stage_v2,dag_two_stage_v2 \
-            --char-budget 4800 \
-            --sample-size 180 \
-            --output evaluation/results/qa/locomo_qa.json
-      - name: Run LongMemEval QA ablation
+            --char-budget 4800 --sample-size 180 \
+            --reader extractive_bm25 --context-strategy flat \
+            --output evaluation/results/qa/locomo_flat_single.json
+          python -m progression_memory.benchmarks.qa_benchmark \
+            --dataset locomo --data-path evaluation/data/locomo10.json \
+            --systems append,two_stage_v2,dag_two_stage_v2 \
+            --char-budget 4800 --sample-size 180 \
+            --reader multi_evidence_extractive --context-strategy flat \
+            --output evaluation/results/qa/locomo_flat_multi.json
+          python -m progression_memory.benchmarks.qa_benchmark \
+            --dataset locomo --data-path evaluation/data/locomo10.json \
+            --systems append,two_stage_v2,dag_two_stage_v2 \
+            --char-budget 4800 --sample-size 180 \
+            --reader multi_evidence_extractive --context-strategy evidence_pack \
+            --output evaluation/results/qa/locomo_pack_multi.json
+      - name: Run LongMemEval QA architecture ablations
         run: |
           python -m progression_memory.benchmarks.qa_benchmark \
-            --dataset longmemeval \
-            --data-path evaluation/data/longmemeval_s_cleaned.json \
+            --dataset longmemeval --data-path evaluation/data/longmemeval_s_cleaned.json \
             --systems append,two_stage_v2,dag_two_stage_v2 \
-            --char-budget 100000 \
-            --sample-size 180 \
+            --char-budget 100000 --sample-size 180 \
+            --reader extractive_bm25 --context-strategy flat \
             --hypotheses-dir evaluation/results/qa/hypotheses \
-            --output evaluation/results/qa/longmemeval_qa.json
+            --output evaluation/results/qa/longmemeval_flat_single.json
+          python -m progression_memory.benchmarks.qa_benchmark \
+            --dataset longmemeval --data-path evaluation/data/longmemeval_s_cleaned.json \
+            --systems append,two_stage_v2,dag_two_stage_v2 \
+            --char-budget 100000 --sample-size 180 \
+            --reader multi_evidence_extractive --context-strategy flat \
+            --hypotheses-dir evaluation/results/qa/hypotheses \
+            --output evaluation/results/qa/longmemeval_flat_multi.json
+          python -m progression_memory.benchmarks.qa_benchmark \
+            --dataset longmemeval --data-path evaluation/data/longmemeval_s_cleaned.json \
+            --systems append,two_stage_v2,dag_two_stage_v2 \
+            --char-budget 100000 --sample-size 180 \
+            --reader multi_evidence_extractive --context-strategy evidence_pack \
+            --hypotheses-dir evaluation/results/qa/hypotheses \
+            --output evaluation/results/qa/longmemeval_pack_multi.json
       - name: Print QA summaries
         run: |
           python - <<'PY'
           import json
           from pathlib import Path
-          for path in sorted(Path('evaluation/results/qa').glob('*_qa.json')):
+          for path in sorted(Path('evaluation/results/qa').glob('*.json')):
               data = json.loads(path.read_text())
-              print(f'=== {path} ===')
+              print(f'=== {path.name} reader={data["reader"]} strategy={data["context_policy"]["context_strategy"]} ===')
               for system, result in data['results'].items():
                   print(system, json.dumps(result['overall'], sort_keys=True))
           PY
