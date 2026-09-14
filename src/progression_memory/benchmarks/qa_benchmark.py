@@ -10,6 +10,7 @@ from progression_memory.benchmarks.real_retrieval import _transform_queries
 from progression_memory.evaluation.datasets import load_locomo, load_longmemeval
 from progression_memory.evaluation.qa import (
     ExtractiveBM25Reader,
+    MultiEvidenceExtractiveReader,
     QARunConfig,
     evaluate_qa,
     write_longmemeval_hypotheses,
@@ -23,6 +24,8 @@ QA_SYSTEMS = (
     "dag_two_stage_v1",
     "dag_two_stage_v2",
 )
+QA_READERS = ("extractive_bm25", "multi_evidence_extractive")
+CONTEXT_STRATEGIES = ("flat", "evidence_pack")
 
 
 def _load(dataset: str, path: str) -> list[RetrievalQuery]:
@@ -67,6 +70,14 @@ def _stable_sample(
     return selected
 
 
+def _reader(name: str):
+    if name == "extractive_bm25":
+        return ExtractiveBM25Reader()
+    if name == "multi_evidence_extractive":
+        return MultiEvidenceExtractiveReader()
+    raise ValueError(f"unsupported reader: {name}")
+
+
 def run(
     dataset: str,
     data_path: str,
@@ -76,14 +87,24 @@ def run(
     char_budget: int | None = None,
     sample_size: int | None = None,
     hypotheses_dir: str | None = None,
+    reader_name: str = "extractive_bm25",
+    context_strategy: str = "flat",
 ) -> dict[str, object]:
     unknown = [system for system in systems if system not in QA_SYSTEMS]
     if unknown:
         raise ValueError(f"unsupported QA systems: {unknown}")
+    if reader_name not in QA_READERS:
+        raise ValueError(f"unsupported QA reader: {reader_name}")
+    if context_strategy not in CONTEXT_STRATEGIES:
+        raise ValueError(f"unsupported context strategy: {context_strategy}")
 
     base_queries = _stable_sample(_load(dataset, data_path), sample_size)
-    reader = ExtractiveBM25Reader()
-    config = QARunConfig(top_k=top_k, char_budget=char_budget)
+    reader = _reader(reader_name)
+    config = QARunConfig(
+        top_k=top_k,
+        char_budget=char_budget,
+        context_strategy=context_strategy,
+    )
 
     results: dict[str, object] = {}
     for system in systems:
@@ -95,7 +116,7 @@ def run(
         if hypotheses_dir and dataset == "longmemeval":
             write_longmemeval_hypotheses(
                 qa,
-                Path(hypotheses_dir) / f"{system}.jsonl",
+                Path(hypotheses_dir) / f"{system}.{reader.name}.{context_strategy}.jsonl",
             )
 
     return {
@@ -103,10 +124,14 @@ def run(
         "reader": reader.name,
         "sample_size": len(base_queries),
         "systems": list(systems),
-        "context_policy": {"top_k": top_k, "char_budget": char_budget},
+        "context_policy": {
+            "top_k": top_k,
+            "char_budget": char_budget,
+            "context_strategy": context_strategy,
+        },
         "results": results,
         "note": (
-            "Deterministic extractive-reader ablation. Not directly comparable to "
+            "Deterministic reader/context ablation. Not directly comparable to "
             "published LLM-reader / LLM-judge QA accuracy."
         ),
     }
@@ -121,6 +146,8 @@ def main() -> None:
     parser.add_argument("--char-budget", type=int)
     parser.add_argument("--sample-size", type=int)
     parser.add_argument("--hypotheses-dir")
+    parser.add_argument("--reader", choices=QA_READERS, default="extractive_bm25")
+    parser.add_argument("--context-strategy", choices=CONTEXT_STRATEGIES, default="flat")
     parser.add_argument("--output")
     args = parser.parse_args()
 
@@ -132,6 +159,8 @@ def main() -> None:
         char_budget=args.char_budget,
         sample_size=args.sample_size,
         hypotheses_dir=args.hypotheses_dir,
+        reader_name=args.reader,
+        context_strategy=args.context_strategy,
     )
     payload = json.dumps(result, indent=2, sort_keys=True)
     print(payload)
