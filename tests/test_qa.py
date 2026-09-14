@@ -2,10 +2,13 @@ import json
 
 from progression_memory.evaluation.qa import (
     ExtractiveBM25Reader,
+    MultiEvidenceExtractiveReader,
     QARunConfig,
     answer_contains,
     evaluate_qa,
     exact_match,
+    plan_query,
+    select_reader_context,
     token_f1,
     write_longmemeval_hypotheses,
 )
@@ -18,11 +21,13 @@ def _query() -> RetrievalQuery:
             id="d1",
             text="user: I adopted a beagle named Scout.",
             evidence_ids=frozenset({"d1"}),
+            timestamp="2026-01-01",
         ),
         RetrievalDocument(
             id="d2",
             text="assistant: The weather is sunny today.",
             evidence_ids=frozenset({"d2"}),
+            timestamp="2026-01-02",
         ),
     )
     return RetrievalQuery(
@@ -52,6 +57,83 @@ def test_extractive_reader_pipeline_tracks_retrieval_and_context() -> None:
     assert overall["retrieval_recall"] == 1.0
     assert overall["answer_contains"] == 1.0
     assert overall["avg_context_units"] == 1.0
+
+
+def test_context_budget_skips_oversized_document_instead_of_stopping() -> None:
+    query = RetrievalQuery(
+        id="q-budget",
+        text="Scout dog",
+        answer="Scout",
+        evidence_ids=frozenset({"small"}),
+        documents=(
+            RetrievalDocument(
+                id="large",
+                text="Scout dog " + "x" * 100,
+                evidence_ids=frozenset({"large"}),
+            ),
+            RetrievalDocument(
+                id="small",
+                text="Scout dog",
+                evidence_ids=frozenset({"small"}),
+            ),
+        ),
+        category="test",
+    )
+    context = select_reader_context(query, QARunConfig(char_budget=20))
+    assert [document.id for document in context] == ["small"]
+
+
+def test_evidence_pack_keeps_timestamp_and_source_provenance() -> None:
+    query = RetrievalQuery(
+        id="q-pack",
+        text="Where did Scout move?",
+        answer="Toronto",
+        evidence_ids=frozenset({"session-1"}),
+        documents=(
+            RetrievalDocument(
+                id="session-1",
+                text="We talked about dinner. Scout moved to Toronto. Then we discussed work.",
+                evidence_ids=frozenset({"session-1"}),
+                timestamp="2026-02-03",
+            ),
+        ),
+        category="single-session-user",
+    )
+    context = select_reader_context(
+        query,
+        QARunConfig(char_budget=200, context_strategy="evidence_pack"),
+    )
+    assert context
+    assert "[2026-02-03]" in context[0].text
+    assert context[0].metadata["source_document_id"] == "session-1"
+    assert context[0].evidence_ids == frozenset({"session-1"})
+
+
+def test_query_planner_marks_multi_evidence_and_update_queries() -> None:
+    assert plan_query("How many trips did I take in total?").needs_multiple_evidence
+    update = plan_query("What is my most recent job now?")
+    assert update.kind == "update"
+    assert update.prefer_recent
+
+
+def test_multi_evidence_reader_can_return_multiple_sources() -> None:
+    context = (
+        RetrievalDocument(
+            id="a",
+            text="I visited Montreal in May.",
+            evidence_ids=frozenset({"a"}),
+        ),
+        RetrievalDocument(
+            id="b",
+            text="I visited Vancouver in June.",
+            evidence_ids=frozenset({"b"}),
+        ),
+    )
+    answer = MultiEvidenceExtractiveReader(max_spans=4).answer(
+        "Which cities did I visit?", context
+    )
+    assert "Montreal" in answer
+    assert "Vancouver" in answer
 
 
 def test_longmemeval_hypothesis_export(tmp_path) -> None:
