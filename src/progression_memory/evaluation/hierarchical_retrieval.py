@@ -1,15 +1,10 @@
 from __future__ import annotations
 
-from collections import Counter, defaultdict
+from collections import Counter
 from dataclasses import dataclass
-import math
 
-from progression_memory.evaluation.dag_retrieval import (
-    _adaptive_candidate_limit,
-    _segment_indexes,
-)
+from progression_memory.evaluation.dag_retrieval import _adaptive_candidate_limit, _segment_indexes
 from progression_memory.evaluation.retrieval import BM25Index, RetrievalDocument, RetrievalQuery, tokenize
-from progression_memory.evaluation.two_stage import _sources_for_segment
 
 DEFAULT_BRANCH_FACTOR = 4
 DEFAULT_BEAM_WIDTH = 4
@@ -32,8 +27,7 @@ def _compact_terms(documents: list[RetrievalDocument], max_terms: int = DEFAULT_
     first_seen: dict[str, int] = {}
     offset = 0
     for document in documents:
-        seen = set(tokenize(document.text))
-        for token in seen:
+        for token in set(tokenize(document.text)):
             counts[token] += 1
             first_seen.setdefault(token, offset)
             offset += 1
@@ -42,25 +36,20 @@ def _compact_terms(documents: list[RetrievalDocument], max_terms: int = DEFAULT_
 
 
 def _node_similarity(left: HierarchyNode, right: HierarchyNode) -> float:
-    a = set(tokenize(left.text))
-    b = set(tokenize(right.text))
-    if not a or not b:
-        return 0.0
-    return len(a & b) / len(a | b)
+    a, b = set(tokenize(left.text)), set(tokenize(right.text))
+    return len(a & b) / len(a | b) if a and b else 0.0
 
 
-def _leaf_nodes(
-    by_progression: dict[str, list[RetrievalDocument]],
-) -> dict[str, HierarchyNode]:
+def _leaf_nodes(by_progression: dict[str, list[RetrievalDocument]]) -> dict[str, HierarchyNode]:
     return {
-        progression_id: HierarchyNode(
-            id=progression_id,
+        pid: HierarchyNode(
+            id=pid,
             level=0,
             text=_compact_terms(children),
             child_ids=tuple(child.id for child in children),
-            leaf_progression_ids=(progression_id,),
+            leaf_progression_ids=(pid,),
         )
-        for progression_id, children in sorted(by_progression.items())
+        for pid, children in sorted(by_progression.items())
     }
 
 
@@ -69,27 +58,21 @@ def _group_level(nodes: list[HierarchyNode], level: int, branch_factor: int) -> 
     groups: list[list[HierarchyNode]] = []
     while remaining:
         seed = remaining.pop(0)
-        ranked = sorted(
-            remaining,
-            key=lambda node: (-_node_similarity(seed, node), node.id),
-        )
-        companions = ranked[: max(0, branch_factor - 1)]
+        ranked = sorted(remaining, key=lambda node: (-_node_similarity(seed, node), node.id))
+        companions = ranked[: branch_factor - 1]
         companion_ids = {node.id for node in companions}
         remaining = [node for node in remaining if node.id not in companion_ids]
         groups.append([seed, *companions])
 
     parents: list[HierarchyNode] = []
     for index, group in enumerate(groups):
-        child_docs = [
-            RetrievalDocument(id=node.id, text=node.text, evidence_ids=frozenset())
-            for node in group
-        ]
+        docs = [RetrievalDocument(id=node.id, text=node.text, evidence_ids=frozenset()) for node in group]
         leaves = sorted({leaf for node in group for leaf in node.leaf_progression_ids})
         parents.append(
             HierarchyNode(
                 id=f"hierarchy:l{level}:{index}",
                 level=level,
-                text=_compact_terms(child_docs),
+                text=_compact_terms(docs),
                 child_ids=tuple(node.id for node in group),
                 leaf_progression_ids=tuple(leaves),
             )
@@ -103,20 +86,13 @@ def build_progression_hierarchy(
     branch_factor: int = DEFAULT_BRANCH_FACTOR,
     max_pillars: int = DEFAULT_MAX_PILLARS,
 ) -> tuple[dict[str, HierarchyNode], tuple[str, ...], int]:
-    """Build an inferred coarse-to-fine progression hierarchy.
-
-    Fine progressions are the leaves. Successive layers group semantically similar
-    progression nodes, producing durable coarse roots ("pillars"). The builder is
-    deterministic and evidence-free; explicit user-defined roots can later replace
-    the inferred top layer without changing traversal.
-    """
+    """Infer coarse user pillars above fine progression leaves."""
     if branch_factor < 2:
         raise ValueError("branch_factor must be at least 2")
     if max_pillars < 1:
         raise ValueError("max_pillars must be positive")
-
     leaves = _leaf_nodes(by_progression)
-    all_nodes: dict[str, HierarchyNode] = dict(leaves)
+    all_nodes = dict(leaves)
     current = list(leaves.values())
     level = 1
     while len(current) > max_pillars:
@@ -124,20 +100,18 @@ def build_progression_hierarchy(
         all_nodes.update({node.id: node for node in current})
         level += 1
     roots = tuple(node.id for node in current)
-    return all_nodes, roots, max((node.level for node in all_nodes.values()), default=0)
+    depth = max((node.level for node in all_nodes.values()), default=0)
+    return all_nodes, roots, depth
 
 
 def _children(nodes: dict[str, HierarchyNode], node: HierarchyNode) -> list[HierarchyNode]:
-    return [nodes[child_id] for child_id in node.child_ids if child_id in nodes]
+    return [nodes[node_id] for node_id in node.child_ids if node_id in nodes]
 
 
 def _score_nodes(query: str, nodes: list[HierarchyNode]) -> list[tuple[float, HierarchyNode]]:
     if not nodes:
         return []
-    docs = tuple(
-        RetrievalDocument(id=node.id, text=node.text, evidence_ids=frozenset())
-        for node in nodes
-    )
+    docs = tuple(RetrievalDocument(id=node.id, text=node.text, evidence_ids=frozenset()) for node in nodes)
     by_id = {node.id: node for node in nodes}
     return [(score, by_id[doc.id]) for score, doc in BM25Index(docs).score(query)]
 
@@ -149,13 +123,10 @@ def _query_is_broad(query: str) -> bool:
 
 def _query_is_temporal(query: str) -> bool:
     q = query.casefold()
-    return any(
-        cue in q
-        for cue in (
-            "when", "before", "after", "first", "last", "latest", "recent",
-            "currently", "now", "changed", "change", "progress", "over time",
-        )
-    )
+    return any(cue in q for cue in (
+        "when", "before", "after", "first", "last", "latest", "recent", "currently",
+        "now", "changed", "change", "progress", "over time",
+    ))
 
 
 def _beam_traverse(
@@ -164,12 +135,10 @@ def _beam_traverse(
     roots: tuple[str, ...],
     *,
     beam_width: int = DEFAULT_BEAM_WIDTH,
-) -> tuple[set[str], int, int]:
+) -> tuple[set[str], int]:
     frontier = [nodes[root_id] for root_id in roots]
     visited = 0
-    depth = 0
     broad = _query_is_broad(query)
-
     while frontier:
         scored = _score_nodes(query, frontier)
         visited += len(frontier)
@@ -177,32 +146,20 @@ def _beam_traverse(
         chosen = (positive or [node for _, node in scored])[:beam_width]
         if not chosen:
             break
-        depth = max(depth, max(node.level for node in chosen))
-
-        # Broad questions intentionally stop one abstraction layer above the leaves;
-        # the selected node then contributes all fine progressions beneath it.
         if broad and all(node.level <= 1 for node in chosen):
-            return {leaf for node in chosen for leaf in node.leaf_progression_ids}, visited, depth
-
+            return {leaf for node in chosen for leaf in node.leaf_progression_ids}, visited
         child_nodes = [child for node in chosen for child in _children(nodes, node)]
         if not child_nodes:
-            return {leaf for node in chosen for leaf in node.leaf_progression_ids}, visited, depth
+            return {leaf for node in chosen for leaf in node.leaf_progression_ids}, visited
         frontier = child_nodes
+    return set(), visited
 
-    return set(), visited, depth
 
-
-def _bottom_up_rescue(
-    query: str,
-    segment_indexes: tuple[RetrievalDocument, ...],
-    *,
-    anchors: int = DEFAULT_ANCHOR_RESCUE,
-) -> set[str]:
+def _bottom_up_rescue(query: str, segments: tuple[RetrievalDocument, ...], anchors: int) -> set[str]:
     rescued: set[str] = set()
-    for score, segment in BM25Index(segment_indexes).score(query)[:anchors]:
-        if score <= 0.0:
-            continue
-        rescued.add(str(segment.metadata.get("progression_id")))
+    for score, segment in BM25Index(segments).score(query)[:anchors]:
+        if score > 0.0:
+            rescued.add(str(segment.metadata.get("progression_id")))
     return rescued
 
 
@@ -220,28 +177,21 @@ def _temporal_anchor_expand(
     temporal = _query_is_temporal(query)
     selected: list[RetrievalDocument] = []
     selected_ids: set[str] = set()
-
     for score, anchor in ranked:
         if len(selected) >= candidate_limit:
             break
         if score <= 0.0 and selected:
             break
         pid = str(anchor.metadata.get("progression_id"))
-        siblings = by_progression.get(pid, [])
-        ordered = sorted(siblings, key=lambda doc: (doc.timestamp or "", doc.id))
-        try:
-            index = next(i for i, doc in enumerate(ordered) if doc.id == anchor.id)
-        except StopIteration:
-            index = 0
+        siblings = sorted(by_progression.get(pid, []), key=lambda doc: (doc.timestamp or "", doc.id))
+        index = next((i for i, doc in enumerate(siblings) if doc.id == anchor.id), 0)
         radius = 1 if temporal else 0
-        neighborhood = ordered[max(0, index - radius) : min(len(ordered), index + radius + 1)]
-        for segment in neighborhood:
+        for segment in siblings[max(0, index - radius): min(len(siblings), index + radius + 1)]:
             if segment.id not in selected_ids:
                 selected.append(segment)
                 selected_ids.add(segment.id)
                 if len(selected) >= candidate_limit:
                     break
-
     for _, segment in ranked:
         if len(selected) >= candidate_limit:
             break
@@ -259,73 +209,62 @@ def build_hierarchical_beam_queries(
     anchor_rescue: int = DEFAULT_ANCHOR_RESCUE,
     max_pillars: int = DEFAULT_MAX_PILLARS,
 ) -> tuple[list[RetrievalQuery], dict[str, object]]:
-    """Coarse-to-fine progression retrieval with bottom-up rescue and temporal expansion."""
-    cache: dict[int, tuple[tuple[RetrievalDocument, ...], dict[str, list[RetrievalDocument]], dict[str, HierarchyNode], tuple[str, ...], int, dict[str, float | int]]] = {}
+    """Coarse-to-fine beam traversal, leaf rescue, and temporal anchor expansion."""
+    cache: dict[int, tuple[tuple[RetrievalDocument, ...], dict[str, list[RetrievalDocument]], dict[str, HierarchyNode], tuple[str, ...], int]] = {}
     transformed: list[RetrievalQuery] = []
     visited_counts: list[int] = []
-    selected_progression_counts: list[int] = []
-    candidate_segment_counts: list[int] = []
-    candidate_source_counts: list[int] = []
-    stage1_coverages: list[float] = []
+    progression_counts: list[int] = []
+    segment_counts: list[int] = []
+    source_counts: list[int] = []
+    coverages: list[float] = []
 
     for query in queries:
         key = id(query.documents)
         if key not in cache:
-            segment_indexes, by_progression, base_stats = _segment_indexes(query.documents)
+            segments, by_progression, _ = _segment_indexes(query.documents)
             nodes, roots, depth = build_progression_hierarchy(
-                by_progression,
-                branch_factor=branch_factor,
-                max_pillars=max_pillars,
+                by_progression, branch_factor=branch_factor, max_pillars=max_pillars
             )
-            cache[key] = (segment_indexes, by_progression, nodes, roots, depth, base_stats)
-        segment_indexes, by_progression, nodes, roots, _, _ = cache[key]
+            cache[key] = (segments, by_progression, nodes, roots, depth)
+        segments, by_progression, nodes, roots, _ = cache[key]
 
-        routed, visited, _ = _beam_traverse(query.text, nodes, roots, beam_width=beam_width)
-        routed.update(_bottom_up_rescue(query.text, segment_indexes, anchors=anchor_rescue))
+        routed, visited = _beam_traverse(query.text, nodes, roots, beam_width=beam_width)
+        routed.update(_bottom_up_rescue(query.text, segments, anchor_rescue))
         if not routed:
             routed = set(by_progression)
-        candidate_limit = _adaptive_candidate_limit(len(segment_indexes))
         selected_segments = _temporal_anchor_expand(
             query.text,
             routed,
             by_progression,
-            candidate_limit=candidate_limit,
+            candidate_limit=_adaptive_candidate_limit(len(segments)),
         )
 
         sources: dict[str, RetrievalDocument] = {}
         candidate_evidence: set[str] = set()
         for segment in selected_segments:
-            for source in _sources_for_segment(segment, query.documents):
-                sources[source.id] = source
-                candidate_evidence.update(source.evidence_ids or {source.id})
-        source_tuple = tuple(sources.values())
-        final_docs = tuple(doc for _, doc in BM25Index(source_tuple).score(query.text)) if source_tuple else tuple()
+            for source in segment.metadata.get("source_documents", ()):
+                if isinstance(source, RetrievalDocument):
+                    sources.setdefault(source.id, source)
+                    candidate_evidence.update(source.evidence_ids or {source.id})
+        candidate_documents = tuple(sources.values()) or query.documents
+        final_docs = tuple(doc for _, doc in BM25Index(candidate_documents).score(query.text))
 
         visited_counts.append(visited)
-        selected_progression_counts.append(len(routed))
-        candidate_segment_counts.append(len(selected_segments))
-        candidate_source_counts.append(len(final_docs))
+        progression_counts.append(len(routed))
+        segment_counts.append(len(selected_segments))
+        source_counts.append(len(candidate_documents))
         if query.evidence_ids:
-            stage1_coverages.append(len(candidate_evidence & query.evidence_ids) / len(query.evidence_ids))
-
-        transformed.append(
-            RetrievalQuery(
-                id=query.id,
-                text=query.text,
-                answer=query.answer,
-                evidence_ids=query.evidence_ids,
-                documents=final_docs,
-                category=query.category,
-            )
-        )
+            coverages.append(len(candidate_evidence & query.evidence_ids) / len(query.evidence_ids))
+        transformed.append(RetrievalQuery(
+            id=query.id,
+            text=query.text,
+            answer=query.answer,
+            evidence_ids=query.evidence_ids,
+            documents=final_docs,
+            category=query.category,
+        ))
 
     corpora = list(cache.values())
-    depths = [row[4] for row in corpora]
-    pillar_counts = [len(row[3]) for row in corpora]
-    leaf_counts = [len(row[1]) for row in corpora]
-    node_counts = [len(row[2]) for row in corpora]
-    raw_chars = [sum(len(doc.text) for doc in queries_for_docs[0]) for queries_for_docs in []]
-
     stats: dict[str, object] = {
         "unique_corpora": len(cache),
         "hierarchy": "inferred_pillars->coarse_progressions->fine_progressions->temporal_segments",
@@ -333,15 +272,15 @@ def build_hierarchical_beam_queries(
         "beam_width": beam_width,
         "bottom_up_anchor_rescue": anchor_rescue,
         "max_pillars": max_pillars,
-        "avg_hierarchy_depth": sum(depths) / max(1, len(depths)),
-        "avg_pillars": sum(pillar_counts) / max(1, len(pillar_counts)),
-        "avg_leaf_progressions": sum(leaf_counts) / max(1, len(leaf_counts)),
-        "avg_hierarchy_nodes": sum(node_counts) / max(1, len(node_counts)),
+        "avg_hierarchy_depth": sum(row[4] for row in corpora) / max(1, len(corpora)),
+        "avg_pillars": sum(len(row[3]) for row in corpora) / max(1, len(corpora)),
+        "avg_leaf_progressions": sum(len(row[1]) for row in corpora) / max(1, len(corpora)),
+        "avg_hierarchy_nodes": sum(len(row[2]) for row in corpora) / max(1, len(corpora)),
         "avg_nodes_visited_per_query": sum(visited_counts) / max(1, len(visited_counts)),
-        "avg_selected_progressions": sum(selected_progression_counts) / max(1, len(selected_progression_counts)),
-        "avg_stage1_selected_units": sum(candidate_segment_counts) / max(1, len(candidate_segment_counts)),
-        "avg_candidate_source_documents": sum(candidate_source_counts) / max(1, len(candidate_source_counts)),
-        "avg_stage1_evidence_coverage": sum(stage1_coverages) / max(1, len(stage1_coverages)),
+        "avg_selected_progressions": sum(progression_counts) / max(1, len(progression_counts)),
+        "avg_stage1_selected_units": sum(segment_counts) / max(1, len(segment_counts)),
+        "avg_candidate_source_documents": sum(source_counts) / max(1, len(source_counts)),
+        "avg_stage1_evidence_coverage": sum(coverages) / max(1, len(coverages)),
         "query_dependent_stopping": True,
         "temporal_anchor_expansion": True,
     }
