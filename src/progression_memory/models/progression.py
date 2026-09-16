@@ -12,8 +12,22 @@ class StorageTier(StrEnum):
     COLD = "cold"
 
 
+class ProgressionStateCheckpoint(BaseModel):
+    """Evidence-backed posterior state of a progression after an update."""
+
+    episode_id: str
+    timestamp: datetime
+    prior_state: str = ""
+    evidence: str
+    posterior_state: str
+    prior_embedding: list[float] | None = None
+    posterior_embedding: list[float] | None = None
+    delta_embedding: list[float] | None = None
+    confidence: float = 1.0
+
+
 class Progression(BaseModel):
-    """Persistent synopsis of an evolving user process or life area."""
+    """Persistent, recursively conditioned state of an evolving user process."""
 
     id: str
     title: str
@@ -26,7 +40,6 @@ class Progression(BaseModel):
     start_time: datetime | None = None
     last_updated_time: datetime | None = None
 
-    # Derived / recomputable statistics.
     activity: float = 0.0
     volatility: float = 0.0
     continuity: float = 0.0
@@ -44,6 +57,8 @@ class Progression(BaseModel):
     child_ids: list[str] = Field(default_factory=list)
 
     embedding: list[float] | None = None
+    state_embedding: list[float] | None = None
+    state_history: list[ProgressionStateCheckpoint] = Field(default_factory=list)
     storage_tier: StorageTier = StorageTier.HOT
 
     evidence_version: str | None = None
