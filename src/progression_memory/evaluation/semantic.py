@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from functools import lru_cache
 from typing import Protocol, Sequence
 
@@ -18,9 +18,20 @@ class TextEmbedder(Protocol):
 
 @dataclass
 class SentenceTransformerEmbedder:
-    """Lazy sentence-transformer adapter used by semantic retrieval experiments."""
+    """Lazy sentence-transformer adapter with a run-local text embedding cache.
+
+    Retrieval V3 reuses the same corpus text at progression construction, hierarchy,
+    branch ranking, global rescue, and final reranking. Caching by exact text makes
+    those later stages cheap instead of repeatedly running the transformer for every
+    query. The cache lives for the benchmark process and therefore does not change
+    retrieval semantics.
+    """
 
     model_name: str = "sentence-transformers/all-MiniLM-L6-v2"
+    batch_size: int = 128
+    _cache: dict[str, np.ndarray] = field(default_factory=dict, init=False, repr=False)
+    cache_hits: int = field(default=0, init=False)
+    cache_misses: int = field(default=0, init=False)
 
     @property
     def model(self):
@@ -33,10 +44,36 @@ class SentenceTransformerEmbedder:
     def encode(self, texts: Sequence[str]) -> np.ndarray:
         if not texts:
             return np.empty((0, self.dimension), dtype=np.float32)
-        values = self.model.encode(
-            list(texts), normalize_embeddings=True, convert_to_numpy=True, show_progress_bar=False
-        )
-        return np.asarray(values, dtype=np.float32)
+
+        # Deduplicate misses before invoking the model. This is especially important
+        # for candidate subsets, whose documents have already been embedded globally.
+        missing: list[str] = []
+        seen_missing: set[str] = set()
+        for text in texts:
+            if text in self._cache:
+                self.cache_hits += 1
+            elif text not in seen_missing:
+                missing.append(text)
+                seen_missing.add(text)
+
+        if missing:
+            values = self.model.encode(
+                missing,
+                batch_size=self.batch_size,
+                normalize_embeddings=True,
+                convert_to_numpy=True,
+                show_progress_bar=False,
+            )
+            values = np.asarray(values, dtype=np.float32)
+            for text, value in zip(missing, values, strict=True):
+                self._cache[text] = value
+            self.cache_misses += len(missing)
+
+        return np.stack([self._cache[text] for text in texts]).astype(np.float32, copy=False)
+
+    @property
+    def cache_size(self) -> int:
+        return len(self._cache)
 
 
 @lru_cache(maxsize=4)
