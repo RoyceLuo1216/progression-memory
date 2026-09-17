@@ -6,73 +6,45 @@ on:
     branches: [master]
     paths:
       - 'src/progression_memory/evaluation/**'
+      - 'src/progression_memory/maintenance/**'
       - 'src/progression_memory/storage/**'
       - 'src/progression_memory/temporal/**'
       - 'src/progression_memory/benchmarks/real_retrieval.py'
-      - 'src/progression_memory/benchmarks/budget_retrieval.py'
-      - 'tests/test_real_retrieval.py'
-      - 'tests/test_budget_retrieval.py'
-      - 'tests/test_temporal_segmentation.py'
-      - 'tests/test_two_stage_retrieval.py'
-      - 'tests/test_progression_graph.py'
-      - 'tests/test_dag_retrieval.py'
-      - 'tests/test_hierarchical_retrieval.py'
+      - 'tests/**'
       - '.github/workflows/retrieval-benchmarks.yml'
 
 jobs:
   benchmark:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 90
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - name: Install package
-        run: pip install -e .[dev]
+      - name: Install package with semantic retrieval
+        run: pip install -e '.[dev,semantic]'
       - name: Run tests
         run: pytest -q
-      - name: Download public benchmarks
+      - name: Download LoCoMo
         run: |
           mkdir -p evaluation/data evaluation/results/ci
           wget -q https://raw.githubusercontent.com/snap-research/locomo/main/data/locomo10.json -O evaluation/data/locomo10.json
-          wget -q https://huggingface.co/datasets/xiaowu0162/longmemeval-cleaned/resolve/main/longmemeval_s_cleaned.json -O evaluation/data/longmemeval_s_cleaned.json
-      - name: Benchmark top-k hierarchy v2
+      - name: Benchmark LoCoMo V2 and semantic V3
         run: |
-          for dataset in locomo longmemeval; do
-            if [ "$dataset" = "locomo" ]; then
-              data_path=evaluation/data/locomo10.json
-            else
-              data_path=evaluation/data/longmemeval_s_cleaned.json
-            fi
+          for system in hierarchical_beam_v2 hierarchical_beam_v3; do
             python -m progression_memory.benchmarks.real_retrieval \
-              --dataset "$dataset" \
-              --data-path "$data_path" \
-              --system hierarchical_beam_v2 \
+              --dataset locomo \
+              --data-path evaluation/data/locomo10.json \
+              --system "$system" \
               --top-k 5,8,10 \
-              --output "evaluation/results/ci/${dataset}_hierarchical_beam_v2.json"
+              --output "evaluation/results/ci/locomo_${system}.json"
           done
-      - name: Benchmark equal character budgets
-        run: |
-          python -m progression_memory.benchmarks.budget_retrieval \
-            --dataset locomo \
-            --data-path evaluation/data/locomo10.json \
-            --systems append,two_stage_v2,dag_two_stage_v2,hierarchical_beam_v2 \
-            --char-budgets 1200,2400,4800 \
-            --bootstrap-samples 2000 \
-            --output evaluation/results/ci/locomo_budget_matched.json
-          python -m progression_memory.benchmarks.budget_retrieval \
-            --dataset longmemeval \
-            --data-path evaluation/data/longmemeval_s_cleaned.json \
-            --systems append,two_stage_v2,dag_two_stage_v2,hierarchical_beam_v2 \
-            --char-budgets 100000,150000,200000 \
-            --bootstrap-samples 2000 \
-            --output evaluation/results/ci/longmemeval_budget_matched.json
       - name: Print result files
         run: |
           for result in evaluation/results/ci/*.json; do
             echo "=== ${result} ==="
-            python -c 'import json,sys; d=json.load(open(sys.argv[1])); print(json.dumps(d, sort_keys=True)[:12000])' "$result"
+            cat "$result"
           done
       - uses: actions/upload-artifact@v4
         with:
