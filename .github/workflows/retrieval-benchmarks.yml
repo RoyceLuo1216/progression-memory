@@ -10,6 +10,7 @@ on:
       - 'src/progression_memory/storage/**'
       - 'src/progression_memory/temporal/**'
       - 'src/progression_memory/benchmarks/real_retrieval.py'
+      - 'src/progression_memory/benchmarks/locomo_failure_analysis.py'
       - 'tests/**'
       - '.github/workflows/retrieval-benchmarks.yml'
 
@@ -39,6 +40,15 @@ jobs:
               --system "$system" \
               --top-k 5,8,10 \
               --output "evaluation/results/ci/locomo_${system}.json"
+          done
+      - name: Diagnose stage-wise LoCoMo failures
+        run: |
+          for system in hierarchical_beam_v2 hierarchical_beam_v3; do
+            python -m progression_memory.benchmarks.locomo_failure_analysis \
+              --data-path evaluation/data/locomo10.json \
+              --system "$system" \
+              --top-k 8 \
+              --output "evaluation/results/ci/locomo_${system}_failure_analysis.json"
           done
       - name: Print result files
         run: |
