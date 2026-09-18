@@ -166,6 +166,12 @@ def build_progression_documents(
                 metadata={"progression_id": progression.id, "segment_size": len(segment.episode_ids), "mode": mode,
                           "embedding_backend": getattr(embedder, "model_name", "hashed") if embedder else "hashed",
                           "progression_state": progression.current_state,
+                          "progression_identity": progression.high_level_summary or progression.title,
+                          "segment_state_before": segment.state_before,
+                          "segment_state_after": segment.state_after,
+                          "segment_delta": segment.delta,
+                          "state_embedding": segment.state_embedding,
+                          "delta_embedding": segment.delta_embedding,
                           "state_update_count": len(progression.state_history)},
             ))
 
