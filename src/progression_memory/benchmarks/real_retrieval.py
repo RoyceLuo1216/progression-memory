@@ -12,6 +12,7 @@ from progression_memory.evaluation.datasets import load_locomo, load_longmemeval
 from progression_memory.evaluation.hierarchical_retrieval import build_hierarchical_beam_queries
 from progression_memory.evaluation.hierarchical_retrieval_v2 import build_hierarchical_beam_v2_queries
 from progression_memory.evaluation.hierarchical_retrieval_v3 import build_hierarchical_beam_v3_queries
+from progression_memory.evaluation.hierarchical_retrieval_v4 import build_hierarchical_beam_v4_queries
 from progression_memory.evaluation.progressions import build_progression_documents
 from progression_memory.evaluation.retrieval import RetrievalQuery, evaluate_retrieval
 from progression_memory.evaluation.two_stage import build_two_stage_queries
@@ -19,7 +20,7 @@ from progression_memory.evaluation.two_stage import build_two_stage_queries
 SYSTEMS = (
     "append", "progression_only", "fixed_progression", "adaptive_progression",
     "adaptive_progression_v2", "two_stage_v2", "dag_two_stage_v1", "dag_two_stage_v2",
-    "hierarchical_beam_v1", "hierarchical_beam_v2", "hierarchical_beam_v3",
+    "hierarchical_beam_v1", "hierarchical_beam_v2", "hierarchical_beam_v3", "hierarchical_beam_v4",
 )
 
 
@@ -36,6 +37,7 @@ def _transform_queries(queries: list[RetrievalQuery], system: str) -> tuple[list
     if system == "hierarchical_beam_v1": return build_hierarchical_beam_queries(queries)
     if system == "hierarchical_beam_v2": return build_hierarchical_beam_v2_queries(queries)
     if system == "hierarchical_beam_v3": return build_hierarchical_beam_v3_queries(queries)
+    if system == "hierarchical_beam_v4": return build_hierarchical_beam_v4_queries(queries)
 
     if system == "progression_only": mode = "flat"
     elif system == "fixed_progression": mode = "fixed"
@@ -63,9 +65,9 @@ def run(dataset: str, data_path: str, cutoffs: list[int], system: str = "append"
     if system not in SYSTEMS: raise ValueError(f"unsupported system: {system}")
     transformed, corpus_stats = _transform_queries(queries, system)
     result = evaluate_retrieval(transformed, cutoffs)
-    source_level = {"two_stage_v2", "dag_two_stage_v1", "dag_two_stage_v2", "hierarchical_beam_v1", "hierarchical_beam_v2", "hierarchical_beam_v3"}
+    source_level = {"two_stage_v2", "dag_two_stage_v1", "dag_two_stage_v2", "hierarchical_beam_v1", "hierarchical_beam_v2", "hierarchical_beam_v3", "hierarchical_beam_v4"}
     granularity = base_granularity if system == "append" else (f"{base_granularity}_after_structural_filter" if system in source_level else "progression_segment")
-    suffix = "hybrid" if system == "hierarchical_beam_v3" else "bm25"
+    suffix = "semantic" if system == "hierarchical_beam_v4" else ("hybrid" if system == "hierarchical_beam_v3" else "bm25")
     result.update({"dataset": dataset, "system": "append_bm25" if system == "append" else f"{system}_{suffix}", "granularity": granularity, "corpus_stats": corpus_stats})
     return result
 
