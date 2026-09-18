@@ -19,7 +19,7 @@ def _adaptive_candidate_limit(n:int)->int:
 def _segment_indexes(raw_documents:tuple[RetrievalDocument,...],*,embedder:TextEmbedder|None=None):
     segments,stats=build_progression_documents(raw_documents,mode="adaptive_v2",embedder=embedder); indexes=[]; by=defaultdict(list)
     for segment in segments:
-        pid=str(segment.metadata.get("progression_id")); doc=RetrievalDocument(id=f"index:{segment.id}",text=_compact_index_text(segment),evidence_ids=frozenset(),timestamp=segment.timestamp,metadata={"segment_id":segment.id,"progression_id":pid,"source_documents":_sources_for_segment(segment,raw_documents)}); indexes.append(doc); by[pid].append(doc)
+        pid=str(segment.metadata.get("progression_id")); doc=RetrievalDocument(id=f"index:{segment.id}",text=_compact_index_text(segment),evidence_ids=frozenset(),timestamp=segment.timestamp,metadata={**segment.metadata,"segment_id":segment.id,"progression_id":pid,"source_documents":_sources_for_segment(segment,raw_documents)}); indexes.append(doc); by[pid].append(doc)
     return tuple(indexes),dict(by),stats
 
 def _graph_for_segments(by,segments):
