@@ -45,16 +45,18 @@ class SLMProgressionManager:
         self.model, self.candidate_k = model, candidate_k
 
     def decide(self, episode: Episode, candidates: list[Progression]) -> WriteDecision:
-        ranked = sorted(candidates, key=lambda p: progression_route_score(episode, p), reverse=True)[:self.candidate_k]
-        if not ranked:
+        scored = sorted(((progression_route_score(episode, p), p) for p in candidates),
+                        key=lambda row: row[0], reverse=True)[:self.candidate_k]
+        if not scored:
             return WriteDecision(MaintenanceAction.CREATE)
+        ranked = [p for _, p in scored]
         rows = [{
             "id": p.id,
-            "proposal_score": round(progression_route_score(episode, p), 4),
+            "proposal_score": round(score, 4),
             "identity": p.high_level_summary or p.title,
             "current_state": p.current_state,
-            "recent_delta": p.state_history[-1].evidence if p.state_history else "",
-        } for p in ranked]
+            "recent_delta": p.state_history[-1].state_delta if p.state_history else "",
+        } for score, p in scored]
         prompt = (
             "You manage evolving memory progressions. Decide how NEW_EVIDENCE changes one candidate. "
             "Return JSON only: action (extend|transition|create_child|create), progression_id or null, "
