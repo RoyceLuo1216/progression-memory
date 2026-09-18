@@ -9,7 +9,7 @@ import numpy as np
 
 from progression_memory.evaluation.retrieval import RetrievalDocument, tokenize
 from progression_memory.evaluation.semantic import TextEmbedder
-from progression_memory.maintenance.manager import HeuristicProgressionManager, ProgressionManager
+from progression_memory.maintenance.manager import ProgressionManager
 from progression_memory.maintenance.state import MaintenanceAction, condition_progression_state
 from progression_memory.models.episode import Episode
 from progression_memory.models.progression import Progression
