@@ -34,7 +34,9 @@ def merge_trigger(left: Progression, right: Progression) -> MaintenanceTrigger |
 
 def maintenance_prompt(progressions: list[Progression], trigger: MaintenanceTrigger) -> str:
     rows = [{"id": p.id, "identity": p.high_level_summary or p.title, "state": p.current_state,
-             "updates": len(p.state_history), "children": p.child_ids} for p in progressions]
+             "updates": len(p.state_history), "children": p.child_ids,
+             "recent_evidence": [{"episode_id": x.episode_id, "evidence": x.evidence}
+                                 for x in p.state_history[-24:]]} for p in progressions]
     return (
         "You maintain evolving long-term memory. Inspect only the flagged progressions. "
         "Return JSON only with action (keep|split|merge|create_child|archive), ids, reason, "
@@ -89,3 +91,29 @@ def apply_plan(store, plan: dict[str, object]) -> bool:
     parent.child_ids.append(child_id)
     for episode_id in episode_ids: store.attach_episode(episode_id, child_id)
     return True
+
+
+
+def run_maintenance(store, model: LanguageModel, *, max_actions: int = 4) -> dict[str, int]:
+    """Run the SLM only on cheap-triggered anomalies; bound work per maintenance cycle."""
+    proposals: list[tuple[float, MaintenanceTrigger, list[Progression]]] = []
+    active = [p for p in store.progressions.values() if p.storage_tier.value != "cold"]
+    for progression in active:
+        trigger = split_trigger(progression)
+        if trigger: proposals.append((trigger.score, trigger, [progression]))
+    for i, left in enumerate(active):
+        best: tuple[float, MaintenanceTrigger, Progression] | None = None
+        for right in active[i + 1:]:
+            trigger = merge_trigger(left, right)
+            if trigger and (best is None or trigger.score > best[0]):
+                best = trigger.score, trigger, right
+        if best: proposals.append((best[0], best[1], [left, best[2]]))
+
+    applied = inspected = invalid = 0
+    for _, trigger, progressions in sorted(proposals, key=lambda row: row[0], reverse=True)[:max_actions]:
+        inspected += 1
+        try:
+            applied += int(apply_plan(store, parse_plan(inspect(model, progressions, trigger))))
+        except (ValueError, TypeError, KeyError):
+            invalid += 1
+    return {"triggered": len(proposals), "inspected": inspected, "applied": applied, "invalid": invalid}
