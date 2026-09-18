@@ -60,11 +60,12 @@ def temporal_compatibility(
 
 
 def progression_route_score(episode: Episode, progression: Progression) -> float:
-    """Initial R(e, P): semantic + entity + temporal compatibility."""
+    """Cheap semantic/state/time proposal score; final write semantics belong to the manager."""
     semantic = (cosine_similarity(episode.embedding, progression.embedding) + 1.0) / 2.0
-    entities = entity_jaccard(episode.entities, progression.scope.split())
+    state = (cosine_similarity(episode.state_vector, progression.state_embedding or progression.embedding) + 1.0) / 2.0
     temporal = temporal_compatibility(episode, progression)
-    return float(0.65 * semantic + 0.20 * entities + 0.15 * temporal)
+    episode_signal = 0.5 * episode.importance + 0.5 * (1.0 - episode.novelty)
+    return float(0.50 * semantic + 0.20 * state + 0.15 * temporal + 0.15 * episode_signal)
 
 
 class HeuristicProgressionRouter:
