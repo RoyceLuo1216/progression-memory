@@ -1,5 +1,9 @@
 name: retrieval-benchmarks
 
+concurrency:
+  group: retrieval-benchmarks-${{ github.ref }}
+  cancel-in-progress: true
+
 on:
   workflow_dispatch:
   push:
