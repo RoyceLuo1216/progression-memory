@@ -130,10 +130,14 @@ def build_progression_documents(
                 progression = store.progressions[progression_id]
                 before = progression.current_state
                 action_segment, segment = segmenter.process(store, episode.id, progression_id)
-                checkpoint = condition_progression_state(progression, episode, posterior_state=getattr(decision, "updated_state", None))
+                checkpoint = condition_progression_state(
+                    progression, episode,
+                    posterior_state=getattr(decision, "updated_state", None),
+                    state_delta=getattr(decision, "state_delta", None),
+                )
                 segment.state_before = before if not segment.state_before else segment.state_before
                 segment.state_after = checkpoint.posterior_state
-                segment.delta = getattr(decision, "state_delta", None) or episode.summary
+                segment.delta = checkpoint.state_delta
                 segment.state_embedding = checkpoint.posterior_embedding
                 segment.delta_embedding = checkpoint.delta_embedding
                 if action == MaintenanceAction.TRANSITION and action_segment.value != "split":
@@ -143,7 +147,7 @@ def build_progression_documents(
                     if episode.id in old.episode_ids: old.episode_ids.remove(episode.id)
                     segment = segmenter._create_segment(store, episode.id, progression_id)
                     segment.state_before, segment.state_after = before, checkpoint.posterior_state
-                    segment.delta = getattr(decision, "state_delta", None) or episode.summary
+                    segment.delta = checkpoint.state_delta
                     segment.state_embedding, segment.delta_embedding = checkpoint.posterior_embedding, checkpoint.delta_embedding
                 _refresh_progression_embedding(store, progression_id)
 
