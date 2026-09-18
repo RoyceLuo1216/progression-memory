@@ -31,9 +31,9 @@ jobs:
         run: |
           mkdir -p evaluation/data evaluation/results/ci
           wget -q https://raw.githubusercontent.com/snap-research/locomo/main/data/locomo10.json -O evaluation/data/locomo10.json
-      - name: Benchmark LoCoMo V2 and semantic V3
+      - name: Benchmark LoCoMo V2, V3 and semantic state V4
         run: |
-          for system in hierarchical_beam_v2 hierarchical_beam_v3; do
+          for system in hierarchical_beam_v2 hierarchical_beam_v3 hierarchical_beam_v4; do
             python -m progression_memory.benchmarks.real_retrieval \
               --dataset locomo \
               --data-path evaluation/data/locomo10.json \
