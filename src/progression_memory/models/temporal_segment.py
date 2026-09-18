@@ -18,5 +18,10 @@ class TemporalSegment(BaseModel):
 
     embedding: list[float] | None = None
     state_vector: list[float] | None = None
+    state_before: str = ""
+    state_after: str = ""
+    delta: str = ""
+    state_embedding: list[float] | None = None
+    delta_embedding: list[float] | None = None
     uncertainty: list[float] | None = None
     resolution_level: int = Field(default=0, ge=0)
