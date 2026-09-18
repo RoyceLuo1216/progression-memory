@@ -129,8 +129,23 @@ def build_progression_documents(
             progression_ids = ([decision.progression_id] if hasattr(decision, "progression_id") else decision.progression_ids)
             for progression_id in filter(None, progression_ids):
                 progression = store.progressions[progression_id]
-                segmenter.process(store, episode.id, progression_id)
-                condition_progression_state(progression, episode, posterior_state=getattr(decision, "updated_state", None))
+                before = progression.current_state
+                action_segment, segment = segmenter.process(store, episode.id, progression_id)
+                checkpoint = condition_progression_state(progression, episode, posterior_state=getattr(decision, "updated_state", None))
+                segment.state_before = before if not segment.state_before else segment.state_before
+                segment.state_after = checkpoint.posterior_state
+                segment.delta = getattr(decision, "state_delta", None) or episode.summary
+                segment.state_embedding = checkpoint.posterior_embedding
+                segment.delta_embedding = checkpoint.delta_embedding
+                if action == MaintenanceAction.TRANSITION and action_segment.value != "split":
+                    # Model-declared transitions are semantic boundaries; move this episode
+                    # from the old segment into a fresh checkpoint segment.
+                    old = segment
+                    if episode.id in old.episode_ids: old.episode_ids.remove(episode.id)
+                    segment = segmenter._create_segment(store, episode.id, progression_id)
+                    segment.state_before, segment.state_after = before, checkpoint.posterior_state
+                    segment.delta = getattr(decision, "state_delta", None) or episode.summary
+                    segment.state_embedding, segment.delta_embedding = checkpoint.posterior_embedding, checkpoint.delta_embedding
                 _refresh_progression_embedding(store, progression_id)
 
     output: list[RetrievalDocument] = []
