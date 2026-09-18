@@ -79,7 +79,6 @@ def build_progression_documents(
     """Route memories into evolving progressions with evidence-conditioned state updates."""
     store = ProgressionStore()
     router = HeuristicProgressionRouter(attach_threshold=attach_threshold)
-    manager = manager or HeuristicProgressionManager()
     if mode == "flat":
         segmenter = FixedWindowTemporalSegmenter(window=timedelta(days=365000))
     elif mode == "fixed":
@@ -112,7 +111,7 @@ def build_progression_documents(
         )
         store.ingest_episode(episode)
         source_by_episode[episode.id] = document
-        decision = manager.decide(episode, candidates) if embedder is not None else router.route(episode, candidates)
+        decision = manager.decide(episode, candidates) if manager is not None else router.route(episode, candidates)
         action = decision.action
         if action in (MaintenanceAction.CREATE, RouteAction.CREATE):
             progression_id = f"progression:{created}"
