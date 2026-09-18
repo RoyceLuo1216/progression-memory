@@ -51,8 +51,11 @@ def build_hierarchical_beam_v4_queries(
         rescue_n = min(len(global_rank), max(6, math.ceil(DEFAULT_GLOBAL_RESCUE_FRACTION * limit)))
         rescued = {str(d.metadata.get("progression_id")) for _, d in global_rank[:rescue_n]}
         active = routed | rescued or set(by)
-        branch = tuple(d for pid in active for d in by.get(pid, ()))
-        selected = [d for _, d in _multi_view_rank(query.text, branch, embedder)[:limit]]
+        # Scores are query-global; filter the cached global ordering instead of re-encoding
+        # the same state views for every routed branch.
+        branch_rank = [(score, d) for score, d in global_rank
+                       if str(d.metadata.get("progression_id")) in active]
+        selected = [d for _, d in branch_rank[:limit]]
         sources, evidence = {}, set()
         for segment in selected:
             for source in segment.metadata.get("source_documents", ()):
