@@ -37,6 +37,7 @@ def condition_progression_state(
     episode: Episode,
     *,
     prior_weight: float = 0.7,
+    posterior_state: str | None = None,
 ) -> ProgressionStateCheckpoint:
     """Update Z_t = f(Z_{t-1}, E_t) while preserving the complete state trajectory.
 
@@ -59,7 +60,7 @@ def condition_progression_state(
     prior_state = progression.current_state
     # Keep the state evidence-grounded and cumulative. A learned/LLM state updater can
     # replace this deterministic reducer without changing the state-history contract.
-    posterior_state = episode.summary if not prior_state else f"{prior_state}\n→ {episode.summary}"
+    posterior_state = posterior_state or (episode.summary if not prior_state else f"{prior_state}\n→ {episode.summary}")
     checkpoint = ProgressionStateCheckpoint(
         episode_id=episode.id,
         timestamp=episode.dialogue_time,
