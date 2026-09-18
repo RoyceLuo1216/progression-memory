@@ -17,10 +17,8 @@ def _multi_view_rank(query: str, docs: tuple[RetrievalDocument, ...] | list[Retr
     if not docs: return []
     qe = embedder.encode([query])[0]
     by_id = {d.id: d for d in docs}
-    scores = {d.id: .30 * v for d, v in (
-        (d, _minmax({x.id: s for s, x in BM25Index(tuple(docs)).score(query)})[d.id])
-        for d in docs
-    )}
+    lexical = _minmax({d.id: s for s, d in BM25Index(tuple(docs)).score(query)})
+    scores = {doc_id: .30 * lexical[doc_id] for doc_id in by_id}
     fields = (("text", .30), ("progression_identity", .15),
               ("segment_state_after", .20), ("segment_delta", .05))
     active = .30
