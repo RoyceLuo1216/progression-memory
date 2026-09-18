@@ -72,6 +72,8 @@ def build_hierarchical_beam_v4_queries(
         "unique_corpora": len(cache), "hierarchy": "state_trajectory_semantic_v4",
         "embedding_model": getattr(embedder, "model_name", type(embedder).__name__),
         "lexical_scoring": True, "views": ["lexical", "evidence", "identity", "state", "delta"],
+        "avg_progressions": sum(float(r[5].get("progression_count", 0)) for r in rows) / max(1, len(rows)),
+        "avg_state_updates_per_progression": sum(float(r[5].get("avg_state_updates_per_progression", 0)) for r in rows) / max(1, len(rows)),
         "avg_hierarchy_depth": sum(r[4] for r in rows) / max(1, len(rows)),
         "avg_nodes_visited_per_query": sum(visited_counts) / max(1, len(visited_counts)),
         "avg_rescued_progressions": sum(rescue_counts) / max(1, len(rescue_counts)),
