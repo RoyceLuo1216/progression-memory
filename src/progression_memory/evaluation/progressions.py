@@ -121,8 +121,30 @@ def build_progression_documents(
                 scope=" ".join(episode.entities), embedding=embedding,
             )
             store.upsert_progression(progression)
-            segmenter.process(store, episode.id, progression_id)
-            condition_progression_state(progression, episode)
+            _, segment = segmenter.process(store, episode.id, progression_id)
+            checkpoint = condition_progression_state(
+                progression, episode,
+                posterior_state=getattr(decision, "updated_state", None),
+                state_delta=getattr(decision, "state_delta", None),
+            )
+            segment.state_after, segment.delta = checkpoint.posterior_state, checkpoint.state_delta
+            segment.state_embedding, segment.delta_embedding = checkpoint.posterior_embedding, checkpoint.delta_embedding
+            _refresh_progression_embedding(store, progression_id)
+        elif action == MaintenanceAction.CREATE_CHILD:
+            parent = store.progressions[decision.progression_id]
+            progression_id = f"{parent.id}:child:{len(parent.child_ids)}"
+            progression = Progression(
+                id=progression_id, title=" ".join(tokenize(document.text)[:6]) or progression_id,
+                scope=" ".join(episode.entities), embedding=embedding, parent_ids=[parent.id],
+            )
+            store.upsert_progression(progression)
+            parent.child_ids.append(progression_id)
+            _, segment = segmenter.process(store, episode.id, progression_id)
+            checkpoint = condition_progression_state(
+                progression, episode, posterior_state=decision.updated_state, state_delta=decision.state_delta,
+            )
+            segment.state_after, segment.delta = checkpoint.posterior_state, checkpoint.state_delta
+            segment.state_embedding, segment.delta_embedding = checkpoint.posterior_embedding, checkpoint.delta_embedding
             _refresh_progression_embedding(store, progression_id)
         else:
             progression_ids = ([decision.progression_id] if hasattr(decision, "progression_id") else decision.progression_ids)
