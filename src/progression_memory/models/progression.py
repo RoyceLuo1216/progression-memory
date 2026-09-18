@@ -20,6 +20,7 @@ class ProgressionStateCheckpoint(BaseModel):
     prior_state: str = ""
     evidence: str
     posterior_state: str
+    state_delta: str = ""
     prior_embedding: list[float] | None = None
     posterior_embedding: list[float] | None = None
     delta_embedding: list[float] | None = None
