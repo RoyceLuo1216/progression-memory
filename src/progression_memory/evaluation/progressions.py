@@ -9,7 +9,8 @@ import numpy as np
 
 from progression_memory.evaluation.retrieval import RetrievalDocument, tokenize
 from progression_memory.evaluation.semantic import TextEmbedder
-from progression_memory.maintenance.state import MaintenanceAction, condition_progression_state, maintenance_decision
+from progression_memory.maintenance.manager import HeuristicProgressionManager, ProgressionManager
+from progression_memory.maintenance.state import MaintenanceAction, condition_progression_state
 from progression_memory.models.episode import Episode
 from progression_memory.models.progression import Progression
 from progression_memory.routing.router import HeuristicProgressionRouter, RouteAction, cosine_similarity
@@ -73,10 +74,12 @@ def build_progression_documents(
     mode: Literal["flat", "fixed", "adaptive", "adaptive_v2"],
     attach_threshold: float = 0.62,
     embedder: TextEmbedder | None = None,
+    manager: ProgressionManager | None = None,
 ) -> tuple[tuple[RetrievalDocument, ...], dict[str, float | int | str]]:
     """Route memories into evolving progressions with evidence-conditioned state updates."""
     store = ProgressionStore()
     router = HeuristicProgressionRouter(attach_threshold=attach_threshold)
+    manager = manager or HeuristicProgressionManager()
     if mode == "flat":
         segmenter = FixedWindowTemporalSegmenter(window=timedelta(days=365000))
     elif mode == "fixed":
@@ -109,8 +112,9 @@ def build_progression_documents(
         )
         store.ingest_episode(episode)
         source_by_episode[episode.id] = document
-        decision = router.route(episode, candidates)
-        if decision.action == RouteAction.CREATE:
+        decision = manager.decide(episode, candidates) if embedder is not None else router.route(episode, candidates)
+        action = decision.action
+        if action in (MaintenanceAction.CREATE, RouteAction.CREATE):
             progression_id = f"progression:{created}"
             created += 1
             progression = Progression(
@@ -122,9 +126,11 @@ def build_progression_documents(
             condition_progression_state(progression, episode)
             _refresh_progression_embedding(store, progression_id)
         else:
-            for progression_id in decision.progression_ids:
+            progression_ids = ([decision.progression_id] if hasattr(decision, "progression_id") else decision.progression_ids)
+            for progression_id in filter(None, progression_ids):
+                progression = store.progressions[progression_id]
                 segmenter.process(store, episode.id, progression_id)
-                condition_progression_state(store.progressions[progression_id], episode)
+                condition_progression_state(progression, episode, posterior_state=getattr(decision, "updated_state", None))
                 _refresh_progression_embedding(store, progression_id)
 
     output: list[RetrievalDocument] = []
