@@ -40,6 +40,15 @@ _ACKNOWLEDGEMENT = re.compile(
     r"(?:[,!. ]+(?:congratulations|congrats))?[!. ]*$",
     re.IGNORECASE,
 )
+_FIRST_PERSON = re.compile(r"\b(?:i|me|my|mine|we|us|our|ours)\b", re.IGNORECASE)
+
+
+def explicit_first_person_subject(text: str) -> str | None:
+    """Return the speaker only when the message explicitly makes a first-person claim."""
+    if ":" not in text:
+        return None
+    speaker, body = (part.strip() for part in text.split(":", 1))
+    return speaker if speaker and len(speaker) <= 120 and _FIRST_PERSON.search(body) else None
 
 
 def obvious_non_update(text: str) -> bool:
@@ -77,8 +86,10 @@ class ProcessWriter:
             "Skip greetings, questions, praise, congratulations and acknowledgments: updates=[]. "
             "Do not create processes for conversation, meeting someone in a greeting, or exchanging messages. "
             "A process is an ongoing goal/activity for ONE subject. Different subjects have different processes. "
+            "In a first-person statement, the speaker before ':' is the subject; never attach it to another subject. "
             "Use create with progression_id=null when no candidate matches BOTH subject and activity. "
-            "Use extend for the same process and stage, transition for a new stage of the same process. "
+            "Use extend only for another event in the SAME stage. Use transition whenever status or stage changes, "
+            "including applied->interview->offer->accepted/rejected and active->paused/resumed/completed. "
             "For extend/transition copy candidate id, subject, process EXACTLY. Never change the subject "
             "of the current fact to fit a candidate. Separate multiple process updates in one turn. "
             "fact is the new claim, state is a short factual current state, delta is what changed. "
@@ -139,7 +150,12 @@ class ProcessWriter:
             response = ProcessResponse.model_validate_json(payload)
             by_id = {c["id"]: c for c in candidates}
             seen = set()
+            explicit_subject = explicit_first_person_subject(source["text"])
             for u in response.updates:
+                if explicit_subject and u.subject.casefold() != explicit_subject.casefold():
+                    raise ValueError(
+                        f"first-person evidence belongs to speaker {explicit_subject!r}"
+                    )
                 if u.action == "create":
                     if u.progression_id is not None:
                         raise ValueError("create must have null progression_id")

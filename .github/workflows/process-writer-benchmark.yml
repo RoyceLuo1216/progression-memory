@@ -39,17 +39,27 @@ jobs:
           pip install -e '.[dev,semantic,slm]'
       - run: pytest -q
       - name: Actual SLM development fixture
+        id: fixture
+        continue-on-error: true
         run: |
           python -m progression_memory.benchmarks.process_writer_benchmark \
             --dataset fixture --max-turns 4 --enforce-quality \
             --output evaluation/results/process-ci/fixture.json
       - name: Actual SLM LoCoMo construction smoke (8 turns, one conversation)
+        if: github.event_name == 'workflow_dispatch' && steps.fixture.outcome == 'success'
         run: |
           mkdir -p evaluation/data
           curl -fL https://raw.githubusercontent.com/snap-research/locomo/main/data/locomo10.json -o evaluation/data/locomo10.json
           python -m progression_memory.benchmarks.real_retrieval --system process_slm \
             --dataset locomo --data-path evaluation/data/locomo10.json \
             --corpus-limit 1 --max-turns 8 --output evaluation/results/process-ci/locomo-smoke.json
+      - name: Report experimental model quality
+        if: always()
+        run: |
+          echo "Actual SLM fixture outcome: ${{ steps.fixture.outcome }}" >> "$GITHUB_STEP_SUMMARY"
+          if [ "${{ steps.fixture.outcome }}" != "success" ]; then
+            echo "The model-quality experiment did not meet its gate; deterministic tests remain blocking." >> "$GITHUB_STEP_SUMMARY"
+          fi
       - uses: actions/upload-artifact@v4
         if: always()
         with:

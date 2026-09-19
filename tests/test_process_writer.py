@@ -10,7 +10,11 @@ from progression_memory.benchmarks.process_writer_benchmark import run
 from progression_memory.evaluation.process_construction import build_process_documents
 from progression_memory.evaluation.retrieval import RetrievalDocument
 from progression_memory.maintenance.local_model import TransformersLanguageModel
-from progression_memory.maintenance.process_writer import ProcessWriter, obvious_non_update
+from progression_memory.maintenance.process_writer import (
+    ProcessWriter,
+    explicit_first_person_subject,
+    obvious_non_update,
+)
 
 
 class Model:
@@ -42,7 +46,7 @@ def test_process_identity_state_and_no_update_provenance():
                    response(update('transition', 'process:0', state='Offer accepted'))])
     writer = ProcessWriter(model)
     docs = tuple(RetrievalDocument(id=str(i), text=text) for i, text in enumerate(
-        ['Ana: Hi!', 'Ana applied.', 'Ben applied.', 'Ana accepted the offer.']))
+        ['Ana: Hi!', 'Ana: I applied.', 'Ben: I applied.', 'Ana: I accepted the offer.']))
     units, processes, stats = build_process_documents(docs, writer, Embedder())
     assert len(processes) == 2  # identical proposal embeddings cannot force an attachment
     assert [h.episode_id for h in processes['process:0'].state_history] == ['1', '3']
@@ -55,6 +59,8 @@ def test_process_identity_state_and_no_update_provenance():
     assert writer.stats()['model_calls'] == 3
     assert writer.stats()['gate_skips'] == 1
     assert 'Ana accepted the offer.' not in model.prompts[0]  # no future evidence
+    ben_prompt = json.loads(model.prompts[1])[-1]['content']
+    assert 'CANDIDATES (existing processes):\n[]' in ben_prompt
 
 
 @pytest.mark.parametrize('raw', ['not JSON', response(update('extend', 'unknown')),
@@ -130,6 +136,7 @@ def test_locomo_scope_filters_whole_evidence_sets(tmp_path):
     assert result['corpora'][0]['excluded_queries'] == 1
     assert result['retrieval']['eligible_query_count'] == result['append_baseline']['eligible_query_count'] == 1
     assert result['retrieval']['cutoffs']['8']['avg_retrieved_chars'] == len('Ana: I applied to Acme.')
+    assert 'embedding' not in result['corpora'][0]['processes'][0]
 
 
 def test_fenced_json_is_visible_not_fallback():
@@ -175,6 +182,14 @@ def test_selective_gate_only_skips_obvious_non_updates():
     assert obvious_non_update('Ben: Did you accept their offer?')
     assert not obvious_non_update('Ana: I accepted their offer this morning.')
     assert not obvious_non_update('Ana: My interview is tomorrow? I just received the schedule.')
+
+
+def test_first_person_subject_is_explicit_and_enforced():
+    assert explicit_first_person_subject('Ben: I applied to Acme.') == 'Ben'
+    assert explicit_first_person_subject('Ana: Ben applied to Acme.') is None
+    writer = ProcessWriter(Model([response(update(subject='Ana'))]), selective=False)
+    with pytest.raises(ValueError, match="belongs to speaker 'Ben'"):
+        writer.decide({'id': 'b', 'text': 'Ben: I applied to Acme.'}, [], [])
 
 
 def test_transformers_backend_applies_json_constraint(monkeypatch):

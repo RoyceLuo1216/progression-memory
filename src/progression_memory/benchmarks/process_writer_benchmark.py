@@ -47,6 +47,25 @@ CASES = [
 ]
 
 
+def _process_record(progression):
+    return {
+        "id": progression.id,
+        "subject": progression.scope,
+        "process": progression.title,
+        "current_state": progression.current_state,
+        "episode_ids": progression.episode_ids,
+        "segment_ids": progression.segment_ids,
+        "history": [{
+            "source_id": checkpoint.episode_id,
+            "action": checkpoint.action,
+            "fact": checkpoint.evidence,
+            "prior_state": checkpoint.prior_state,
+            "state": checkpoint.posterior_state,
+            "delta": checkpoint.state_delta,
+        } for checkpoint in progression.state_history],
+    }
+
+
 def grouping_metrics(processes, cases=CASES):
     expected = {f"turn:{i}": label for i, (_, label, _) in enumerate(cases) if label}
     actual: dict[str, set] = {}
@@ -142,7 +161,7 @@ def run(*, dataset, data_path=None, model_name="Qwen/Qwen2.5-1.5B-Instruct", out
             if dataset != "fixture" and max_turns is not None: docs = docs[:max_turns]
             units, processes, stats = build_process_documents(docs, writer, embedder)
             row = {"id": name, **stats,
-                   "processes": [p.model_dump(mode="json") for p in processes.values()]}
+                   "processes": [_process_record(p) for p in processes.values()]}
             result["corpora"].append(row)
             if dataset == "fixture":
                 row["grouping"] = grouping_metrics(processes, CASES[:len(docs)])

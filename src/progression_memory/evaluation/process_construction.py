@@ -7,7 +7,10 @@ from collections.abc import Sequence
 from progression_memory.evaluation.progressions import parse_timestamp
 from progression_memory.evaluation.retrieval import RetrievalDocument
 from progression_memory.evaluation.semantic import TextEmbedder, cosine_scores
-from progression_memory.maintenance.process_writer import ProcessWriter
+from progression_memory.maintenance.process_writer import (
+    ProcessWriter,
+    explicit_first_person_subject,
+)
 from progression_memory.maintenance.state import condition_progression_state
 from progression_memory.models.episode import Episode
 from progression_memory.models.progression import Progression
@@ -30,6 +33,12 @@ def _candidate_rows(
     *,
     candidate_k: int,
 ) -> list[dict]:
+    explicit_subject = explicit_first_person_subject(text)
+    if explicit_subject:
+        progressions = [
+            progression for progression in progressions
+            if progression.scope.casefold() == explicit_subject.casefold()
+        ]
     if not progressions:
         return []
     query = embedder.encode([text])[0]

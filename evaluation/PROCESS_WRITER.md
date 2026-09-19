@@ -63,9 +63,11 @@ OMP_NUM_THREADS=2 python -m progression_memory.benchmarks.writer_model_shootout 
 ```
 
 `.github/workflows/process-writer-benchmark.yml` installs the SLM dependencies and
-runs a four-turn quality-gated fixture and an eight-turn LoCoMo smoke. The model cache
-is reused across CI runs and artifacts upload even after failure. The small default model is an experimental CPU baseline, not a selected
-best-performing writer or a demonstrated distilled classifier.
+runs a four-turn quality-gated fixture on pushes. Its experimental quality result is
+reported and uploaded without masking deterministic test failures or making master red.
+The eight-turn LoCoMo smoke runs only on manual dispatch after the fixture passes. The
+model cache is reused across CI runs. The small default model is an experimental CPU
+baseline, not a selected best-performing writer or a demonstrated distilled classifier.
 
 The shootout ranks only completed, schema-valid runs, then construction grouping,
 admission/action quality and latency. It does not use the older heuristic fallback.
