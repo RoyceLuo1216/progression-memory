@@ -1,75 +1,99 @@
+"""Compare local writers on the source-linked construction fixture."""
 from __future__ import annotations
 
 import argparse
 import json
-import time
-from dataclasses import asdict, dataclass
+import re
+from pathlib import Path
 
-from progression_memory.maintenance.local_model import TransformersLanguageModel
-from progression_memory.maintenance.manager import SLMProgressionManager
-from progression_memory.models.episode import Episode
-from progression_memory.models.progression import Progression
-
+from progression_memory.benchmarks.process_writer_benchmark import run as run_construction
+from progression_memory.evaluation.semantic import SentenceTransformerEmbedder
+from progression_memory.maintenance.local_model import clear_model_cache
 
 MODELS = (
-    "HuggingFaceTB/SmolLM3-3B",
+    "Qwen/Qwen2.5-1.5B-Instruct",
     "Qwen/Qwen3-1.7B",
-    "meta-llama/Llama-3.2-3B-Instruct",
+    "Qwen/Qwen2.5-3B-Instruct",
 )
 
 
-@dataclass(frozen=True)
-class Case:
-    evidence: str
-    state: str
-    expected: str
+def _slug(model: str) -> str:
+    return re.sub(r"[^a-z0-9]+", "-", model.casefold()).strip("-")
 
 
-CASES = (
-    Case("I have another Google interview next week.", "Interviewing with Google.", "extend"),
-    Case("Google sent me a software engineering offer.", "Interviewing with Google.", "transition"),
-    Case("I declined Google's offer.", "Received a Google software engineering offer.", "transition"),
-    Case("I started preparing specifically for Google's system design round.", "Recruiting with Google.", "create_child"),
-    Case("I signed up for a pottery class.", "Recruiting with Google.", "create"),
-    Case("My Shopify internship starts next Monday.", "Accepted a Shopify internship.", "transition"),
-    Case("I completed another easy run today.", "Running consistently three times per week.", "extend"),
-    Case("My ankle injury means I stopped running for now.", "Running consistently three times per week.", "transition"),
-)
+def _admission_f1(grouping: dict) -> float:
+    precision = float(grouping.get("admission_precision", 0.0))
+    recall = float(grouping.get("admission_recall", 0.0))
+    return 2 * precision * recall / max(1e-12, precision + recall)
 
 
-def run(model_name: str) -> dict[str, object]:
-    model = TransformersLanguageModel(model_name)
-    manager = SLMProgressionManager(model, candidate_k=1)
-    rows, correct, valid, elapsed = [], 0, 0, 0.0
-    for i, case in enumerate(CASES):
-        p = Progression(id="p", title="progression", scope="", high_level_summary="",
-                        current_state=case.state)
-        e = Episode(id=str(i), summary=case.evidence, dialogue_time="2026-01-01T00:00:00",
-                    embedding=[1.0, 0.0], state_vector=[1.0, 0.0])
-        start = time.perf_counter()
-        decision = manager.decide(e, [p])
-        latency = time.perf_counter() - start
-        elapsed += latency
-        action = decision.action.value
-        is_valid = action in {"extend", "transition", "create_child", "create"}
-        valid += int(is_valid); correct += int(action == case.expected)
-        rows.append({"expected": case.expected, "predicted": action, "latency_s": latency})
-    return {"model": model_name, "cases": len(CASES), "accuracy": correct / len(CASES),
-            "valid_rate": valid / len(CASES), "total_seconds": elapsed, "rows": rows}
+def run_model(model: str, output_dir: Path, max_turns: int,
+              embedder: SentenceTransformerEmbedder) -> dict:
+    path = output_dir / f"{_slug(model)}.json"
+    try:
+        result = run_construction(
+            dataset="fixture",
+            model_name=model,
+            max_turns=max_turns,
+            output=str(path),
+            embedder=embedder,
+        )
+    except Exception:  # noqa: BLE001 - each model failure is a recorded benchmark outcome
+        result = json.loads(path.read_text())
+    finally:
+        clear_model_cache()
+    corpora = result.get("corpora") or [{}]
+    grouping = corpora[0].get("grouping", {})
+    writer = result.get("writer", {})
+    calls = max(1, int(writer.get("model_calls", 0)))
+    return {
+        "model": model,
+        "status": result.get("status", "failed"),
+        "pair_f1": float(grouping.get("pair_f1", 0.0)),
+        "admission_f1": _admission_f1(grouping),
+        "action_accuracy": float(grouping.get("action_accuracy", 0.0)),
+        "cluster_purity": float(grouping.get("cluster_purity", 0.0)),
+        "invalid_responses": int(writer.get("invalid_responses", 0)),
+        "seconds_per_call": float(writer.get("generation_seconds", 0.0)) / calls,
+        "result_path": str(path),
+    }
+
+
+def rank_key(row: dict) -> tuple:
+    return (
+        row["status"] != "completed",
+        row["invalid_responses"] > 0,
+        -row["pair_f1"],
+        -row["admission_f1"],
+        -row["action_accuracy"],
+        row["seconds_per_call"],
+    )
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--models", default=",".join(MODELS))
+    parser.add_argument("--max-turns", type=int, default=12)
+    parser.add_argument("--output-dir", default="evaluation/results/writer-shootout")
     parser.add_argument("--output")
     args = parser.parse_args()
-    results = [run(x.strip()) for x in args.models.split(",") if x.strip()]
-    results.sort(key=lambda x: (-float(x["accuracy"]), float(x["total_seconds"])))
-    payload = {"winner": results[0]["model"], "results": results}
-    text = json.dumps(payload, indent=2); print(text)
+    output_dir = Path(args.output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    embedder = SentenceTransformerEmbedder()
+    rows = [
+        run_model(model.strip(), output_dir, args.max_turns, embedder)
+        for model in args.models.split(",") if model.strip()
+    ]
+    rows.sort(key=rank_key)
+    payload = {"winner": rows[0]["model"] if rows else None,
+               "max_turns": args.max_turns, "results": rows}
+    text = json.dumps(payload, indent=2)
+    print(text)
     if args.output:
-        from pathlib import Path
-        path = Path(args.output); path.parent.mkdir(parents=True, exist_ok=True); path.write_text(text + "\n")
+        path = Path(args.output)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(text + "\n")
 
 
-if __name__ == "__main__": main()
+if __name__ == "__main__":
+    main()

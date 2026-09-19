@@ -39,6 +39,10 @@ def condition_progression_state(
     prior_weight: float = 0.7,
     posterior_state: str | None = None,
     state_delta: str | None = None,
+    evidence: str | None = None,
+    action: str = "extend",
+    posterior_embedding: list[float] | None = None,
+    delta_embedding: list[float] | None = None,
 ) -> ProgressionStateCheckpoint:
     """Update Z_t = f(Z_{t-1}, E_t) while preserving the complete state trajectory.
 
@@ -46,7 +50,10 @@ def condition_progression_state(
     previous state acts as a prior and new evidence supplies the innovation. It is not
     presented as literal Naive Bayes; no conditional-independence assumption is made.
     """
-    evidence_embedding = np.asarray(episode.embedding or episode.state_vector or [], dtype=float)
+    supplied_posterior = posterior_embedding
+    evidence_embedding = np.asarray(
+        supplied_posterior or episode.embedding or episode.state_vector or [], dtype=float
+    )
     prior_embedding = np.asarray(progression.state_embedding or progression.embedding or [], dtype=float)
     if evidence_embedding.size and prior_embedding.size == evidence_embedding.size:
         posterior_embedding = _unit(prior_weight * prior_embedding + (1.0 - prior_weight) * evidence_embedding)
@@ -68,12 +75,13 @@ def condition_progression_state(
         episode_id=episode.id,
         timestamp=episode.dialogue_time,
         prior_state=prior_state,
-        evidence=episode.summary,
+        evidence=evidence or episode.summary,
         posterior_state=posterior_state,
         state_delta=state_delta or episode.summary,
+        action=action,
         prior_embedding=progression.state_embedding or progression.embedding,
         posterior_embedding=posterior_embedding,
-        delta_embedding=delta,
+        delta_embedding=delta_embedding or delta,
         confidence=float(episode.metadata.get("state_confidence", 1.0)),
     )
     progression.current_state = posterior_state

@@ -16,6 +16,7 @@ slm = [
   "transformers>=4.53,<5",
   "torch>=2.2",
   "accelerate>=1.0",
+  "lm-format-enforcer>=0.10",
 ]
 dev = [
   "pytest>=8.0",
@@ -34,4 +35,3 @@ testpaths = ["tests"]
 
 [tool.ruff]
 line-length = 100
-
