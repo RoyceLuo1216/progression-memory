@@ -1,13 +1,16 @@
 import json
+import sys
+import types
 from collections import deque
 
 import numpy as np
 import pytest
 
+from progression_memory.benchmarks.process_writer_benchmark import run
 from progression_memory.evaluation.process_construction import build_process_documents
 from progression_memory.evaluation.retrieval import RetrievalDocument
-from progression_memory.maintenance.process_writer import ProcessWriter
-from progression_memory.benchmarks.process_writer_benchmark import run
+from progression_memory.maintenance.local_model import TransformersLanguageModel
+from progression_memory.maintenance.process_writer import ProcessWriter, obvious_non_update
 
 
 class Model:
@@ -26,15 +29,15 @@ class Embedder:
 
 
 def update(action='create', pid=None, subject='Ana', process='Acme application', state='Applied'):
-    return dict(action=action, progression_id=pid, subject=subject, process=process,
-                fact=f'{subject}: {state}', state=state, delta=state)
+    return {'action': action, 'progression_id': pid, 'subject': subject, 'process': process,
+            'fact': f'{subject}: {state}', 'state': state, 'delta': state}
 
 
 def response(*updates): return json.dumps({'updates': list(updates)})
 
 
 def test_process_identity_state_and_no_update_provenance():
-    model = Model([response(), response(update()),
+    model = Model([response(update()),
                    response(update(subject='Ben')),
                    response(update('transition', 'process:0', state='Offer accepted'))])
     writer = ProcessWriter(model)
@@ -42,13 +45,15 @@ def test_process_identity_state_and_no_update_provenance():
         ['Ana: Hi!', 'Ana applied.', 'Ben applied.', 'Ana accepted the offer.']))
     units, processes, stats = build_process_documents(docs, writer, Embedder())
     assert len(processes) == 2  # identical proposal embeddings cannot force an attachment
-    assert [h['source_id'] for h in processes['process:0'].history] == ['1', '3']
-    assert processes['process:0'].history[-1]['prior_state'] == 'Applied'
-    assert processes['process:0'].state == 'Offer accepted'
+    assert [h.episode_id for h in processes['process:0'].state_history] == ['1', '3']
+    assert processes['process:0'].state_history[-1].prior_state == 'Applied'
+    assert processes['process:0'].current_state == 'Offer accepted'
+    assert len(processes['process:0'].segment_ids) == 2
     assert {d.id for u in units for d in u.metadata['source_documents']} == {'0','1','2','3'}
     assert all(not u.evidence_ids for u in units)  # index summaries earn no evidence credit
     assert stats['unassigned_source_count'] == 1
-    assert writer.stats()['model_calls'] == 4
+    assert writer.stats()['model_calls'] == 3
+    assert writer.stats()['gate_skips'] == 1
     assert 'Ana accepted the offer.' not in model.prompts[0]  # no future evidence
 
 
@@ -86,14 +91,16 @@ def test_benchmark_uses_model_and_saves_failure(tmp_path):
 
 
 def test_benchmark_no_updates_is_not_success(tmp_path):
-    writer = ProcessWriter(Model([response()]*12))
+    from progression_memory.benchmarks.process_writer_benchmark import CASES
+    writer = ProcessWriter(Model([response()] * len(CASES)))
     with pytest.raises(RuntimeError, match='no process updates'):
         run(dataset='fixture', output=str(tmp_path/'result.json'), writer=writer, embedder=Embedder())
-    assert writer.stats()['model_calls'] == 12
+    assert writer.stats()['model_calls'] == len(CASES) - writer.stats()['gate_skips']
+    assert writer.stats()['gate_skips'] == 5
 
 
 def test_retrieval_entrypoint_routes_to_real_writer(monkeypatch, tmp_path):
-    from progression_memory.benchmarks import real_retrieval, process_writer_benchmark
+    from progression_memory.benchmarks import process_writer_benchmark, real_retrieval
     called = {}
     def fake_run(**kwargs):
         called.update(kwargs)
@@ -126,7 +133,7 @@ def test_locomo_scope_filters_whole_evidence_sets(tmp_path):
 
 
 def test_fenced_json_is_visible_not_fallback():
-    writer = ProcessWriter(Model(['```json\n{"updates":[]}\n```']))
+    writer = ProcessWriter(Model(['```json\n{"updates":[]}\n```']), selective=False)
     assert writer.decide({'id':'greeting','text':'Hi'}, [], []) == []
     assert writer.stats()['fenced_responses'] == 1
     assert writer.stats()['model_calls'] == writer.stats()['valid_responses'] == 1
@@ -147,6 +154,56 @@ def test_chat_backend_receives_separate_instructions_and_evidence():
             assert 'new message to classify:\nAna: hello' in messages[-1]['content']
             assert any(m['role'] == 'assistant' for m in messages)
             return response()
-    writer = ProcessWriter(ChatModel())
+    writer = ProcessWriter(ChatModel(), selective=False)
     assert writer.decide({'id':'a','text':'Ana: hello'}, [], []) == []
     assert writer.stats()['model_calls'] == 1
+
+
+def test_constrained_backend_receives_response_schema():
+    class ConstrainedModel:
+        def generate_messages(self, messages, *, json_schema=None):
+            assert json_schema['properties']['updates']['type'] == 'array'
+            return response()
+    writer = ProcessWriter(ConstrainedModel(), selective=False)
+    assert writer.decide({'id':'a','text':'Ana: hello'}, [], []) == []
+    assert writer.stats()['constrained_calls'] == 1
+
+
+def test_selective_gate_only_skips_obvious_non_updates():
+    assert obvious_non_update('Ana: Hi Ben, good to see you!')
+    assert obvious_non_update("Ben: That's great, congratulations!")
+    assert obvious_non_update('Ben: Did you accept their offer?')
+    assert not obvious_non_update('Ana: I accepted their offer this morning.')
+    assert not obvious_non_update('Ana: My interview is tomorrow? I just received the schedule.')
+
+
+def test_transformers_backend_applies_json_constraint(monkeypatch):
+    class Inputs(dict):
+        def to(self, _device): return self
+    class Tokenizer:
+        eos_token_id = 0
+        def apply_chat_template(self, messages, **kwargs): return 'prompt'
+        def __call__(self, text, return_tensors):
+            return Inputs(input_ids=np.array([[1, 2]]))
+        def decode(self, tokens, skip_special_tokens): return '{"updates":[]}'
+    class ModelBackend:
+        device = 'cpu'
+        def __init__(self): self.kwargs = {}
+        def generate(self, **kwargs):
+            self.kwargs = kwargs
+            return np.array([[1, 2, 3]])
+    backend = ModelBackend()
+    monkeypatch.setattr(
+        TransformersLanguageModel, 'runtime', property(lambda self: (Tokenizer(), backend))
+    )
+    root = types.ModuleType('lmformatenforcer')
+    root.JsonSchemaParser = lambda schema: schema
+    integration = types.ModuleType('lmformatenforcer.integrations.transformers')
+    integration.build_transformers_prefix_allowed_tokens_fn = lambda tokenizer, parser: 'limit'
+    monkeypatch.setitem(sys.modules, 'lmformatenforcer', root)
+    monkeypatch.setitem(sys.modules, 'lmformatenforcer.integrations', types.ModuleType('integrations'))
+    monkeypatch.setitem(sys.modules, 'lmformatenforcer.integrations.transformers', integration)
+    model = TransformersLanguageModel(max_new_tokens=20)
+    assert model.generate_messages([{'role': 'user', 'content': 'x'}],
+                                   json_schema={'type': 'object'}) == '{"updates":[]}'
+    assert backend.kwargs['prefix_allowed_tokens_fn'] == 'limit'

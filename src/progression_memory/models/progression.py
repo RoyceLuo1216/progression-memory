@@ -21,6 +21,7 @@ class ProgressionStateCheckpoint(BaseModel):
     evidence: str
     posterior_state: str
     state_delta: str = ""
+    action: str = "extend"
     prior_embedding: list[float] | None = None
     posterior_embedding: list[float] | None = None
     delta_embedding: list[float] | None = None

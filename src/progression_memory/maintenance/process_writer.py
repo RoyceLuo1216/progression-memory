@@ -1,6 +1,7 @@
 """Process-aware admission and writing. Model errors are never heuristic successes."""
 from __future__ import annotations
 
+import inspect
 import json
 import re
 import time
@@ -28,13 +29,46 @@ class ProcessResponse(BaseModel):
     updates: list[ProcessUpdate] = Field(max_length=4)
 
 
+_QUESTION_START = re.compile(
+    r"^(?:who|what|when|where|why|how|do|does|did|is|are|was|were|can|could|"
+    r"would|will|have|has|had|should|may|might)\b",
+    re.IGNORECASE,
+)
+_ACKNOWLEDGEMENT = re.compile(
+    r"^(?:(?:that(?:'s| is) )?(?:great|awesome|wonderful|nice|good)|"
+    r"congratulations|congrats|thanks|thank you|okay|ok|sure|sounds good)"
+    r"(?:[,!. ]+(?:congratulations|congrats))?[!. ]*$",
+    re.IGNORECASE,
+)
+
+
+def obvious_non_update(text: str) -> bool:
+    """Conservative no-op gate; uncertain statements always reach the writer."""
+    body = text.split(":", 1)[1].strip() if ":" in text else text.strip()
+    words = re.findall(r"\w+", body)
+    if len(words) <= 12 and re.match(r"^(?:hi|hello|hey)\b", body, re.IGNORECASE):
+        return True
+    if len(words) <= 24 and "?" in body and _QUESTION_START.match(body):
+        return True
+    return len(words) <= 12 and bool(_ACKNOWLEDGEMENT.fullmatch(body))
+
+
 class ProcessWriter:
-    def __init__(self, model: LanguageModel, *, trace_path: str | None = None):
-        self.model, self.trace_path = model, trace_path
+    def __init__(self, model: LanguageModel, *, trace_path: str | None = None,
+                 selective: bool = True):
+        self.model, self.trace_path, self.selective = model, trace_path, selective
         self.counts: Counter = Counter()
         self.seconds = 0.0
 
     def decide(self, source: dict, context: list[dict], candidates: list[dict]) -> list[ProcessUpdate]:
+        self.counts["turns"] += 1
+        if self.selective and obvious_non_update(source["text"]):
+            self.counts["gate_skips"] += 1
+            self.counts["no_update_turns"] += 1
+            self._trace({"source_id": source["id"], "source_text": source["text"],
+                         "candidates": candidates, "updates": [], "decision_source": "gate",
+                         "latency_s": 0.0})
+            return []
         instructions = (
             "You extract changes in ongoing real-world processes from conversation. "
             "Return JSON only: {\"updates\":[...]}. Each update has exactly action, progression_id, "
@@ -82,7 +116,19 @@ class ProcessWriter:
         record = {"source_id": source["id"], "source_text": source["text"], "candidates": candidates}
         try:
             if hasattr(self.model, "generate_messages"):
-                raw = self.model.generate_messages(messages)
+                generate_messages = self.model.generate_messages
+                parameters = inspect.signature(generate_messages).parameters.values()
+                supports_schema = any(
+                    p.name == "json_schema" or p.kind == inspect.Parameter.VAR_KEYWORD
+                    for p in parameters
+                )
+                if supports_schema:
+                    raw = generate_messages(
+                        messages, json_schema=ProcessResponse.model_json_schema()
+                    )
+                    self.counts["constrained_calls"] += 1
+                else:
+                    raw = generate_messages(messages)
             else:
                 raw = self.model.generate(json.dumps(messages, ensure_ascii=False))
             payload = raw.strip()
@@ -125,16 +171,20 @@ class ProcessWriter:
             elapsed = time.perf_counter() - start
             self.seconds += elapsed
             record.update(raw_response=raw, latency_s=elapsed)
-            if self.trace_path:
-                from pathlib import Path
-                path = Path(self.trace_path)
-                path.parent.mkdir(parents=True, exist_ok=True)
-                with path.open("a", encoding="utf-8") as out:
-                    out.write(json.dumps(record, ensure_ascii=False) + "\n")
+            self._trace(record)
+
+    def _trace(self, record: dict) -> None:
+        if self.trace_path:
+            from pathlib import Path
+            path = Path(self.trace_path)
+            path.parent.mkdir(parents=True, exist_ok=True)
+            with path.open("a", encoding="utf-8") as out:
+                out.write(json.dumps(record, ensure_ascii=False) + "\n")
 
     def stats(self) -> dict:
         return {**{k: self.counts[k] for k in (
-            "model_calls", "valid_responses", "invalid_responses", "fenced_responses", "model_errors", "no_update_turns",
+            "turns", "gate_skips", "model_calls", "constrained_calls", "valid_responses",
+            "invalid_responses", "fenced_responses", "model_errors", "no_update_turns",
             "create", "extend", "transition")}, "fallback_calls": 0,
             "model": getattr(self.model, "model_name", type(self.model).__name__),
             "generation_seconds": self.seconds}
