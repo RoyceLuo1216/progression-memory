@@ -14,9 +14,12 @@ class TransformersLanguageModel:
         return _load(self.model_name)
 
     def generate(self, prompt: str) -> str:
+        return self.generate_messages([{"role": "user", "content": prompt}])
+
+    def generate_messages(self, messages: list[dict[str, str]]) -> str:
         tokenizer, model = self.runtime
-        messages = [{"role": "user", "content": prompt}]
-        text = tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
+        text = tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True,
+                                            enable_thinking=False)
         inputs = tokenizer(text, return_tensors="pt").to(model.device)
         output = model.generate(**inputs, max_new_tokens=self.max_new_tokens, do_sample=False,
                                 pad_token_id=tokenizer.eos_token_id)
@@ -33,3 +36,4 @@ def _load(model_name: str):
     model = AutoModelForCausalLM.from_pretrained(model_name, torch_dtype="auto", device_map="auto")
     model.eval()
     return tokenizer, model
+
