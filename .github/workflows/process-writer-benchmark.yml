@@ -1,0 +1,48 @@
+name: process-writer-benchmark
+on:
+  workflow_dispatch:
+  push:
+    branches: [master, codex/process-aware-writer]
+    paths:
+      - 'src/progression_memory/maintenance/process_writer.py'
+      - 'src/progression_memory/maintenance/local_model.py'
+      - 'src/progression_memory/evaluation/process_construction.py'
+      - 'src/progression_memory/benchmarks/process_writer_benchmark.py'
+      - 'src/progression_memory/benchmarks/real_retrieval.py'
+      - 'tests/test_process_writer.py'
+      - '.github/workflows/process-writer-benchmark.yml'
+concurrency:
+  group: process-writer-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  construction:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      OMP_NUM_THREADS: '2'
+      TOKENIZERS_PARALLELISM: 'false'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: |
+          pip install torch --index-url https://download.pytorch.org/whl/cpu
+          pip install -e '.[dev,semantic,slm]'
+      - run: pytest -q
+      - name: Actual SLM development fixture
+        run: |
+          python -m progression_memory.benchmarks.process_writer_benchmark \
+            --dataset fixture --output evaluation/results/process-ci/fixture.json
+      - name: Actual SLM LoCoMo construction smoke (32 turns, one conversation)
+        run: |
+          mkdir -p evaluation/data
+          curl -fL https://raw.githubusercontent.com/snap-research/locomo/main/data/locomo10.json -o evaluation/data/locomo10.json
+          python -m progression_memory.benchmarks.real_retrieval --system process_slm \
+            --dataset locomo --data-path evaluation/data/locomo10.json \
+            --corpus-limit 1 --max-turns 32 --output evaluation/results/process-ci/locomo-smoke.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: process-writer-results
+          path: evaluation/results/process-ci/

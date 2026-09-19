@@ -20,11 +20,13 @@ from progression_memory.evaluation.two_stage import build_two_stage_queries
 SYSTEMS = (
     "append", "progression_only", "fixed_progression", "adaptive_progression",
     "adaptive_progression_v2", "two_stage_v2", "dag_two_stage_v1", "dag_two_stage_v2",
-    "hierarchical_beam_v1", "hierarchical_beam_v2", "hierarchical_beam_v3", "hierarchical_beam_v4",
+    "hierarchical_beam_v1", "hierarchical_beam_v2", "hierarchical_beam_v3", "hierarchical_beam_v4", "process_slm",
 )
 
 
 def _transform_queries(queries: list[RetrievalQuery], system: str) -> tuple[list[RetrievalQuery], dict[str, object]]:
+    if system == "process_slm":
+        raise ValueError("process_slm requires run() with explicit model tracing")
     if system == "append":
         unique: dict[int, tuple] = {}
         for query in queries: unique[id(query.documents)] = query.documents
@@ -58,7 +60,15 @@ def _transform_queries(queries: list[RetrievalQuery], system: str) -> tuple[list
     return transformed, result
 
 
-def run(dataset: str, data_path: str, cutoffs: list[int], system: str = "append") -> dict[str, object]:
+def run(dataset: str, data_path: str, cutoffs: list[int], system: str = "append", *,
+        writer_model: str = "Qwen/Qwen2.5-1.5B-Instruct", output: str | None = None,
+        corpus_limit: int = 1, max_turns: int | None = None) -> dict[str, object]:
+    if system == "process_slm":
+        if dataset != "locomo" or output is None:
+            raise ValueError("process_slm currently requires LoCoMo and --output for model traces")
+        from progression_memory.benchmarks.process_writer_benchmark import run as run_process
+        return run_process(dataset=dataset, data_path=data_path, model_name=writer_model,
+                           output=output, corpus_limit=corpus_limit, max_turns=max_turns, cutoffs=cutoffs)
     if dataset == "locomo": queries, base_granularity = load_locomo(data_path), "turn"
     elif dataset == "longmemeval": queries, base_granularity = load_longmemeval(data_path), "session"
     else: raise ValueError(f"unsupported dataset: {dataset}")
@@ -79,11 +89,17 @@ def main() -> None:
     parser.add_argument("--system", choices=SYSTEMS, default="append")
     parser.add_argument("--top-k", default="5,8,10")
     parser.add_argument("--output")
+    parser.add_argument("--writer-model", default="Qwen/Qwen2.5-1.5B-Instruct")
+    parser.add_argument("--corpus-limit", type=int, default=1)
+    parser.add_argument("--max-turns", type=int)
     args = parser.parse_args()
-    result = run(args.dataset, args.data_path, [int(x) for x in args.top_k.split(",") if x], args.system)
+    result = run(args.dataset, args.data_path, [int(x) for x in args.top_k.split(",") if x], args.system,
+                 writer_model=args.writer_model, output=args.output, corpus_limit=args.corpus_limit,
+                 max_turns=args.max_turns)
     payload = json.dumps(result, indent=2, sort_keys=True); print(payload)
     if args.output:
         path = Path(args.output); path.parent.mkdir(parents=True, exist_ok=True); path.write_text(payload + "\n", encoding="utf-8")
 
 
 if __name__ == "__main__": main()
+
