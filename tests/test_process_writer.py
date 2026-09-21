@@ -9,10 +9,12 @@ import pytest
 from progression_memory.benchmarks.process_writer_benchmark import run
 from progression_memory.evaluation.process_construction import build_process_documents
 from progression_memory.evaluation.retrieval import RetrievalDocument
+from progression_memory.maintenance import local_model
 from progression_memory.maintenance.local_model import TransformersLanguageModel
 from progression_memory.maintenance.process_writer import (
     ProcessWriter,
     explicit_first_person_subject,
+    obvious_lifecycle_transition,
     obvious_non_update,
 )
 
@@ -137,6 +139,7 @@ def test_locomo_scope_filters_whole_evidence_sets(tmp_path):
     assert result['retrieval']['eligible_query_count'] == result['append_baseline']['eligible_query_count'] == 1
     assert result['retrieval']['cutoffs']['8']['avg_retrieved_chars'] == len('Ana: I applied to Acme.')
     assert 'embedding' not in result['corpora'][0]['processes'][0]
+    assert result['corpora'][0]['diagnostics']['transition_segment_mismatch_count'] == 0
 
 
 def test_fenced_json_is_visible_not_fallback():
@@ -190,6 +193,51 @@ def test_first_person_subject_is_explicit_and_enforced():
     writer = ProcessWriter(Model([response(update(subject='Ana'))]), selective=False)
     with pytest.raises(ValueError, match="belongs to speaker 'Ben'"):
         writer.decide({'id': 'b', 'text': 'Ben: I applied to Acme.'}, [], [])
+
+
+def test_obvious_lifecycle_change_upgrades_extension_to_transition():
+    assert obvious_lifecycle_transition('Ana was invited to an interview')
+    writer = ProcessWriter(Model([response(update(
+        action='extend', pid='process:0', state='Interview invitation received'
+    ))]), selective=False)
+    updates = writer.decide(
+        {'id': 'i', 'text': 'Ana: Acme invited me to an interview.'},
+        [],
+        [{'id': 'process:0', 'subject': 'Ana', 'process': 'Acme application'}],
+    )
+    assert updates[0].action == 'transition'
+    assert writer.stats()['transition_overrides'] == 1
+
+
+def test_distilled_prompt_contract_and_quanto_loading(monkeypatch):
+    messages = [
+        {'role': 'system', 'content': 'instructions'},
+        {'role': 'user', 'content': 'evidence'},
+    ]
+    prepared = local_model._prepare_messages(
+        'deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B', messages
+    )
+    assert [message['role'] for message in prepared] == ['user']
+    assert prepared[0]['content'] == 'instructions\n\nevidence'
+
+    observed = {}
+    transformers = types.ModuleType('transformers')
+    transformers.AutoTokenizer = types.SimpleNamespace(
+        from_pretrained=lambda name: f'tokenizer:{name}'
+    )
+    class AutoModel:
+        @staticmethod
+        def from_pretrained(name, **kwargs):
+            observed.update(model=name, **kwargs)
+            return types.SimpleNamespace(eval=lambda: None)
+    transformers.AutoModelForCausalLM = AutoModel
+    transformers.QuantoConfig = lambda *, weights: {'weights': weights}
+    monkeypatch.setitem(sys.modules, 'transformers', transformers)
+    local_model._load.cache_clear()
+    tokenizer, _ = local_model._load('distilled-test', 'quanto-int8')
+    local_model._load.cache_clear()
+    assert tokenizer == 'tokenizer:distilled-test'
+    assert observed['quantization_config'] == {'weights': 'int8'}
 
 
 def test_transformers_backend_applies_json_constraint(monkeypatch):

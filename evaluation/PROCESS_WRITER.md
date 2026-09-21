@@ -27,6 +27,12 @@ The identity is stable; current state is independently generated rather than cop
 from an episode vector or a growing transcript. Each update retains its source ID,
 prior state, new state and action for inspection.
 
+A conservative lifecycle invariant upgrades an `extend` decision to `transition` for
+explicit stage-change language such as interview, offer, acceptance/rejection,
+pause/resume, promotion and completion. Overrides are counted in writer telemetry. This
+keeps obvious state changes from remaining inside the old temporal segment while model
+selection experiments continue.
+
 Validated updates are executed through the canonical `ProgressionStore`: the source
 becomes an `Episode`, membership remains many-to-many, every update creates a
 `ProgressionStateCheckpoint`, and a model-declared transition starts a new temporal
@@ -72,15 +78,23 @@ baseline, not a selected best-performing writer or a demonstrated distilled clas
 The shootout ranks only completed, schema-valid runs, then construction grouping,
 admission/action quality and latency. It does not use the older heuristic fallback.
 
+The CI comparison also runs `deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B` with Quanto
+int8 weight-only quantization. The existing Qwen2.5-1.5B writer remains the control;
+distillation and quantization are benchmark variables rather than assumed improvements.
+
 ## Reading results
 
 - `writer`: actual calls, valid/invalid responses, model errors, zero fallback calls,
   no-update decisions, creates/transitions/extensions and total generation time.
 - `corpora`: complete process memberships and state histories, largest-group fraction,
   singleton fraction, assigned/unassigned source counts and membership duplication.
+- `diagnostics`: process-size distribution, broad-process count, explicit-subject
+  mismatches, duplicate identities, and extensions whose state changed without a
+  declared transition.
 - Development fixture: pair precision/recall/F1, cluster purity, fragmentation,
   cross-subject contamination, admission precision/recall, gate event recall and action
-  accuracy. Labels are hand-authored development expectations, not a held-out test set.
+  accuracy, plus concrete false-pair and action-error examples. Labels are hand-authored
+  development expectations, not a held-out test set.
 - LoCoMo smoke: only questions whose **complete** gold evidence is present in the
   selected prefix are evaluated; total/eligible/excluded counts are explicit.
   This conditional subset is not comparable to full-LoCoMo published/previous scores.

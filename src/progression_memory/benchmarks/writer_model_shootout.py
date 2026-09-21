@@ -15,6 +15,9 @@ MODELS = (
     "Qwen/Qwen3-1.7B",
     "Qwen/Qwen2.5-3B-Instruct",
 )
+QUANTIZED_MODELS = (
+    "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B",
+)
 
 
 def _slug(model: str) -> str:
@@ -28,12 +31,14 @@ def _admission_f1(grouping: dict) -> float:
 
 
 def run_model(model: str, output_dir: Path, max_turns: int,
+              quantization: str,
               embedder: SentenceTransformerEmbedder) -> dict:
-    path = output_dir / f"{_slug(model)}.json"
+    path = output_dir / f"{_slug(model)}-{_slug(quantization)}.json"
     try:
         result = run_construction(
             dataset="fixture",
             model_name=model,
+            quantization=quantization,
             max_turns=max_turns,
             output=str(path),
             embedder=embedder,
@@ -48,6 +53,7 @@ def run_model(model: str, output_dir: Path, max_turns: int,
     calls = max(1, int(writer.get("model_calls", 0)))
     return {
         "model": model,
+        "quantization": quantization,
         "status": result.get("status", "failed"),
         "pair_f1": float(grouping.get("pair_f1", 0.0)),
         "admission_f1": _admission_f1(grouping),
@@ -73,6 +79,7 @@ def rank_key(row: dict) -> tuple:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--models", default=",".join(MODELS))
+    parser.add_argument("--quantized-models", default=",".join(QUANTIZED_MODELS))
     parser.add_argument("--max-turns", type=int, default=12)
     parser.add_argument("--output-dir", default="evaluation/results/writer-shootout")
     parser.add_argument("--output")
@@ -80,12 +87,16 @@ def main() -> None:
     output_dir = Path(args.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
     embedder = SentenceTransformerEmbedder()
-    rows = [
-        run_model(model.strip(), output_dir, args.max_turns, embedder)
-        for model in args.models.split(",") if model.strip()
+    variants = [(model.strip(), "none") for model in args.models.split(",") if model.strip()]
+    variants += [
+        (model.strip(), "quanto-int8")
+        for model in args.quantized_models.split(",") if model.strip()
     ]
+    rows = [run_model(model, output_dir, args.max_turns, quantization, embedder)
+            for model, quantization in variants]
     rows.sort(key=rank_key)
-    payload = {"winner": rows[0]["model"] if rows else None,
+    payload = {"winner": ({"model": rows[0]["model"],
+                            "quantization": rows[0]["quantization"]} if rows else None),
                "max_turns": args.max_turns, "results": rows}
     text = json.dumps(payload, indent=2)
     print(text)

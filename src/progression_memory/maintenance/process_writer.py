@@ -41,6 +41,12 @@ _ACKNOWLEDGEMENT = re.compile(
     re.IGNORECASE,
 )
 _FIRST_PERSON = re.compile(r"\b(?:i|me|my|mine|we|us|our|ours)\b", re.IGNORECASE)
+_LIFECYCLE_TRANSITION = re.compile(
+    r"\b(?:interview(?:ed|ing)?|offer(?:ed)?|accept(?:ed)?|declin(?:e|ed)|"
+    r"reject(?:ed)?|promot(?:e|ed)|paus(?:e|ed)|resum(?:e|ed)|return(?:ed)?\s+to|"
+    r"complet(?:e|ed)|finish(?:ed)?|cancel(?:led|ed)|withdraw(?:n)?|graduat(?:e|ed))\b",
+    re.IGNORECASE,
+)
 
 
 def explicit_first_person_subject(text: str) -> str | None:
@@ -49,6 +55,11 @@ def explicit_first_person_subject(text: str) -> str | None:
         return None
     speaker, body = (part.strip() for part in text.split(":", 1))
     return speaker if speaker and len(speaker) <= 120 and _FIRST_PERSON.search(body) else None
+
+
+def obvious_lifecycle_transition(*texts: str) -> bool:
+    """Identify high-precision lifecycle changes that must start a new state segment."""
+    return bool(_LIFECYCLE_TRANSITION.search(" ".join(texts)))
 
 
 def obvious_non_update(text: str) -> bool:
@@ -166,6 +177,11 @@ class ProcessWriter:
                     c = by_id.get(u.progression_id)
                     if c is None or (u.subject, u.process) != (c["subject"], c["process"]):
                         raise ValueError("attachment must preserve a proposed subject/process identity")
+                    if u.action == "extend" and obvious_lifecycle_transition(
+                        source["text"], u.state, u.delta
+                    ):
+                        u.action = "transition"
+                        self.counts["transition_overrides"] += 1
                 identity = (u.subject.casefold(), u.process.casefold())
                 if identity in seen:
                     raise ValueError("duplicate process update in one response")
@@ -201,6 +217,7 @@ class ProcessWriter:
         return {**{k: self.counts[k] for k in (
             "turns", "gate_skips", "model_calls", "constrained_calls", "valid_responses",
             "invalid_responses", "fenced_responses", "model_errors", "no_update_turns",
-            "create", "extend", "transition")}, "fallback_calls": 0,
+            "create", "extend", "transition", "transition_overrides")}, "fallback_calls": 0,
             "model": getattr(self.model, "model_name", type(self.model).__name__),
+            "quantization": getattr(self.model, "quantization", "none"),
             "generation_seconds": self.seconds}

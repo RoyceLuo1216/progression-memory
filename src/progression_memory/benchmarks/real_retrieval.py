@@ -10,9 +10,15 @@ from progression_memory.evaluation.dag_retrieval import (
 )
 from progression_memory.evaluation.datasets import load_locomo, load_longmemeval
 from progression_memory.evaluation.hierarchical_retrieval import build_hierarchical_beam_queries
-from progression_memory.evaluation.hierarchical_retrieval_v2 import build_hierarchical_beam_v2_queries
-from progression_memory.evaluation.hierarchical_retrieval_v3 import build_hierarchical_beam_v3_queries
-from progression_memory.evaluation.hierarchical_retrieval_v4 import build_hierarchical_beam_v4_queries
+from progression_memory.evaluation.hierarchical_retrieval_v2 import (
+    build_hierarchical_beam_v2_queries,
+)
+from progression_memory.evaluation.hierarchical_retrieval_v3 import (
+    build_hierarchical_beam_v3_queries,
+)
+from progression_memory.evaluation.hierarchical_retrieval_v4 import (
+    build_hierarchical_beam_v4_queries,
+)
 from progression_memory.evaluation.progressions import build_progression_documents
 from progression_memory.evaluation.retrieval import RetrievalQuery, evaluate_retrieval
 from progression_memory.evaluation.two_stage import build_two_stage_queries
@@ -62,12 +68,14 @@ def _transform_queries(queries: list[RetrievalQuery], system: str) -> tuple[list
 
 def run(dataset: str, data_path: str, cutoffs: list[int], system: str = "append", *,
         writer_model: str = "Qwen/Qwen2.5-1.5B-Instruct", output: str | None = None,
-        corpus_limit: int = 1, max_turns: int | None = None) -> dict[str, object]:
+        writer_quantization: str = "none", corpus_limit: int = 1,
+        max_turns: int | None = None) -> dict[str, object]:
     if system == "process_slm":
         if dataset != "locomo" or output is None:
             raise ValueError("process_slm currently requires LoCoMo and --output for model traces")
         from progression_memory.benchmarks.process_writer_benchmark import run as run_process
         return run_process(dataset=dataset, data_path=data_path, model_name=writer_model,
+                           quantization=writer_quantization,
                            output=output, corpus_limit=corpus_limit, max_turns=max_turns, cutoffs=cutoffs)
     if dataset == "locomo": queries, base_granularity = load_locomo(data_path), "turn"
     elif dataset == "longmemeval": queries, base_granularity = load_longmemeval(data_path), "session"
@@ -90,11 +98,13 @@ def main() -> None:
     parser.add_argument("--top-k", default="5,8,10")
     parser.add_argument("--output")
     parser.add_argument("--writer-model", default="Qwen/Qwen2.5-1.5B-Instruct")
+    parser.add_argument("--writer-quantization", choices=["none", "quanto-int8"], default="none")
     parser.add_argument("--corpus-limit", type=int, default=1)
     parser.add_argument("--max-turns", type=int)
     args = parser.parse_args()
     result = run(args.dataset, args.data_path, [int(x) for x in args.top_k.split(",") if x], args.system,
                  writer_model=args.writer_model, output=args.output, corpus_limit=args.corpus_limit,
+                 writer_quantization=args.writer_quantization,
                  max_turns=args.max_turns)
     payload = json.dumps(result, indent=2, sort_keys=True); print(payload)
     if args.output:
@@ -102,4 +112,3 @@ def main() -> None:
 
 
 if __name__ == "__main__": main()
-

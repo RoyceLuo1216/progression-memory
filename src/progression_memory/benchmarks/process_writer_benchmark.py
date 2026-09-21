@@ -14,7 +14,11 @@ from progression_memory.evaluation.process_construction import build_process_doc
 from progression_memory.evaluation.retrieval import BM25Index, RetrievalDocument, evaluate_retrieval
 from progression_memory.evaluation.semantic import SentenceTransformerEmbedder
 from progression_memory.maintenance.local_model import TransformersLanguageModel
-from progression_memory.maintenance.process_writer import ProcessWriter, obvious_non_update
+from progression_memory.maintenance.process_writer import (
+    ProcessWriter,
+    explicit_first_person_subject,
+    obvious_non_update,
+)
 
 # Development cases, not an independent test set or evidence of model superiority.
 CASES = [
@@ -66,6 +70,69 @@ def _process_record(progression):
     }
 
 
+def construction_diagnostics(processes, documents):
+    """Expose likely construction failures without using benchmark answers at write time."""
+    sources = {document.id: document for document in documents}
+    sizes = [len(set(progression.episode_ids)) for progression in processes.values()]
+    subject_mismatches = []
+    extend_state_changes = []
+    segment_mismatches = []
+    action_counts = Counter()
+    identities = Counter()
+    for progression in processes.values():
+        identities[(progression.scope.casefold(), progression.title.casefold())] += 1
+        transition_count = sum(
+            checkpoint.action == "transition" for checkpoint in progression.state_history
+        )
+        expected_segments = int(bool(progression.state_history)) + transition_count
+        if len(progression.segment_ids) != expected_segments:
+            segment_mismatches.append({
+                "progression_id": progression.id,
+                "expected_segments": expected_segments,
+                "actual_segments": len(progression.segment_ids),
+            })
+        for checkpoint in progression.state_history:
+            action_counts[checkpoint.action] += 1
+            document = sources.get(checkpoint.episode_id)
+            explicit_subject = explicit_first_person_subject(document.text) if document else None
+            if explicit_subject and explicit_subject.casefold() != progression.scope.casefold():
+                subject_mismatches.append({
+                    "source_id": checkpoint.episode_id,
+                    "speaker": explicit_subject,
+                    "progression_id": progression.id,
+                    "progression_subject": progression.scope,
+                })
+            if (checkpoint.action == "extend" and checkpoint.prior_state
+                    and checkpoint.prior_state != checkpoint.posterior_state):
+                extend_state_changes.append({
+                    "source_id": checkpoint.episode_id,
+                    "progression_id": progression.id,
+                    "prior_state": checkpoint.prior_state,
+                    "posterior_state": checkpoint.posterior_state,
+                    "delta": checkpoint.state_delta,
+                })
+    histogram = Counter(sizes)
+    broad_threshold = max(5, math.ceil(0.20 * len(documents)))
+    return {
+        "mean_progression_size": sum(sizes) / max(1, len(sizes)),
+        "max_progression_size": max(sizes, default=0),
+        "progression_size_histogram": {str(size): count for size, count in sorted(histogram.items())},
+        "broad_progression_threshold": broad_threshold,
+        "broad_progression_count": sum(size >= broad_threshold for size in sizes),
+        "action_counts": dict(action_counts),
+        "extend_with_state_change_count": len(extend_state_changes),
+        "extend_with_state_change_examples": extend_state_changes[:12],
+        "explicit_subject_mismatch_count": len(subject_mismatches),
+        "explicit_subject_mismatch_examples": subject_mismatches[:12],
+        "duplicate_identity_count": sum(count - 1 for count in identities.values() if count > 1),
+        "multi_update_progression_fraction": (
+            sum(size > 1 for size in sizes) / max(1, len(sizes))
+        ),
+        "transition_segment_mismatch_count": len(segment_mismatches),
+        "transition_segment_mismatch_examples": segment_mismatches[:12],
+    }
+
+
 def grouping_metrics(processes, cases=CASES):
     expected = {f"turn:{i}": label for i, (_, label, _) in enumerate(cases) if label}
     actual: dict[str, set] = {}
@@ -105,6 +172,14 @@ def grouping_metrics(processes, cases=CASES):
                    for pid in pids})
         for label in set(expected.values())
     }
+    false_positive_pairs = sorted(predicted_pairs - gold_pairs)
+    false_negative_pairs = sorted(gold_pairs - predicted_pairs)
+    action_errors = [
+        {"source_id": source, "expected": expected_action,
+         "predicted": sorted(actions.get(source, set()))}
+        for source, expected_action in expected_actions.items()
+        if actions.get(source) != {expected_action}
+    ]
     return {"pair_precision": precision, "pair_recall": recall,
             "pair_f1": 2*precision*recall/max(1e-12, precision+recall),
             "admission_precision": len(set(actual) & set(expected))/max(1, len(actual)),
@@ -117,10 +192,17 @@ def grouping_metrics(processes, cases=CASES):
             "predicted_process_count": len(processes),
             "gate_event_recall": len(set(expected) - skipped) / max(1, len(expected)),
             "gate_skipped_turns": len(skipped),
+            "false_positive_pair_count": len(false_positive_pairs),
+            "false_negative_pair_count": len(false_negative_pairs),
+            "false_positive_pair_examples": false_positive_pairs[:12],
+            "false_negative_pair_examples": false_negative_pairs[:12],
+            "action_error_count": len(action_errors),
+            "action_error_examples": action_errors[:12],
             "label_source": "hand_authored_development_fixture"}
 
 
-def run(*, dataset, data_path=None, model_name="Qwen/Qwen2.5-1.5B-Instruct", output,
+def run(*, dataset, data_path=None, model_name="Qwen/Qwen2.5-1.5B-Instruct",
+        quantization="none", output,
         corpus_limit=1, max_turns=None, writer=None, embedder=None, cutoffs=(5, 8, 10),
         enforce_quality=False):
     if corpus_limit < 1 or (max_turns is not None and max_turns < 1):
@@ -130,14 +212,22 @@ def run(*, dataset, data_path=None, model_name="Qwen/Qwen2.5-1.5B-Instruct", out
     trace = path.with_suffix(".trace.jsonl")
     trace.write_text("")
     writer = writer or ProcessWriter(
-        TransformersLanguageModel(model_name, max_new_tokens=256), trace_path=str(trace)
+        TransformersLanguageModel(
+            model_name, max_new_tokens=256, quantization=quantization
+        ), trace_path=str(trace)
     )
     embedder = embedder or SentenceTransformerEmbedder()
     packages = {}
-    for package in ("transformers", "torch", "sentence-transformers", "lm-format-enforcer"):
+    for package in (
+        "transformers", "torch", "sentence-transformers", "lm-format-enforcer",
+        "optimum-quanto",
+    ):
         try: packages[package] = version(package)
         except PackageNotFoundError: packages[package] = None
-    result = {"runtime_packages": packages, "status": "running", "dataset": dataset, "system": "process_slm_bm25",
+    result = {"runtime_packages": packages, "status": "running", "dataset": dataset,
+              "system": "process_slm_bm25", "writer_configuration": {
+                  "model": model_name, "quantization": quantization,
+              },
               "scope": {"corpus_limit": corpus_limit, "max_turns": max_turns},
               "ranking": "BM25 over process updates, then BM25 over original source turns",
               "corpora": []}
@@ -161,14 +251,21 @@ def run(*, dataset, data_path=None, model_name="Qwen/Qwen2.5-1.5B-Instruct", out
             if dataset != "fixture" and max_turns is not None: docs = docs[:max_turns]
             units, processes, stats = build_process_documents(docs, writer, embedder)
             row = {"id": name, **stats,
-                   "processes": [_process_record(p) for p in processes.values()]}
+                   "processes": [_process_record(p) for p in processes.values()],
+                   "diagnostics": construction_diagnostics(processes, docs)}
             result["corpora"].append(row)
+            if row["diagnostics"]["transition_segment_mismatch_count"]:
+                raise RuntimeError(
+                    "transition/segment invariant failed: "
+                    f"{row['diagnostics']['transition_segment_mismatch_examples']}"
+                )
             if dataset == "fixture":
                 row["grouping"] = grouping_metrics(processes, CASES[:len(docs)])
                 if enforce_quality:
                     grouping = row["grouping"]
                     if (grouping["admission_recall"] < .80 or grouping["pair_f1"] < .65
                             or grouping["cluster_purity"] < .85
+                            or grouping["action_accuracy"] < .80
                             or grouping["avg_fragments_per_gold_process"] > 1.5
                             or grouping["cross_subject_predicted_pairs"]):
                         raise RuntimeError(f"construction quality gate failed: {grouping}")
@@ -205,12 +302,14 @@ def main():
     parser.add_argument("--dataset", choices=["fixture", "locomo"], required=True)
     parser.add_argument("--data-path")
     parser.add_argument("--model", default="Qwen/Qwen2.5-1.5B-Instruct")
+    parser.add_argument("--quantization", choices=["none", "quanto-int8"], default="none")
     parser.add_argument("--corpus-limit", type=int, default=1)
     parser.add_argument("--max-turns", type=int)
     parser.add_argument("--enforce-quality", action="store_true")
     parser.add_argument("--output", required=True)
     args = parser.parse_args()
     result = run(dataset=args.dataset, data_path=args.data_path, model_name=args.model,
+                 quantization=args.quantization,
                  output=args.output, corpus_limit=args.corpus_limit, max_turns=args.max_turns,
                  enforce_quality=args.enforce_quality)
     print(json.dumps({"status": result["status"], "writer": result["writer"]}, indent=2))
