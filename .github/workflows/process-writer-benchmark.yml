@@ -38,19 +38,19 @@ jobs:
           pip install torch --index-url https://download.pytorch.org/whl/cpu
           pip install -e '.[dev,semantic,slm,quantized]'
       - run: pytest -q
-      - name: Actual SLM development fixture
+      - name: Actual SLM 12-turn development fixture
         id: fixture
         continue-on-error: true
         run: |
           python -m progression_memory.benchmarks.process_writer_benchmark \
-            --dataset fixture --max-turns 4 --enforce-quality \
+            --dataset fixture --max-turns 12 --enforce-quality \
             --output evaluation/results/process-ci/fixture.json
-      - name: Quantized distilled-Qwen development fixture
+      - name: Quantized distilled-Qwen 12-turn development fixture
         id: distilled
         continue-on-error: true
         run: |
           python -m progression_memory.benchmarks.process_writer_benchmark \
-            --dataset fixture --max-turns 4 --enforce-quality \
+            --dataset fixture --max-turns 12 --enforce-quality \
             --model deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B \
             --quantization quanto-int8 \
             --output evaluation/results/process-ci/distilled-qwen-int8.json
