@@ -177,6 +177,20 @@ class ProcessWriter:
                     c = by_id.get(u.progression_id)
                     if c is None or (u.subject, u.process) != (c["subject"], c["process"]):
                         raise ValueError("attachment must preserve a proposed subject/process identity")
+                    # Small local models can select a semantically weaker candidate even
+                    # when retrieval has a clearly stronger same-subject match. Preserve
+                    # the model's extracted fact/state, but reconcile the attachment to
+                    # the stronger candidate before it mutates the store.
+                    ranked = sorted(candidates, key=lambda item: item.get("score", 0.0), reverse=True)
+                    best = ranked[0] if ranked else None
+                    if (best and best["id"] != c["id"]
+                            and best.get("subject", "").casefold() == u.subject.casefold()
+                            and float(best.get("score", 0.0)) - float(c.get("score", 0.0)) >= 0.15):
+                        u.progression_id = best["id"]
+                        u.subject = best["subject"]
+                        u.process = best["process"]
+                        c = best
+                        self.counts["candidate_reassignments"] += 1
                     if u.action == "extend" and obvious_lifecycle_transition(
                         source["text"], u.state, u.delta
                     ):
@@ -217,7 +231,8 @@ class ProcessWriter:
         return {**{k: self.counts[k] for k in (
             "turns", "gate_skips", "model_calls", "constrained_calls", "valid_responses",
             "invalid_responses", "fenced_responses", "model_errors", "no_update_turns",
-            "create", "extend", "transition", "transition_overrides")}, "fallback_calls": 0,
+            "create", "extend", "transition", "transition_overrides",
+            "candidate_reassignments")}, "fallback_calls": 0,
             "model": getattr(self.model, "model_name", type(self.model).__name__),
             "quantization": getattr(self.model, "quantization", "none"),
             "generation_seconds": self.seconds}
