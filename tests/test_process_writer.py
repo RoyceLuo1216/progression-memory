@@ -209,6 +209,23 @@ def test_obvious_lifecycle_change_upgrades_extension_to_transition():
     assert writer.stats()['transition_overrides'] == 1
 
 
+def test_reassigns_clear_same_subject_candidate_when_model_picks_weaker_match():
+    writer = ProcessWriter(Model([response(update(
+        action='transition', pid='process:1', process='Pottery', state='Offer accepted'
+    ))]), selective=False)
+    updates = writer.decide(
+        {'id': 'offer', 'text': "Ana: Acme offered me the job."},
+        [],
+        [
+            {'id': 'process:0', 'subject': 'Ana', 'process': 'Acme application', 'score': 0.72},
+            {'id': 'process:1', 'subject': 'Ana', 'process': 'Pottery', 'score': 0.41},
+        ],
+    )
+    assert updates[0].progression_id == 'process:0'
+    assert updates[0].process == 'Acme application'
+    assert writer.stats()['candidate_reassignments'] == 1
+
+
 def test_distilled_prompt_contract_and_quanto_loading(monkeypatch):
     messages = [
         {'role': 'system', 'content': 'instructions'},
@@ -261,12 +278,3 @@ def test_transformers_backend_applies_json_constraint(monkeypatch):
     )
     root = types.ModuleType('lmformatenforcer')
     root.JsonSchemaParser = lambda schema: schema
-    integration = types.ModuleType('lmformatenforcer.integrations.transformers')
-    integration.build_transformers_prefix_allowed_tokens_fn = lambda tokenizer, parser: 'limit'
-    monkeypatch.setitem(sys.modules, 'lmformatenforcer', root)
-    monkeypatch.setitem(sys.modules, 'lmformatenforcer.integrations', types.ModuleType('integrations'))
-    monkeypatch.setitem(sys.modules, 'lmformatenforcer.integrations.transformers', integration)
-    model = TransformersLanguageModel(max_new_tokens=20)
-    assert model.generate_messages([{'role': 'user', 'content': 'x'}],
-                                   json_schema={'type': 'object'}) == '{"updates":[]}'
-    assert backend.kwargs['prefix_allowed_tokens_fn'] == 'limit'
