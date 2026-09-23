@@ -150,6 +150,31 @@ The current evidence supports the following architecture story:
 
 Primary references: TiMem (Findings ACL 2026), LongMemEval public benchmark, and Snap Research LoCoMo. These external percentages must not be directly compared with the retrieval numbers above.
 
+## Controlled temporal/semantic baselines
+
+The `temporal-semantic-baselines.yml` workflow runs five systems on both public
+datasets: raw append-only, temporal-only grouping, semantic-only grouping,
+temporal+semantic grouping, and the existing progression-only grouping. Temporal
+groups use a 14-day rolling gap. Semantic-only reuses the closest centroid above
+cosine 0.58; combined grouping requires both similarity and temporal continuity.
+The semantic baselines use `sentence-transformers/all-MiniLM-L6-v2` in CI.
+These are controlled component ablations, **not** reproductions of TiMem or
+Temporal Semantic Memory.
+
+All grouped systems use the same bounded Stage-1 BM25 selection, expand selected
+groups to original source memories and BM25-rerank those sources. The report
+counts evidence only for sources in the final source-level top-5/8/10 and under
+strict character budgets (LoCoMo 1200/2400/4800; LongMemEval-S
+100000/150000/200000). Stage-1 evidence coverage, selected units, candidate
+source count, and structural unit size expose the cost of broad groups. Raw
+whole-group evidence recall is deliberately excluded. The workflow artifact
+`temporal-semantic-baseline-results` contains both dataset reports. Old
+progression-only whole-unit figures in this ledger measure another protocol.
+
+To run locally: `python -m progression_memory.benchmarks.baseline_retrieval
+--dataset locomo --data-path evaluation/data/locomo10.json
+--output evaluation/results/locomo_component_baselines.json`.
+
 ## Evaluation roadmap
 
 1. **DONE** — dataset adapters and evidence-aware retrieval metrics.

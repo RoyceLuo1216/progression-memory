@@ -1,0 +1,57 @@
+name: temporal-semantic-baselines
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [master]
+    paths:
+      - 'src/progression_memory/evaluation/temporal_semantic_baselines.py'
+      - 'src/progression_memory/benchmarks/baseline_retrieval.py'
+      - 'tests/test_baseline_retrieval.py'
+      - '.github/workflows/baseline-retrieval.yml'
+
+jobs:
+  baseline-retrieval:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install package and semantic encoder
+        run: pip install -e '.[dev,semantic]'
+      - name: Run baseline tests
+        run: pytest -q tests/test_baseline_retrieval.py
+      - name: Download public benchmarks
+        run: |
+          mkdir -p evaluation/data evaluation/results/ci/baselines
+          wget -q https://raw.githubusercontent.com/snap-research/locomo/main/data/locomo10.json \
+            -O evaluation/data/locomo10.json
+          wget -q https://huggingface.co/datasets/xiaowu0162/longmemeval-cleaned/resolve/main/longmemeval_s_cleaned.json \
+            -O evaluation/data/longmemeval_s_cleaned.json
+      - name: Run source-level temporal, semantic, combined, and progression baselines
+        run: |
+          for dataset in locomo longmemeval; do
+            if [ "$dataset" = locomo ]; then data=evaluation/data/locomo10.json; else data=evaluation/data/longmemeval_s_cleaned.json; fi
+            python -m progression_memory.benchmarks.baseline_retrieval \
+              --dataset "$dataset" \
+              --data-path "$data" \
+              --semantic-model sentence-transformers/all-MiniLM-L6-v2 \
+              --output "evaluation/results/ci/baselines/${dataset}.json"
+          done
+      - name: Print baseline comparison
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          for path in sorted(Path('evaluation/results/ci/baselines').glob('*.json')):
+              result = json.loads(path.read_text())
+              for system, row in result['results'].items():
+                  top8 = row['source_top_k']['cutoffs']['8']
+                  print(f"{path.stem} {system}: macro@8={top8['macro_evidence_recall']:.4f} chars@8={top8['avg_retrieved_chars']:.0f} stage1_coverage={row['corpus_stats']['avg_stage1_evidence_coverage']:.4f}")
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: temporal-semantic-baseline-results
+          path: evaluation/results/ci/baselines/*.json
