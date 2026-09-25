@@ -1,0 +1,41 @@
+name: paper-reproduction-contracts
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [master]
+    paths:
+      - 'evaluation/paper_pairs.json'
+      - 'evaluation/PAPER_REPRODUCTIONS.md'
+      - 'src/progression_memory/benchmarks/paper_pairs.py'
+      - 'tests/test_paper_pairs.py'
+      - '.github/workflows/paper-reproduction-contracts.yml'
+
+jobs:
+  source-contracts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install validation dependencies
+        run: python -m pip install pytest pyyaml
+      - name: Verify comparison contracts
+        env:
+          PYTHONPATH: src
+        run: pytest -q tests/test_paper_pairs.py
+      - name: Check out exact upstream revisions
+        env:
+          PYTHONPATH: src
+        run: |
+          python -m progression_memory.benchmarks.paper_pairs prepare tsm "$RUNNER_TEMP/tsm" --fetch
+          python -m progression_memory.benchmarks.paper_pairs prepare timem "$RUNNER_TEMP/timem" --fetch
+      - name: Check original experiment entrypoints
+        run: |
+          python "$RUNNER_TEMP/tsm/scripts/validate_configs.py"
+          python -m compileall -q "$RUNNER_TEMP/tsm"
+          python -m compileall -q "$RUNNER_TEMP/timem/experiments/datasets"
+          test -f "$RUNNER_TEMP/timem/experiments/datasets/locomo/01_memory_generation.py"
+          test -f "$RUNNER_TEMP/timem/experiments/datasets/longmemeval_s/03_evaluation.py"

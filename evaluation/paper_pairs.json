@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "papers": {
+    "timem": {
+      "repository": "https://github.com/TiMEM-AI/TiMEM.git",
+      "revision": "6d279a5f5d40ee229e1995df15c182cb2062c71c",
+      "license": "Apache-2.0 core; MIT tools",
+      "entrypoints": {
+        "locomo": [
+          "pytest experiments/datasets/locomo/01_memory_generation.py -v",
+          "python experiments/datasets/locomo/02_memory_retrieval.py",
+          "python experiments/datasets/locomo/03_evaluation.py"
+        ],
+        "longmemeval": [
+          "pytest experiments/datasets/longmemeval_s/01_memory_generation.py -v",
+          "python experiments/datasets/longmemeval_s/02_memory_retrieval.py",
+          "python experiments/datasets/longmemeval_s/03_evaluation.py"
+        ]
+      },
+      "intervention": "After native L1 evidence generation and before L2-L5 consolidation; preserve the native retrieval workflow and its reader."
+    },
+    "tsm": {
+      "repository": "https://github.com/cosmicexotic/TSM.git",
+      "revision": "0da3633ba8e27e9f8122872ff775587116948f5e",
+      "license": "Apache-2.0 (see upstream notices)",
+      "entrypoints": {
+        "locomo": ["python scripts/run_experiment.py --config configs/locomo/tsm.yaml --force-rebuild"],
+        "longmemeval": ["python scripts/run_experiment.py --config configs/longmemeval/tsm.yaml --force-rebuild"]
+      },
+      "intervention": "After native temporal fact extraction and before snapshot/durative summary construction; preserve native temporal filtering, retriever, and reader."
+    }
+  },
+  "pairs": [
+    ["timem", "timem+progression"],
+    ["tsm", "tsm+progression"],
+    ["timem+tsm", "timem+tsm+progression"]
+  ]
+}
