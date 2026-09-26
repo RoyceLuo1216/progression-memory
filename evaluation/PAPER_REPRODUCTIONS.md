@@ -40,6 +40,14 @@ time and tokens. They have not yet produced benchmark results. TiMem's native
 evaluation and TSM's released diagnostic metrics must still be aligned to a
 single pinned evaluator before claiming a cross-paper QA ranking.
 
+The TSM runner also inspects each native `snapshots.json` alongside its dense
+index mapping. It reports how many persona/topic summary IDs appear in the
+index. The released tree builder says summaries are stored only in snapshots
+and the tree contains leaves; the retriever requires indexed IDs to return
+summary text. A zero count would mean that part of the released baseline is
+not reachable through its dense retriever. Treat this as a measured diagnostic
+from each real run, not as an assumed paper score or an intervention fix.
+
 ## Required experiment matrix
 
 Run each dataset (LoCoMo and LongMemEval-S) under three paired comparisons:

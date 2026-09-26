@@ -42,6 +42,35 @@ def _sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
+def audit_tsm_indexes(run_dir: Path) -> dict:
+    """Check whether snapshot summary IDs can be returned by native FAISS search."""
+    rows = []
+    for snapshot_path in sorted(run_dir.rglob("snapshots.json")):
+        snapshots = json.loads(snapshot_path.read_text(encoding="utf-8"))
+        mapping_path = snapshot_path.with_name("dense_index_mapping.json")
+        indexed = (set(json.loads(mapping_path.read_text(encoding="utf-8")).get("doc_ids", []))
+                   if mapping_path.exists() else None)
+        summary_ids = [item["node_id"] for snapshot in snapshots
+                       for category in ("persona_summaries", "topic_summaries")
+                       for item in snapshot.get(category, []) if item.get("node_id")]
+        rows.append({
+            "snapshot_path": str(snapshot_path.relative_to(run_dir)),
+            "index_mapping_present": indexed is not None,
+            "summary_count": len(summary_ids),
+            "unique_summary_ids": len(set(summary_ids)),
+            "indexed_summary_ids": len(set(summary_ids) & indexed) if indexed is not None else None,
+        })
+    return {
+        "scope": "native_dense_index_summary_reachability",
+        "cases": rows,
+        "summary_count": sum(row["summary_count"] for row in rows),
+        "indexed_summary_ids": sum(row["indexed_summary_ids"] or 0 for row in rows),
+        "cases_missing_index": sum(not row["index_mapping_present"] for row in rows),
+        "cases_with_duplicate_summary_ids": sum(row["summary_count"] != row["unique_summary_ids"]
+                                               for row in rows),
+    }
+
+
 def inspect(paper: str, dataset: str, checkout: Path) -> dict:
     """Check native source and runtime before any model or database calls."""
     spec = specification()["papers"][paper]
@@ -107,6 +136,7 @@ def run(paper: str, dataset: str, checkout: Path, output: Path, *, acknowledge: 
                    "isolated_database_acknowledged": isolated_database})
     manifest = output / "native_runner.json"
     manifest.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n")
+    prior_runs = {item.name for item in (checkout / "runs").glob("*")} if paper == "tsm" else set()
     for index, command in enumerate(commands):
         with (output / f"step_{index:02d}.stdout.log").open("w") as stdout, \
              (output / f"step_{index:02d}.stderr.log").open("w") as stderr:
@@ -119,6 +149,13 @@ def run(paper: str, dataset: str, checkout: Path, output: Path, *, acknowledge: 
         if completed.returncode:
             raise RuntimeError(f"native step {index} failed; inspect {output / f'step_{index:02d}.stderr.log'}")
     report.update({"status": "completed", "finished_at_utc": _utc()})
+    if paper == "tsm":
+        new_runs = sorted((item for item in (checkout / "runs").glob("*")
+                           if item.is_dir() and item.name not in prior_runs), key=lambda item: item.name)
+        if not new_runs:
+            raise RuntimeError("upstream TSM reported success without a new run directory")
+        report["upstream_run_directory"] = str(new_runs[-1])
+        report["index_audit"] = audit_tsm_indexes(new_runs[-1])
     manifest.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n")
     return report
 

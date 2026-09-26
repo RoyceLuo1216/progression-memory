@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+import json
 
 import pytest
 
@@ -40,3 +41,17 @@ def test_rejects_unpinned_paper_before_model_calls(tmp_path: Path, monkeypatch):
 def test_rejects_unacknowledged_model_calls(tmp_path: Path):
     with pytest.raises(ValueError, match="acknowledge"):
         paper_native.run("tsm", "locomo", tmp_path, tmp_path / "out", acknowledge=False)
+
+
+def test_tsm_index_audit_detects_unreachable_snapshot_summaries(tmp_path: Path):
+    cache = tmp_path / "sample" / "cache"
+    cache.mkdir(parents=True)
+    (cache / "snapshots.json").write_text(json.dumps([
+        {"persona_summaries": [{"node_id": "summary_0_0"}],
+         "topic_summaries": [{"node_id": "entity_summary_0_0"}]},
+    ]))
+    (cache / "dense_index_mapping.json").write_text(json.dumps({"doc_ids": ["leaf_0"]}))
+    audit = paper_native.audit_tsm_indexes(tmp_path)
+    assert audit["summary_count"] == 2
+    assert audit["indexed_summary_ids"] == 0
+    assert audit["cases_missing_index"] == 0
