@@ -9,8 +9,10 @@ on:
       - 'evaluation/PAPER_REPRODUCTIONS.md'
       - 'src/progression_memory/benchmarks/paper_pairs.py'
       - 'src/progression_memory/benchmarks/paper_native.py'
+      - 'src/progression_memory/benchmarks/open_weight.py'
       - 'tests/test_paper_pairs.py'
       - 'tests/test_paper_native.py'
+      - 'tests/test_open_weight.py'
       - '.github/workflows/paper-reproduction-contracts.yml'
       - '.github/workflows/paper-native-tsm.yml'
       - '.github/workflows/paper-native-timem.yml'
@@ -29,7 +31,7 @@ jobs:
       - name: Verify comparison contracts
         env:
           PYTHONPATH: src
-        run: pytest -q tests/test_paper_pairs.py tests/test_paper_native.py
+        run: pytest -q tests/test_paper_pairs.py tests/test_paper_native.py tests/test_open_weight.py
       - name: Check out exact upstream revisions
         env:
           PYTHONPATH: src
@@ -43,6 +45,13 @@ jobs:
           python -m compileall -q "$RUNNER_TEMP/timem/experiments/datasets"
           test -f "$RUNNER_TEMP/timem/experiments/datasets/locomo/01_memory_generation.py"
           test -f "$RUNNER_TEMP/timem/experiments/datasets/longmemeval_s/03_evaluation.py"
+      - name: Check standardized model adaptations
+        env:
+          PYTHONPATH: src
+        run: |
+          python -m progression_memory.benchmarks.open_weight tsm "$RUNNER_TEMP/tsm" "$RUNNER_TEMP/tsm-standardized"
+          python -m progression_memory.benchmarks.open_weight timem "$RUNNER_TEMP/timem" "$RUNNER_TEMP/timem-standardized"
+          python "$RUNNER_TEMP/tsm-standardized/scripts/validate_configs.py"
       - name: Parse live workflow manifests
         run: |
           python - <<'PY'
