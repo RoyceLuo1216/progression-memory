@@ -10,6 +10,36 @@ tsm /tmp/tsm --fetch` (or `timem`) to obtain the exact revision. The source
 contract CI only checks code provenance, configuration validation and Python
 syntax. It does **not** execute a benchmark or claim a paper result.
 
+The native runner verifies source SHA and the original dataset SHA256, checks
+for Python 3.11, Docker and a configured model key, and records each upstream
+command and exit code. It runs the paper's original entrypoints, not the
+component-ablation code. Set up the paper's native services and dependencies
+first; no credentials are stored in this repository. For TSM:
+
+```
+python -m progression_memory.benchmarks.paper_native tsm locomo /tmp/tsm
+python -m progression_memory.benchmarks.paper_native tsm locomo /tmp/tsm \
+  --output /tmp/tsm-locomo-native --acknowledge-model-calls
+```
+
+For TiMem, place the same checksum-verified LoCoMo file at
+`data/locomo10.json` or LongMemEval-S at `data/longmemeval_s_cleaned.json`.
+Configure its native PostgreSQL/Qdrant and model provider, then run with
+`--isolated-database --acknowledge-model-calls`. The isolation flag is
+mandatory: TiMem's native generation scripts clear existing memory tables.
+The runner first calls TiMem's dataset splitter, then native generation,
+retrieval and evaluation scripts. Its output is a run manifest and per-step
+logs; preserve the paper-generated predictions and evaluator files as well.
+
+Manual GitHub workflows `paper-native-tsm` and `paper-native-timem` expose
+each dataset as an input and archive native outputs. They require an
+`OPENAI_API_KEY` repository secret. TiMem additionally downloads its pinned
+Qwen3-Embedding-0.6B model; its released settings select that local embedding
+provider. These workflows are live model-backed runs and can take substantial
+time and tokens. They have not yet produced benchmark results. TiMem's native
+evaluation and TSM's released diagnostic metrics must still be aligned to a
+single pinned evaluator before claiming a cross-paper QA ranking.
+
 ## Required experiment matrix
 
 Run each dataset (LoCoMo and LongMemEval-S) under three paired comparisons:

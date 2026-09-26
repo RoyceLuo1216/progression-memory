@@ -1,0 +1,92 @@
+name: paper-native-timem
+
+# Original TiMem generation, retrieval and evaluation scripts in an isolated
+# runner. This job does not contain a progression intervention.
+on:
+  workflow_dispatch:
+    inputs:
+      dataset:
+        description: Dataset to reproduce
+        required: true
+        type: choice
+        options: [locomo, longmemeval]
+
+jobs:
+  native-timem:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    env:
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      TIMEM_LLM_DEFAULT_PROVIDER: openai
+      POSTGRES_HOST: localhost
+      POSTGRES_USER: timem_user
+      POSTGRES_PASSWORD: timem_password
+      POSTGRES_DATABASE: timem_db
+      QWEN_EMBEDDING_PATH: ${{ runner.temp }}/qwen3-embedding-0.6b
+      PYTHONPATH: src
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Require model credentials
+        run: test -n "$OPENAI_API_KEY" || { echo 'Configure OPENAI_API_KEY repository secret'; exit 1; }
+      - name: Prepare original TiMem revision
+        run: python -m progression_memory.benchmarks.paper_pairs prepare timem "$RUNNER_TEMP/timem" --fetch
+      - name: Install paper dependencies
+        run: |
+          python -m pip install -r "$RUNNER_TEMP/timem/requirements.txt"
+          python -m pip install 'torch>=2.2' 'transformers>=4.51,<5'
+      - name: Prepare native Qwen embedding model
+        run: |
+          python - <<'PY'
+          import os
+          from huggingface_hub import snapshot_download
+          snapshot_download(
+              repo_id='Qwen/Qwen3-Embedding-0.6B',
+              revision='3d106eabb5535a84de3ae88f45887a78259b52de',
+              local_dir=os.environ['QWEN_EMBEDDING_PATH'],
+          )
+          PY
+      - name: Fetch identical pinned benchmark bytes
+        run: |
+          python -m progression_memory.benchmarks.paper_pairs prepare tsm "$RUNNER_TEMP/tsm-data" --fetch
+          python "$RUNNER_TEMP/tsm-data/scripts/download_data.py" "${{ inputs.dataset }}"
+          mkdir -p "$RUNNER_TEMP/timem/data"
+          if [ '${{ inputs.dataset }}' = locomo ]; then
+            cp "$RUNNER_TEMP/tsm-data/data/locomo/locomo10.json" "$RUNNER_TEMP/timem/data/locomo10.json"
+          else
+            cp "$RUNNER_TEMP/tsm-data/data/longmemeval/longmemeval_s.json" "$RUNNER_TEMP/timem/data/longmemeval_s_cleaned.json"
+          fi
+      - name: Start isolated paper databases
+        run: |
+          if [ '${{ inputs.dataset }}' = locomo ]; then
+            echo 'POSTGRES_PORT=15432' >> "$GITHUB_ENV"
+            qdrant_url=http://localhost:16333
+            docker compose -f "$RUNNER_TEMP/timem/migration/docker-compose.yml" up -d
+          else
+            echo 'POSTGRES_PORT=5433' >> "$GITHUB_ENV"
+            qdrant_url=http://localhost:6335
+            docker compose -f "$RUNNER_TEMP/timem/migration/docker-compose.longmemeval_s.yml" -p timem_longmemeval_s up -d
+          fi
+          echo "QDRANT_URL=$qdrant_url" >> "$GITHUB_ENV"
+          for i in $(seq 1 60); do
+            if curl -fsS "$qdrant_url/healthz" >/dev/null 2>&1; then break; fi
+            sleep 2
+          done
+          curl -fsS "$qdrant_url/healthz"
+      - name: Run paper-native baseline
+        run: |
+          python -m progression_memory.benchmarks.paper_native \
+            timem "${{ inputs.dataset }}" "$RUNNER_TEMP/timem" \
+            --output "$RUNNER_TEMP/native-report" \
+            --acknowledge-model-calls --isolated-database
+      - name: Archive raw native outputs and manifests
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: timem-native-${{ inputs.dataset }}
+          path: |
+            ${{ runner.temp }}/native-report/**
+            ${{ runner.temp }}/timem/logs/**
+          if-no-files-found: warn

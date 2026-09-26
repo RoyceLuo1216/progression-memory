@@ -8,8 +8,12 @@ on:
       - 'evaluation/paper_pairs.json'
       - 'evaluation/PAPER_REPRODUCTIONS.md'
       - 'src/progression_memory/benchmarks/paper_pairs.py'
+      - 'src/progression_memory/benchmarks/paper_native.py'
       - 'tests/test_paper_pairs.py'
+      - 'tests/test_paper_native.py'
       - '.github/workflows/paper-reproduction-contracts.yml'
+      - '.github/workflows/paper-native-tsm.yml'
+      - '.github/workflows/paper-native-timem.yml'
 
 jobs:
   source-contracts:
@@ -25,7 +29,7 @@ jobs:
       - name: Verify comparison contracts
         env:
           PYTHONPATH: src
-        run: pytest -q tests/test_paper_pairs.py
+        run: pytest -q tests/test_paper_pairs.py tests/test_paper_native.py
       - name: Check out exact upstream revisions
         env:
           PYTHONPATH: src
@@ -39,3 +43,12 @@ jobs:
           python -m compileall -q "$RUNNER_TEMP/timem/experiments/datasets"
           test -f "$RUNNER_TEMP/timem/experiments/datasets/locomo/01_memory_generation.py"
           test -f "$RUNNER_TEMP/timem/experiments/datasets/longmemeval_s/03_evaluation.py"
+      - name: Parse live workflow manifests
+        run: |
+          python - <<'PY'
+          import yaml
+          for path in ('.github/workflows/paper-native-tsm.yml',
+                       '.github/workflows/paper-native-timem.yml'):
+              doc = yaml.safe_load(open(path, encoding='utf-8'))
+              assert len(doc['jobs']) == 1
+          PY
