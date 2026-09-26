@@ -4,6 +4,29 @@ The temporal/semantic component ablations in `baseline_retrieval.py` are **not**
 reproductions of TiMem or Temporal Semantic Memory (TSM). Do not compare their
 retrieval recall with the papers' reported end-to-end QA accuracy.
 
+## Standardized open-weight track
+
+To isolate the effect of progressions, use the same pinned Qwen3-8B chat model
+and Qwen3-Embedding-0.6B embeddings on both sides of **each** paired comparison.
+These are adapted paper implementations, not reproductions of published scores.
+The `open_weight` preparation command creates an isolated copy of either
+pinned upstream checkout, changes explicit model selectors and embedding
+dimension (1024 for TSM), and records edited configuration hashes:
+
+```
+python -m progression_memory.benchmarks.open_weight tsm /tmp/tsm /tmp/tsm-standardized
+python -m progression_memory.benchmarks.open_weight timem /tmp/timem /tmp/timem-standardized
+```
+
+Before a live run, supply version-pinned OpenAI-compatible chat and embeddings
+servers and audit all upstream model calls, including TiMem's retrieval planner,
+answer generator, judge and fallback paths. Use a common frozen judge and
+retrieval budget for each pair. The preparation command is a configuration
+contract only; it does not launch servers, execute benchmarks, or add
+progressions. The CI contract validates configurations without reporting
+accuracy. Record exact checkpoint revisions, quantization, serving settings,
+and output question IDs in each live result.
+
 `paper_pairs.json` pins the public source revisions and records the native
 entrypoints. Run `python -m progression_memory.benchmarks.paper_pairs prepare
 tsm /tmp/tsm --fetch` (or `timem`) to obtain the exact revision. The source
