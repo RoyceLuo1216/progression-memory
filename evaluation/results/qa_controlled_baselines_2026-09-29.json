@@ -1,0 +1,393 @@
+{
+  "datasets": {
+    "locomo": {
+      "context_policy": {
+        "char_budget": 4800,
+        "context_strategy": "flat",
+        "top_k": null
+      },
+      "dataset_sha256": "79fa87e90f04081343b8c8debecb80a9a6842b76a7aa537dc9fdf651ea698ff4",
+      "question_ids_sha256": "de4dbca2eca17e5b74c9c414c205ccb71958f4e0d15cc0728ec876108ca85b81",
+      "sample_size": 180,
+      "systems": {
+        "adaptive_progression_v2": {
+          "overall": {
+            "answer_contains": 0.044444444444444446,
+            "avg_context_chars": 4790.811111111111,
+            "retrieval_recall": 0.545928330928331,
+            "token_f1": 0.022799123039904032
+          },
+          "paired_vs_append": {
+            "answer_improved_ids": [
+              "conv-49:q65"
+            ],
+            "answer_regressed_ids": [
+              "conv-41:q41",
+              "conv-50:q66"
+            ],
+            "delta": {
+              "answer_contains": -0.005555555555555556,
+              "retrieval_recall": -0.05620370370370369,
+              "token_f1": -0.008084760754279264
+            },
+            "question_count": 180
+          }
+        },
+        "append": {
+          "overall": {
+            "answer_contains": 0.05,
+            "avg_context_chars": 4791.966666666666,
+            "retrieval_recall": 0.6021320346320347,
+            "token_f1": 0.03088388379418329
+          },
+          "paired_vs_append": null
+        },
+        "dag_two_stage_v1": {
+          "overall": {
+            "answer_contains": 0.05,
+            "avg_context_chars": 4293.072222222222,
+            "retrieval_recall": 0.600928330928331,
+            "token_f1": 0.029473908609783984
+          },
+          "paired_vs_append": {
+            "answer_improved_ids": [],
+            "answer_regressed_ids": [],
+            "delta": {
+              "answer_contains": 0.0,
+              "retrieval_recall": -0.0012037037037037038,
+              "token_f1": -0.0014099751843993054
+            },
+            "question_count": 180
+          }
+        },
+        "dag_two_stage_v2": {
+          "overall": {
+            "answer_contains": 0.05,
+            "avg_context_chars": 4462.511111111111,
+            "retrieval_recall": 0.6057894420394421,
+            "token_f1": 0.03068757107139942
+          },
+          "paired_vs_append": {
+            "answer_improved_ids": [],
+            "answer_regressed_ids": [],
+            "delta": {
+              "answer_contains": 0.0,
+              "retrieval_recall": 0.003657407407407407,
+              "token_f1": -0.00019631272278387136
+            },
+            "question_count": 180
+          }
+        },
+        "hierarchical_beam_v2": {
+          "overall": {
+            "answer_contains": 0.05,
+            "avg_context_chars": 4327.844444444445,
+            "retrieval_recall": 0.6305579605579605,
+            "token_f1": 0.02915626648179703
+          },
+          "paired_vs_append": {
+            "answer_improved_ids": [],
+            "answer_regressed_ids": [],
+            "delta": {
+              "answer_contains": 0.0,
+              "retrieval_recall": 0.028425925925925924,
+              "token_f1": -0.001727617312386261
+            },
+            "question_count": 180
+          }
+        },
+        "progression_only": {
+          "overall": {
+            "answer_contains": 0.05,
+            "avg_context_chars": 4791.966666666666,
+            "retrieval_recall": 0.6021320346320347,
+            "token_f1": 0.03088388379418329
+          },
+          "paired_vs_append": {
+            "answer_improved_ids": [],
+            "answer_regressed_ids": [],
+            "delta": {
+              "answer_contains": 0.0,
+              "retrieval_recall": 0.0,
+              "token_f1": 0.0
+            },
+            "question_count": 180
+          }
+        },
+        "semantic_only": {
+          "overall": {
+            "answer_contains": 0.05555555555555555,
+            "avg_context_chars": 4764.855555555556,
+            "retrieval_recall": 0.6028264790764791,
+            "token_f1": 0.032789620634411
+          },
+          "paired_vs_append": {
+            "answer_improved_ids": [
+              "conv-44:q71"
+            ],
+            "answer_regressed_ids": [],
+            "delta": {
+              "answer_contains": 0.005555555555555556,
+              "retrieval_recall": 0.0006944444444444445,
+              "token_f1": 0.00190573684022771
+            },
+            "question_count": 180
+          }
+        },
+        "temporal_only": {
+          "overall": {
+            "answer_contains": 0.05,
+            "avg_context_chars": 4791.966666666666,
+            "retrieval_recall": 0.6021320346320347,
+            "token_f1": 0.03088388379418329
+          },
+          "paired_vs_append": {
+            "answer_improved_ids": [],
+            "answer_regressed_ids": [],
+            "delta": {
+              "answer_contains": 0.0,
+              "retrieval_recall": 0.0,
+              "token_f1": 0.0
+            },
+            "question_count": 180
+          }
+        },
+        "temporal_semantic": {
+          "overall": {
+            "answer_contains": 0.05555555555555555,
+            "avg_context_chars": 4648.8,
+            "retrieval_recall": 0.6021320346320347,
+            "token_f1": 0.0328413048116122
+          },
+          "paired_vs_append": {
+            "answer_improved_ids": [
+              "conv-44:q71"
+            ],
+            "answer_regressed_ids": [],
+            "delta": {
+              "answer_contains": 0.005555555555555556,
+              "retrieval_recall": 0.0,
+              "token_f1": 0.0019574210174289155
+            },
+            "question_count": 180
+          }
+        },
+        "two_stage_v2": {
+          "overall": {
+            "answer_contains": 0.05,
+            "avg_context_chars": 4283.8388888888885,
+            "retrieval_recall": 0.600928330928331,
+            "token_f1": 0.029473908609783984
+          },
+          "paired_vs_append": {
+            "answer_improved_ids": [],
+            "answer_regressed_ids": [],
+            "delta": {
+              "answer_contains": 0.0,
+              "retrieval_recall": -0.0012037037037037038,
+              "token_f1": -0.0014099751843993054
+            },
+            "question_count": 180
+          }
+        }
+      }
+    },
+    "longmemeval": {
+      "context_policy": {
+        "char_budget": 100000,
+        "context_strategy": "flat",
+        "top_k": null
+      },
+      "dataset_sha256": "d6f21ea9d60a0d56f34a05b609c79c88a451d2ae03597821ea3d5a9678c3a442",
+      "question_ids_sha256": "1c360ac2a612811ce393396e7c6b21585a91634f01f33a0d5fc52ffb64086ec0",
+      "sample_size": 180,
+      "systems": {
+        "adaptive_progression_v2": {
+          "overall": {
+            "answer_contains": 0.23333333333333334,
+            "avg_context_chars": 99451.03888888888,
+            "retrieval_recall": 0.8398148148148149,
+            "token_f1": 0.06301677959871292
+          },
+          "paired_vs_append": {
+            "answer_improved_ids": [],
+            "answer_regressed_ids": [],
+            "delta": {
+              "answer_contains": 0.0,
+              "retrieval_recall": -0.03342592592592593,
+              "token_f1": -0.008615632193005724
+            },
+            "question_count": 180
+          }
+        },
+        "append": {
+          "overall": {
+            "answer_contains": 0.23333333333333334,
+            "avg_context_chars": 99422.55555555556,
+            "retrieval_recall": 0.8732407407407407,
+            "token_f1": 0.07163241179171864
+          },
+          "paired_vs_append": null
+        },
+        "dag_two_stage_v1": {
+          "overall": {
+            "answer_contains": 0.2388888888888889,
+            "avg_context_chars": 95298.40555555555,
+            "retrieval_recall": 0.8616666666666666,
+            "token_f1": 0.06946971128370594
+          },
+          "paired_vs_append": {
+            "answer_improved_ids": [
+              "gpt4_385a5000"
+            ],
+            "answer_regressed_ids": [],
+            "delta": {
+              "answer_contains": 0.005555555555555556,
+              "retrieval_recall": -0.011574074074074072,
+              "token_f1": -0.0021627005080127135
+            },
+            "question_count": 180
+          }
+        },
+        "dag_two_stage_v2": {
+          "overall": {
+            "answer_contains": 0.2388888888888889,
+            "avg_context_chars": 95742.57222222222,
+            "retrieval_recall": 0.8616666666666666,
+            "token_f1": 0.06977276579364891
+          },
+          "paired_vs_append": {
+            "answer_improved_ids": [
+              "gpt4_385a5000"
+            ],
+            "answer_regressed_ids": [],
+            "delta": {
+              "answer_contains": 0.005555555555555556,
+              "retrieval_recall": -0.011574074074074072,
+              "token_f1": -0.0018596459980697354
+            },
+            "question_count": 180
+          }
+        },
+        "hierarchical_beam_v2": {
+          "overall": {
+            "answer_contains": 0.2388888888888889,
+            "avg_context_chars": 95635.38888888889,
+            "retrieval_recall": 0.8616666666666666,
+            "token_f1": 0.06988483983270602
+          },
+          "paired_vs_append": {
+            "answer_improved_ids": [
+              "gpt4_385a5000"
+            ],
+            "answer_regressed_ids": [],
+            "delta": {
+              "answer_contains": 0.005555555555555556,
+              "retrieval_recall": -0.011574074074074072,
+              "token_f1": -0.001747571959012611
+            },
+            "question_count": 180
+          }
+        },
+        "progression_only": {
+          "overall": {
+            "answer_contains": 0.23333333333333334,
+            "avg_context_chars": 99419.63888888889,
+            "retrieval_recall": 0.8732407407407407,
+            "token_f1": 0.07163241179171864
+          },
+          "paired_vs_append": {
+            "answer_improved_ids": [],
+            "answer_regressed_ids": [],
+            "delta": {
+              "answer_contains": 0.0,
+              "retrieval_recall": 0.0,
+              "token_f1": 0.0
+            },
+            "question_count": 180
+          }
+        },
+        "semantic_only": {
+          "overall": {
+            "answer_contains": 0.2388888888888889,
+            "avg_context_chars": 97455.97777777778,
+            "retrieval_recall": 0.8807407407407407,
+            "token_f1": 0.06983996916809158
+          },
+          "paired_vs_append": {
+            "answer_improved_ids": [
+              "gpt4_385a5000"
+            ],
+            "answer_regressed_ids": [],
+            "delta": {
+              "answer_contains": 0.005555555555555556,
+              "retrieval_recall": 0.007500000000000001,
+              "token_f1": -0.0017924426236270465
+            },
+            "question_count": 180
+          }
+        },
+        "temporal_only": {
+          "overall": {
+            "answer_contains": 0.23333333333333334,
+            "avg_context_chars": 99419.63888888889,
+            "retrieval_recall": 0.8732407407407407,
+            "token_f1": 0.07163241179171864
+          },
+          "paired_vs_append": {
+            "answer_improved_ids": [],
+            "answer_regressed_ids": [],
+            "delta": {
+              "answer_contains": 0.0,
+              "retrieval_recall": 0.0,
+              "token_f1": 0.0
+            },
+            "question_count": 180
+          }
+        },
+        "temporal_semantic": {
+          "overall": {
+            "answer_contains": 0.23333333333333334,
+            "avg_context_chars": 97454.01111111112,
+            "retrieval_recall": 0.8807407407407407,
+            "token_f1": 0.06936250303999707
+          },
+          "paired_vs_append": {
+            "answer_improved_ids": [],
+            "answer_regressed_ids": [],
+            "delta": {
+              "answer_contains": 0.0,
+              "retrieval_recall": 0.007500000000000001,
+              "token_f1": -0.002269908751721558
+            },
+            "question_count": 180
+          }
+        },
+        "two_stage_v2": {
+          "overall": {
+            "answer_contains": 0.2388888888888889,
+            "avg_context_chars": 95290.70555555556,
+            "retrieval_recall": 0.8616666666666666,
+            "token_f1": 0.06946971128370594
+          },
+          "paired_vs_append": {
+            "answer_improved_ids": [
+              "gpt4_385a5000"
+            ],
+            "answer_regressed_ids": [],
+            "delta": {
+              "answer_contains": 0.005555555555555556,
+              "retrieval_recall": -0.011574074074074072,
+              "token_f1": -0.0021627005080127135
+            },
+            "question_count": 180
+          }
+        }
+      }
+    }
+  },
+  "reader": "multi_evidence_extractive",
+  "scope": "matched 180-question stratified deterministic QA diagnostic, not official paper QA",
+  "semantic_model": "hashed",
+  "workflow_run": "https://github.com/RoyceLuo1216/progression-memory/actions/runs/36592991616"
+}
