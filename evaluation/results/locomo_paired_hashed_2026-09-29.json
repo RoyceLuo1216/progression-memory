@@ -1,0 +1,133 @@
+{
+  "char_budget": 2400,
+  "dataset": "locomo",
+  "dataset_sha256": "79fa87e90f04081343b8c8debecb80a9a6842b76a7aa537dc9fdf651ea698ff4",
+  "embedding": "hashed lexical vectors for all construction paths",
+  "kind": "source_level_component_retrieval_not_paper_reproduction",
+  "limitations": [
+    "No TiMem or TSM native writer was executed.",
+    "No answer-generation or QA judge was run.",
+    "Progression groups are broad and this run does not isolate a coherent process construction intervention."
+  ],
+  "pairs": {
+    "append_vs_progression_only": {
+      "delta_macro_recall": 0.0,
+      "improved_ids": [],
+      "questions_with_evidence": 1982,
+      "regressed_ids": []
+    },
+    "temporal_semantic_vs_progression_only": {
+      "delta_macro_recall": -0.0018008630329112189,
+      "improved_ids": [
+        "conv-26:q14",
+        "conv-30:q82",
+        "conv-41:q37",
+        "conv-42:q140",
+        "conv-42:q203",
+        "conv-42:q204",
+        "conv-42:q213",
+        "conv-42:q94",
+        "conv-43:q193",
+        "conv-43:q52",
+        "conv-43:q61",
+        "conv-43:q80",
+        "conv-44:q145",
+        "conv-44:q96",
+        "conv-47:q181",
+        "conv-47:q54",
+        "conv-47:q72",
+        "conv-47:q75",
+        "conv-47:q94",
+        "conv-48:q178",
+        "conv-48:q188",
+        "conv-48:q41",
+        "conv-48:q73",
+        "conv-48:q82",
+        "conv-49:q11",
+        "conv-49:q116",
+        "conv-49:q20",
+        "conv-49:q44",
+        "conv-49:q52",
+        "conv-49:q70",
+        "conv-50:q19",
+        "conv-50:q47",
+        "conv-50:q89",
+        "conv-50:q91"
+      ],
+      "questions_with_evidence": 1982,
+      "regressed_ids": [
+        "conv-26:q39",
+        "conv-26:q43",
+        "conv-30:q84",
+        "conv-41:q113",
+        "conv-41:q159",
+        "conv-41:q176",
+        "conv-41:q9",
+        "conv-42:q242",
+        "conv-42:q52",
+        "conv-42:q78",
+        "conv-43:q177",
+        "conv-43:q4",
+        "conv-44:q127",
+        "conv-44:q69",
+        "conv-44:q7",
+        "conv-44:q73",
+        "conv-44:q84",
+        "conv-44:q9",
+        "conv-47:q133",
+        "conv-47:q157",
+        "conv-47:q166",
+        "conv-47:q69",
+        "conv-47:q91",
+        "conv-48:q182",
+        "conv-48:q45",
+        "conv-48:q46",
+        "conv-48:q49",
+        "conv-49:q39",
+        "conv-50:q117",
+        "conv-50:q118",
+        "conv-50:q183",
+        "conv-50:q186"
+      ]
+    }
+  },
+  "results": {
+    "append": {
+      "avg_sources_per_unit": 1.0,
+      "avg_stage1_candidate_sources": 601.2789526686807,
+      "avg_structural_units_per_conversation": 0.0,
+      "macro_source_evidence_recall_at_2400_chars": 0.6310806147883188,
+      "macro_source_evidence_recall_at_8": 0.5617557423753594
+    },
+    "progression_only": {
+      "avg_sources_per_unit": 139.15,
+      "avg_stage1_candidate_sources": 601.2789526686807,
+      "avg_structural_units_per_conversation": 8.0,
+      "macro_source_evidence_recall_at_2400_chars": 0.6310806147883188,
+      "macro_source_evidence_recall_at_8": 0.5617557423753594
+    },
+    "semantic_only": {
+      "avg_sources_per_unit": 1.0959567728712503,
+      "avg_stage1_candidate_sources": 70.49546827794562,
+      "avg_structural_units_per_conversation": 536.7,
+      "macro_source_evidence_recall_at_2400_chars": 0.6325851601687063,
+      "macro_source_evidence_recall_at_8": 0.5653828283599163
+    },
+    "temporal_only": {
+      "avg_sources_per_unit": 103.19298245614036,
+      "avg_stage1_candidate_sources": 601.2789526686807,
+      "avg_structural_units_per_conversation": 5.7,
+      "macro_source_evidence_recall_at_2400_chars": 0.6310806147883188,
+      "macro_source_evidence_recall_at_8": 0.5617557423753594
+    },
+    "temporal_semantic": {
+      "avg_sources_per_unit": 1.0044398907103824,
+      "avg_stage1_candidate_sources": 58.56495468277946,
+      "avg_structural_units_per_conversation": 585.6,
+      "macro_source_evidence_recall_at_2400_chars": 0.6328814778212298,
+      "macro_source_evidence_recall_at_8": 0.5671426967570198
+    }
+  },
+  "retriever": "structural BM25 to raw source BM25",
+  "source_evidence_questions": 1982
+}
