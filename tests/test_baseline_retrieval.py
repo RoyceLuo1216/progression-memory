@@ -2,7 +2,7 @@ from datetime import date, timedelta
 
 import numpy as np
 
-from progression_memory.benchmarks.baseline_retrieval import evaluate_system
+from progression_memory.benchmarks.baseline_retrieval import evaluate_system, paired_budget_comparison
 from progression_memory.evaluation.retrieval import RetrievalDocument, RetrievalQuery
 from progression_memory.evaluation.temporal_semantic_baselines import build_baseline_documents
 
@@ -15,6 +15,23 @@ class SimpleEmbedder:
             [1.0, 0.0] if "pottery" in text else [0.0, 1.0]
             for text in texts
         ], dtype=np.float32)
+
+
+def test_progression_uses_shared_encoder_and_emits_matched_source_outcomes():
+    docs = (
+        RetrievalDocument("a", "pottery cup", timestamp="2026-01-01"),
+        RetrievalDocument("b", "new job", timestamp="2026-01-02"),
+        RetrievalDocument("c", "pottery bowl", timestamp="2026-01-03"),
+    )
+    query = RetrievalQuery("q", "pottery bowl", frozenset({"c"}), docs, "test")
+    embedder = SimpleEmbedder()
+    baseline = evaluate_system([query], "temporal_semantic", cutoffs=(2,), budgets=(100,), embedder=embedder)
+    progression = evaluate_system([query], "progression_only", cutoffs=(2,), budgets=(100,), embedder=embedder)
+    assert progression["semantic_backend"] == "test-embeddings"
+    pair = paired_budget_comparison({"temporal_semantic": baseline, "progression_only": progression},
+                                    "temporal_semantic", "progression_only", 100)
+    assert pair["questions_with_evidence"] == 1
+    assert pair["delta_macro_recall"] == (pair["per_question_delta"]["q"])
 
 
 def test_temporal_group_can_be_large_but_source_top_k_does_not_get_group_credit():
