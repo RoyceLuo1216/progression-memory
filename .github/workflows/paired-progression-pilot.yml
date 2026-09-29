@@ -1,0 +1,51 @@
+name: paired-progression-pilot
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [master]
+    paths:
+      - 'src/progression_memory/benchmarks/baseline_retrieval.py'
+      - 'tests/test_baseline_retrieval.py'
+      - '.github/workflows/paired-progression-pilot.yml'
+
+jobs:
+  locomo-pilot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install project
+        run: python -m pip install -e '.[dev]'
+      - name: Test paired retrieval and source attribution
+        run: pytest -q tests/test_baseline_retrieval.py
+      - name: Download and verify official LoCoMo
+        run: |
+          mkdir -p evaluation/data evaluation/results/ci/paired-pilot
+          curl -fsSL --retry 3 https://raw.githubusercontent.com/snap-research/locomo/main/data/locomo10.json -o evaluation/data/locomo10.json
+          echo '79fa87e90f04081343b8c8debecb80a9a6842b76a7aa537dc9fdf651ea698ff4  evaluation/data/locomo10.json' | sha256sum -c -
+      - name: Run fixed-encoder LoCoMo retrieval comparison
+        env:
+          PYTHONPATH: src
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from progression_memory.benchmarks.baseline_retrieval import run
+          result = run('locomo', 'evaluation/data/locomo10.json', semantic_model=None)
+          path = Path('evaluation/results/ci/paired-pilot/locomo-hashed.json')
+          path.write_text(json.dumps(result, indent=2, sort_keys=True) + '\n')
+          for name, row in result['results'].items():
+              print(f"{name}: evidence recall@8={row['source_top_k']['cutoffs']['8']['macro_evidence_recall']:.4f}")
+          for name, row in result['paired_retrieval'].items():
+              print(f"{name}: delta at {row['char_budget']} chars={row['delta_macro_recall']:+.4f}; improved={len(row['improved_ids'])}; regressed={len(row['regressed_ids'])}")
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: locomo-paired-progression-pilot
+          path: evaluation/results/ci/paired-pilot/*.json
+          if-no-files-found: warn
