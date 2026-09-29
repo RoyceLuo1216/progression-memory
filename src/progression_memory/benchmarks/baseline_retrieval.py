@@ -47,6 +47,33 @@ def evaluate_system(
     temporal_window_days: float = 14.0, semantic_threshold: float = 0.58,
 ) -> dict[str, object]:
     """Compare raw evidence exposed to the reader under shared source budgets."""
+    transformed, stats = transform_source_queries(
+        queries, system, embedder=embedder, temporal_window_days=temporal_window_days,
+        semantic_threshold=semantic_threshold,
+    )
+    result: dict[str, object] = {
+        "system": system,
+        "protocol": "structural_bm25_to_source_bm25" if system != "append" else "raw_bm25",
+        "source_top_k": evaluate_retrieval(transformed, cutoffs),
+        "source_char_budget": evaluate_retrieval_by_char_budget(
+            transformed, budgets, include_per_query=True,
+        ),
+        "corpus_stats": stats,
+    }
+    if system in {"semantic_only", "temporal_semantic", "progression_only"}:
+        result["semantic_backend"] = getattr(embedder, "model_name", "hashed")
+    if system in {"temporal_only", "temporal_semantic"}:
+        result["temporal_window_days"] = temporal_window_days
+    if system in {"semantic_only", "temporal_semantic"}:
+        result["semantic_threshold"] = semantic_threshold
+    return result
+
+
+def transform_source_queries(
+    queries: list[RetrievalQuery], system: str, *, embedder: TextEmbedder | None = None,
+    temporal_window_days: float = 14.0, semantic_threshold: float = 0.58,
+) -> tuple[list[RetrievalQuery], dict[str, float | int]]:
+    """Rank structural units, expand to raw sources, then rank the source candidates."""
     if system not in SYSTEMS:
         raise ValueError(f"unknown system: {system}")
     transformed: list[RetrievalQuery] = []
@@ -96,14 +123,7 @@ def evaluate_system(
             coverage.append(len(query.evidence_ids & candidates.keys()) / len(query.evidence_ids))
 
     unit_counts = [len(row[0]) for row in cache.values()]
-    result: dict[str, object] = {
-        "system": system,
-        "protocol": "structural_bm25_to_source_bm25" if system != "append" else "raw_bm25",
-        "source_top_k": evaluate_retrieval(transformed, cutoffs),
-        "source_char_budget": evaluate_retrieval_by_char_budget(
-            transformed, budgets, include_per_query=True,
-        ),
-        "corpus_stats": {
+    return transformed, {
             "unique_corpora": len(cache),
             "avg_structural_units": sum(unit_counts) / len(unit_counts) if unit_counts else 0.0,
             "avg_stage1_selected_units": sum(selected_counts) / len(selected_counts) if selected_counts else 0.0,
@@ -113,15 +133,7 @@ def evaluate_system(
                 sum(sum(len(unit.evidence_ids) for unit in row[0]) for row in cache.values())
                 / max(1, sum(unit_counts))
             ),
-        },
     }
-    if system in {"semantic_only", "temporal_semantic", "progression_only"}:
-        result["semantic_backend"] = getattr(embedder, "model_name", "hashed")
-    if system in {"temporal_only", "temporal_semantic"}:
-        result["temporal_window_days"] = temporal_window_days
-    if system in {"semantic_only", "temporal_semantic"}:
-        result["semantic_threshold"] = semantic_threshold
-    return result
 
 
 def paired_budget_comparison(results: dict[str, dict], baseline: str, intervention: str,
