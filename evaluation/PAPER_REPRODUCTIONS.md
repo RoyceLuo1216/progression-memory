@@ -6,6 +6,13 @@ retrieval recall with the papers' reported end-to-end QA accuracy.
 
 ## Standardized open-weight track
 
+The automated `paired-progression-pilot` workflow runs a credential-free,
+source-level LoCoMo comparison using the *same hashed encoder* for the
+non-progression groups and progression-only construction. It reports paired
+source-evidence changes under a fixed reader-character budget and archives
+per-question results. This is a cheap construction sanity check; it does not
+run either paper's original code and does not establish paper-level accuracy.
+
 To isolate the effect of progressions, use the same pinned Qwen3-8B chat model
 and Qwen3-Embedding-0.6B embeddings on both sides of **each** paired comparison.
 These are adapted paper implementations, not reproductions of published scores.
