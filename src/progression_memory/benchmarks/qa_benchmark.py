@@ -6,6 +6,8 @@ import json
 from collections import defaultdict
 from pathlib import Path
 
+from progression_memory.benchmarks.baseline_retrieval import SYSTEMS as GROUPING_SYSTEMS
+from progression_memory.benchmarks.baseline_retrieval import transform_source_queries
 from progression_memory.benchmarks.real_retrieval import _transform_queries
 from progression_memory.evaluation.datasets import load_locomo, load_longmemeval
 from progression_memory.evaluation.qa import (
@@ -16,9 +18,11 @@ from progression_memory.evaluation.qa import (
     write_longmemeval_hypotheses,
 )
 from progression_memory.evaluation.retrieval import RetrievalQuery
+from progression_memory.evaluation.semantic import SentenceTransformerEmbedder
 
 QA_SYSTEMS = (
     "append",
+    "temporal_only", "semantic_only", "temporal_semantic", "progression_only",
     "adaptive_progression_v2",
     "two_stage_v2",
     "dag_two_stage_v1",
@@ -27,6 +31,29 @@ QA_SYSTEMS = (
 )
 QA_READERS = ("extractive_bm25", "multi_evidence_extractive")
 CONTEXT_STRATEGIES = ("flat", "evidence_pack")
+
+
+def paired_qa(results: dict[str, dict], baseline: str = "append") -> dict[str, dict]:
+    """Compare the same question IDs and same reader output metrics against append."""
+    first = {row["id"]: row for row in results[baseline]["per_query"]}
+    metrics = ("token_f1", "answer_contains", "retrieval_recall")
+    comparisons = {}
+    for name, result in results.items():
+        if name == baseline:
+            continue
+        second = {row["id"]: row for row in result["per_query"]}
+        if first.keys() != second.keys():
+            raise ValueError(f"unpaired QA question IDs for {name}")
+        differences = {metric: {qid: float(second[qid][metric]) - float(first[qid][metric])
+                                for qid in first} for metric in metrics}
+        comparisons[name] = {
+            "question_count": len(first),
+            "delta": {metric: sum(rows.values()) / max(1, len(rows))
+                      for metric, rows in differences.items()},
+            "answer_improved_ids": sorted(qid for qid, d in differences["answer_contains"].items() if d > 0),
+            "answer_regressed_ids": sorted(qid for qid, d in differences["answer_contains"].items() if d < 0),
+        }
+    return comparisons
 
 
 def _load(dataset: str, path: str) -> list[RetrievalQuery]:
@@ -77,7 +104,8 @@ def _reader(name: str):
 def run(dataset: str, data_path: str, *, systems: tuple[str, ...] = QA_SYSTEMS,
         top_k: int | None = None, char_budget: int | None = None,
         sample_size: int | None = None, hypotheses_dir: str | None = None,
-        reader_name: str = "extractive_bm25", context_strategy: str = "flat") -> dict[str, object]:
+        reader_name: str = "extractive_bm25", context_strategy: str = "flat",
+        semantic_model: str | None = None) -> dict[str, object]:
     unknown = [system for system in systems if system not in QA_SYSTEMS]
     if unknown:
         raise ValueError(f"unsupported QA systems: {unknown}")
@@ -87,10 +115,16 @@ def run(dataset: str, data_path: str, *, systems: tuple[str, ...] = QA_SYSTEMS,
         raise ValueError(f"unsupported context strategy: {context_strategy}")
     base_queries = _stable_sample(_load(dataset, data_path), sample_size)
     reader = _reader(reader_name)
+    shared_embedder = SentenceTransformerEmbedder(semantic_model) if semantic_model else None
     config = QARunConfig(top_k=top_k, char_budget=char_budget, context_strategy=context_strategy)
     results: dict[str, object] = {}
     for system in systems:
-        transformed, corpus_stats = _transform_queries(base_queries, system)
+        if system in GROUPING_SYSTEMS:
+            transformed, corpus_stats = transform_source_queries(
+                base_queries, system, embedder=shared_embedder,
+            )
+        else:
+            transformed, corpus_stats = _transform_queries(base_queries, system)
         qa = evaluate_qa(transformed, reader, config)
         qa["system"] = system
         qa["corpus_stats"] = corpus_stats
@@ -99,9 +133,13 @@ def run(dataset: str, data_path: str, *, systems: tuple[str, ...] = QA_SYSTEMS,
             write_longmemeval_hypotheses(qa, Path(hypotheses_dir) / f"{system}.{reader.name}.{context_strategy}.jsonl")
     return {
         "dataset": dataset, "reader": reader.name, "sample_size": len(base_queries),
+        "dataset_sha256": hashlib.sha256(Path(data_path).read_bytes()).hexdigest(),
+        "question_ids_sha256": hashlib.sha256("\n".join(q.id for q in base_queries).encode()).hexdigest(),
+        "semantic_model": semantic_model or "hashed",
         "systems": list(systems),
         "context_policy": {"top_k": top_k, "char_budget": char_budget, "context_strategy": context_strategy},
         "results": results,
+        "paired_vs_append": paired_qa(results) if "append" in results else {},
         "note": "Deterministic reader/context ablation. Not directly comparable to published LLM-reader / LLM-judge QA accuracy.",
     }
 
@@ -116,13 +154,14 @@ def main() -> None:
     parser.add_argument("--sample-size", type=int)
     parser.add_argument("--hypotheses-dir")
     parser.add_argument("--reader", choices=QA_READERS, default="extractive_bm25")
+    parser.add_argument("--semantic-model", help="One shared sentence-transformer encoder for grouping systems")
     parser.add_argument("--context-strategy", choices=CONTEXT_STRATEGIES, default="flat")
     parser.add_argument("--output")
     args = parser.parse_args()
     result = run(args.dataset, args.data_path, systems=tuple(v for v in args.systems.split(",") if v),
                  top_k=args.top_k, char_budget=args.char_budget, sample_size=args.sample_size,
                  hypotheses_dir=args.hypotheses_dir, reader_name=args.reader,
-                 context_strategy=args.context_strategy)
+                 context_strategy=args.context_strategy, semantic_model=args.semantic_model)
     payload = json.dumps(result, indent=2, sort_keys=True)
     print(payload)
     if args.output:
