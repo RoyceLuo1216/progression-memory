@@ -10,6 +10,7 @@ on:
       - 'src/progression_memory/evaluation/hierarchical_retrieval.py'
       - 'src/progression_memory/benchmarks/real_retrieval.py'
       - 'tests/test_qa.py'
+      - 'pyproject.toml'
       - '.github/workflows/qa-benchmarks.yml'
 
 jobs:
