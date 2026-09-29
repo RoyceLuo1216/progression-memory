@@ -13,6 +13,8 @@ from progression_memory.evaluation.qa import (
     write_longmemeval_hypotheses,
 )
 from progression_memory.evaluation.retrieval import RetrievalDocument, RetrievalQuery
+from progression_memory.benchmarks.qa_benchmark import paired_qa
+from progression_memory.benchmarks.baseline_retrieval import transform_source_queries
 
 
 def _query() -> RetrievalQuery:
@@ -147,3 +149,16 @@ def test_longmemeval_hypothesis_export(tmp_path) -> None:
     row = json.loads(path.read_text(encoding="utf-8").strip())
     assert row["question_id"] == "q1"
     assert "hypothesis" in row
+
+
+def test_all_grouping_baselines_enter_same_source_level_qa_reader() -> None:
+    query = _query()
+    results = {}
+    for system in ("append", "temporal_only", "semantic_only", "temporal_semantic", "progression_only"):
+        transformed, stats = transform_source_queries([query], system)
+        assert stats["unique_corpora"] == 1
+        assert all(doc.id in {"d1", "d2"} for doc in transformed[0].documents)
+        results[system] = evaluate_qa(transformed, ExtractiveBM25Reader(), QARunConfig(char_budget=200))
+    comparisons = paired_qa(results)
+    assert set(comparisons) == {"temporal_only", "semantic_only", "temporal_semantic", "progression_only"}
+    assert all(row["question_count"] == 1 for row in comparisons.values())
