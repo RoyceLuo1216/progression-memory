@@ -8,6 +8,7 @@ raw source documents count toward evidence recall and reader character budgets.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 from collections import OrderedDict
 from pathlib import Path
@@ -31,7 +32,7 @@ def _groups(
     temporal_window_days: float, semantic_threshold: float,
 ) -> tuple[tuple[RetrievalDocument, ...], dict[str, object]]:
     if system == "progression_only":
-        units, stats = build_progression_documents(documents, mode="flat")
+        units, stats = build_progression_documents(documents, mode="flat", embedder=embedder)
     else:
         units, stats = build_baseline_documents(
             documents, system, embedder=embedder, temporal_window_days=temporal_window_days,
@@ -99,7 +100,9 @@ def evaluate_system(
         "system": system,
         "protocol": "structural_bm25_to_source_bm25" if system != "append" else "raw_bm25",
         "source_top_k": evaluate_retrieval(transformed, cutoffs),
-        "source_char_budget": evaluate_retrieval_by_char_budget(transformed, budgets),
+        "source_char_budget": evaluate_retrieval_by_char_budget(
+            transformed, budgets, include_per_query=True,
+        ),
         "corpus_stats": {
             "unique_corpora": len(cache),
             "avg_structural_units": sum(unit_counts) / len(unit_counts) if unit_counts else 0.0,
@@ -112,13 +115,39 @@ def evaluate_system(
             ),
         },
     }
-    if system in {"semantic_only", "temporal_semantic"}:
+    if system in {"semantic_only", "temporal_semantic", "progression_only"}:
         result["semantic_backend"] = getattr(embedder, "model_name", "hashed")
     if system in {"temporal_only", "temporal_semantic"}:
         result["temporal_window_days"] = temporal_window_days
     if system in {"semantic_only", "temporal_semantic"}:
         result["semantic_threshold"] = semantic_threshold
     return result
+
+
+def paired_budget_comparison(results: dict[str, dict], baseline: str, intervention: str,
+                             budget: int) -> dict[str, object]:
+    """Measure matched source-evidence changes with identical question IDs and budget."""
+    def rows(system: str) -> dict[str, dict]:
+        return {row["id"]: row for row in
+                results[system]["source_char_budget"]["budgets"][str(budget)]["per_query"]}
+
+    first, second = rows(baseline), rows(intervention)
+    if first.keys() != second.keys():
+        raise ValueError("paired retrieval question IDs differ")
+    if baseline != "append" and results[baseline].get("semantic_backend") != results[intervention].get("semantic_backend"):
+        raise ValueError("paired systems used different semantic encoders")
+    deltas = {qid: float(second[qid]["recall"]) - float(first[qid]["recall"])
+              for qid in first}
+    return {
+        "baseline": baseline, "intervention": intervention, "char_budget": budget,
+        "questions_with_evidence": len(first),
+        "baseline_macro_recall": sum(float(row["recall"]) for row in first.values()) / max(1, len(first)),
+        "intervention_macro_recall": sum(float(row["recall"]) for row in second.values()) / max(1, len(second)),
+        "delta_macro_recall": sum(deltas.values()) / max(1, len(deltas)),
+        "improved_ids": sorted(qid for qid, delta in deltas.items() if delta > 0),
+        "regressed_ids": sorted(qid for qid, delta in deltas.items() if delta < 0),
+        "per_question_delta": deltas,
+    }
 
 
 def run(
@@ -130,16 +159,28 @@ def run(
         raise ValueError(f"unknown dataset: {dataset}")
     queries = load_locomo(data_path) if dataset == "locomo" else load_longmemeval(data_path)
     embedder = SentenceTransformerEmbedder(semantic_model) if semantic_model else None
+    results = {
+        system: evaluate_system(
+            queries, system, cutoffs=cutoffs, budgets=BUDGETS[dataset],
+            embedder=embedder, temporal_window_days=temporal_window_days,
+            semantic_threshold=semantic_threshold,
+        ) for system in systems
+    }
+    pairs = {}
+    if "progression_only" in results:
+        for baseline in ("append", "temporal_semantic"):
+            if baseline in results:
+                pairs[f"{baseline}_vs_progression_only"] = paired_budget_comparison(
+                    results, baseline, "progression_only", BUDGETS[dataset][1],
+                )
+    data_bytes = Path(data_path).read_bytes()
     return {
         "dataset": dataset,
+        "dataset_sha256": hashlib.sha256(data_bytes).hexdigest(),
+        "semantic_model": semantic_model or "hashed",
         "retrieval_level": "raw_source",
-        "results": {
-            system: evaluate_system(
-                queries, system, cutoffs=cutoffs, budgets=BUDGETS[dataset],
-                embedder=embedder, temporal_window_days=temporal_window_days,
-                semantic_threshold=semantic_threshold,
-            ) for system in systems
-        },
+        "results": results,
+        "paired_retrieval": pairs,
     }
 
 
