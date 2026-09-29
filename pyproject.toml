@@ -6,6 +6,7 @@ requires-python = ">=3.11"
 dependencies = [
   "pydantic>=2.7",
   "numpy>=1.26",
+  "PyYAML>=6.0",
 ]
 
 [project.optional-dependencies]
