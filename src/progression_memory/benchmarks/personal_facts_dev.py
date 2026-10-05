@@ -53,12 +53,28 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--train-parquet", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--export-dir", type=Path,
+                        help="write normalized train-only JSONL shards")
     args = parser.parse_args()
     import pyarrow.parquet as pq
     rows = pq.read_table(args.train_parquet).to_pylist()
     result = summarize(rows, "train", hashlib.sha256(args.train_parquet.read_bytes()).hexdigest())
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(result, indent=2) + "\n")
+    if args.export_dir:
+        args.export_dir.mkdir(parents=True, exist_ok=True)
+        normalized = [normalize(row) for row in rows]
+        shard_size = 400  # file transport only; never a model or label threshold
+        for start in range(0, len(normalized), shard_size):
+            path = args.export_dir / f"train_{start // shard_size:02d}.jsonl"
+            path.write_text("".join(json.dumps(row, ensure_ascii=False) + "\n"
+                                    for row in normalized[start:start + shard_size]))
+        (args.export_dir / "manifest.json").write_text(json.dumps({
+            "source": SOURCE, "revision": REVISION,
+            "source_sha256": result["source_sha256"],
+            "split": "train", "rows": len(normalized),
+            "shards": sorted(p.name for p in args.export_dir.glob("train_*.jsonl")),
+        }, indent=2) + "\n")
     print(json.dumps({"rows": result["rows"],
                       "durable_self_candidates": result["durable_self_candidates"]}))
 
