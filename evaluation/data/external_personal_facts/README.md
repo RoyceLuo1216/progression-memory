@@ -6,13 +6,22 @@ paired with dialogue context and labels for topic, time, referent, duration,
 validity, and follow-up. The CI importer pins revision
 `22854562a2934ea07983ecda4f4fd8ff3aef2e85`, downloads **train only**,
 audits the schema, and saves counts and a source checksum as an artifact. The
-source is CC BY-SA 4.0; cite both its card and original MSC. Its raw Parquet
-is not copied into this repository.
+source is CC BY-SA 4.0; cite both its card and original MSC. The original
+Parquet is not copied into this repository; normalized **train-only** rows are
+checked into `train/` with all original labels, dialogue context, extracted
+fact, stable hash ID, and an explicitly derived candidate flag. The 556-row
+source test split is not used here.
 
 The pinned training file has 2,223 rows; 1,368 meet the dataset's Self,
 Long-term, and valid-label filter. The committed `train_audit_v1.json`
 records the exact source checksum and category counts. Those 1,368 are
 candidate facts, not 1,368 progression routing decisions.
+
+The `train/manifest.json` pins the upstream revision and SHA256. To reproduce
+all six JSONL shards, run the importer with `--export-dir`, as the CI workflow
+does. The CI compares every regenerated shard byte-for-byte to the checked-in
+copy. Keep the source's attribution and CC BY-SA terms with redistributed
+derived copies.
 
 Use it for supervised *fact characterization*: identify self versus other,
 long versus short duration, and invalid candidate facts. The supplied `text`
