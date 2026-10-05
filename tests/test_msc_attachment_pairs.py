@@ -4,6 +4,8 @@ import json
 from collections import Counter, defaultdict
 from pathlib import Path
 
+from progression_memory.benchmarks.calibrate_progression import load_real_pairs
+
 
 def test_msc_pair_snapshot():
     path = Path("evaluation/data/progression_attachment/msc_train_pairs_v1.json")
@@ -26,3 +28,6 @@ def test_msc_pair_snapshot():
             return int(session), int(turn)
         assert order(row["candidate_anchor_source_id"]) < order(row["event_source_id"])
     assert all(len(ids) == 1 for ids in by_event.values())
+    model_rows = load_real_pairs(path)
+    assert len(model_rows) == 100
+    assert len({row["scenario"] for row in model_rows}) == 6
