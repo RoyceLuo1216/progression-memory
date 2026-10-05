@@ -21,3 +21,16 @@ ongoing processes and should be used for writer inspection, not as evidence
 of general accuracy. The 100-pair synthetic prototype remains in
 `evaluation/progression_calibration_scenarios.json` for its original contract
 test; this file is a separate real dialogue development set.
+
+To fit an **exploratory** proposal on these provisional labels:
+
+```bash
+python -m progression_memory.benchmarks.calibrate_progression \
+  --real-pairs evaluation/data/progression_attachment/msc_train_pairs_v1.json \
+  --output evaluation/results/msc_attachment_exploratory.json
+```
+
+Folds leave out whole conversations; the reported cutoff is still selected
+from these same folds, so the reported accuracy is diagnostic, not an unbiased
+test estimate. This is only a proposal score, not a trained hierarchy/state
+writer.
