@@ -1,0 +1,35 @@
+name: alpsbench-dev-audit
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - '.github/workflows/alpsbench-dev-audit.yml'
+      - 'src/progression_memory/benchmarks/alpsbench_dev.py'
+      - 'evaluation/data/external_alpsbench/**'
+  workflow_dispatch:
+
+jobs:
+  audit-update-dev:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Fetch pinned AlpsBench development update task
+        run: |
+          base=https://huggingface.co/datasets/Cosineyx/Alpsbench/resolve/238961f49e4fe6de8b09a4fefd77d76d759d620f/dataset/dev/task2
+          curl --fail --location --retry 3 --silent --show-error \
+            "$base/model_input.jsonl" -o "$RUNNER_TEMP/alps-input.jsonl"
+          curl --fail --location --retry 3 --silent --show-error \
+            "$base/reference_output.jsonl" -o "$RUNNER_TEMP/alps-reference.jsonl"
+          PYTHONPATH=src python -m progression_memory.benchmarks.alpsbench_dev \
+            --inputs "$RUNNER_TEMP/alps-input.jsonl" \
+            --references "$RUNNER_TEMP/alps-reference.jsonl" \
+            --output "$RUNNER_TEMP/alps-dev-audit.json"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: alpsbench-dev-update-audit
+          path: ${{ runner.temp }}/alps-dev-audit.json
