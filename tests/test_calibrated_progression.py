@@ -6,7 +6,7 @@ import numpy as np
 import pytest
 
 from progression_memory.benchmarks.calibrate_progression import load_pairs
-from progression_memory.benchmarks.representation_rag_benchmark import evaluate
+from progression_memory.benchmarks.representation_rag_benchmark import evaluate, replay_decisions
 from progression_memory.evaluation.representation_rag import records, retrieve
 from progression_memory.evaluation.retrieval import RetrievalDocument, RetrievalQuery
 from progression_memory.maintenance.calibrated_progression import (
@@ -124,3 +124,16 @@ def test_paired_rag_uses_identical_sources_and_reader():
     assert progression["overall"]["retrieval_recall"] == 1.0
     assert append["reader"] == progression["reader"]
     assert append["question_ids_sha256"] == progression["question_ids_sha256"]
+
+
+def test_writer_trace_replay_rejects_source_mismatch():
+    docs = (RetrievalDocument("e1", "Started working"),)
+    query = RetrievalQuery("person:q0", "Where?", frozenset({"e1"}), docs,
+                           "fact", "work")
+    rows = [{"source_id": "e1", "subject_id": "person",
+             "decision": {"action": "create_root", "identity": "Career",
+                          "scope": "Work", "state": "Working", "reason": "Started work"}}]
+    assert replay_decisions(query, rows).progressions["progression:0"].current_state.text == "Working"
+    rows[0]["source_id"] = "wrong"
+    with pytest.raises(ValueError, match="source order"):
+        replay_decisions(query, rows)
