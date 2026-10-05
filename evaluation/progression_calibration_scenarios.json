@@ -1,0 +1,43 @@
+{
+  "provenance": "Hand-authored synthetic process examples for prototype wiring. Labels are hypotheses, not human annotation or benchmark ground truth.",
+  "subject_id": "example-user",
+  "candidates": {
+    "education": ["Education", "Degree studies, university courses and academic milestones", "Studying computer science at university"],
+    "postgrad": ["Postgraduate applications", "Graduate school selection, applications and admissions", "Considering graduate programs"],
+    "shopify": ["Shopify employment", "Shopify internship, work and employment decisions", "Working on shipping software at Shopify"],
+    "bank": ["Bank employment", "Banking internship, trade floor work and employment decisions", "Building internal tools at a bank"],
+    "job_search": ["Software job search", "Applications, interviews and offers for software jobs", "Searching for software roles"],
+    "running": ["Running training", "Running goals, training, races and injuries", "Training for a distance race"],
+    "music": ["Music interest", "Learning instruments, practice and performances", "Practicing piano"],
+    "travel": ["Travel plans", "Trips, destinations and bookings", "Planning a trip"],
+    "housing": ["Housing search", "Apartment search, applications and leases", "Searching for an apartment"],
+    "research": ["Memory research", "Research on long term memory architectures", "Testing a memory system"]
+  },
+  "scenarios": [
+    ["Enrolled in a university computer science course", ["education"], ["education", "music", "housing", "bank"]],
+    ["Completed a university degree requirement", ["education"], ["education", "research", "travel", "shopify"]],
+    ["Started studying for a statistics course exam", ["education"], ["education", "running", "job_search", "music"]],
+    ["Applied to graduate programs in computer science", ["postgrad", "education"], ["postgrad", "education", "housing", "travel"]],
+    ["Received a graduate school admission offer", ["postgrad", "education"], ["postgrad", "education", "shopify", "running"]],
+    ["Compared funding for postgraduate applications", ["postgrad"], ["postgrad", "bank", "music", "housing"]],
+    ["Started a software internship at Shopify", ["shopify"], ["shopify", "bank", "running", "travel"]],
+    ["Shipped shipping software at Shopify", ["shopify"], ["shopify", "research", "housing", "music"]],
+    ["Received a return offer from Shopify during the software job search", ["shopify", "job_search"], ["shopify", "job_search", "education", "running"]],
+    ["Built a trade floor dashboard at the bank", ["bank"], ["bank", "shopify", "travel", "running"]],
+    ["Completed the banking internship", ["bank"], ["bank", "housing", "postgrad", "music"]],
+    ["Applied to a software engineering job", ["job_search"], ["job_search", "bank", "travel", "education"]],
+    ["Scheduled a software job interview", ["job_search"], ["job_search", "research", "housing", "music"]],
+    ["Accepted a software job offer after interviews", ["job_search"], ["job_search", "shopify", "running", "travel"]],
+    ["Ran five kilometers while training for a race", ["running"], ["running", "job_search", "education", "housing"]],
+    ["Paused running training after an ankle injury", ["running"], ["running", "postgrad", "bank", "music"]],
+    ["Resumed distance race training", ["running"], ["running", "research", "travel", "shopify"]],
+    ["Practiced piano for a music performance", ["music"], ["music", "running", "research", "housing"]],
+    ["Joined a music lesson for piano", ["music"], ["music", "bank", "postgrad", "travel"]],
+    ["Booked a flight for the planned trip", ["travel"], ["travel", "education", "shopify", "housing"]],
+    ["Returned from the planned travel destination", ["travel"], ["travel", "running", "research", "job_search"]],
+    ["Submitted an apartment rental application", ["housing"], ["housing", "postgrad", "bank", "music"]],
+    ["Signed an apartment lease after the housing search", ["housing"], ["housing", "shopify", "education", "running"]],
+    ["Tested retrieval in a long term memory research project", ["research"], ["research", "education", "job_search", "travel"]],
+    ["Revised the memory research experiment after a failed benchmark", ["research"], ["research", "shopify", "bank", "music"]]
+  ]
+}
