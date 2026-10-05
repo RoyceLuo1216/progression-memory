@@ -1,0 +1,15 @@
+{
+  "source": "adugeen/personal-facts-msc",
+  "revision": "22854562a2934ea07983ecda4f4fd8ff3aef2e85",
+  "source_sha256": "f7f7fab70fcfc949abc743480fbf189d5956fc2d05cbd0628147aa76d1551b8b",
+  "split": "train",
+  "rows": 2223,
+  "shards": [
+    "train_00.jsonl",
+    "train_01.jsonl",
+    "train_02.jsonl",
+    "train_03.jsonl",
+    "train_04.jsonl",
+    "train_05.jsonl"
+  ]
+}
