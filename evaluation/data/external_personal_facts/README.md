@@ -9,6 +9,11 @@ audits the schema, and saves counts and a source checksum as an artifact. The
 source is CC BY-SA 4.0; cite both its card and original MSC. Its raw Parquet
 is not copied into this repository.
 
+The pinned training file has 2,223 rows; 1,368 meet the dataset's Self,
+Long-term, and valid-label filter. The committed `train_audit_v1.json`
+records the exact source checksum and category counts. Those 1,368 are
+candidate facts, not 1,368 progression routing decisions.
+
 Use it for supervised *fact characterization*: identify self versus other,
 long versus short duration, and invalid candidate facts. The supplied `text`
 is a candidate paraphrase grounded in `context`, not an adjudicated before/after
