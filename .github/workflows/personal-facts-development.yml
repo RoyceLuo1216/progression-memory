@@ -29,6 +29,8 @@ jobs:
           python -m progression_memory.benchmarks.personal_facts_dev \
             --train-parquet "$RUNNER_TEMP/personal-facts-train.parquet" \
             --output "$RUNNER_TEMP/personal-facts-audit.json"
+          cmp "$RUNNER_TEMP/personal-facts-audit.json" \
+            evaluation/data/external_personal_facts/train_audit_v1.json
       - uses: actions/upload-artifact@v4
         with:
           name: external-personal-facts-train-audit
