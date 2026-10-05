@@ -26,9 +26,12 @@ can infer phase changes or hierarchy. Each update supplies explicit state and
 whether a new phase starts. The memory checks source IDs, subject isolation,
 unique identity, target existence, and duplicate targets before mutation.
 
-The mock does not yet validate the truth of generated state text against source
-text, decide when to create children, or extract real events from conversations.
-Those are necessary writer tasks before a live LoCoMo/LongMemEval comparison.
+`model_progression_writer.py` now provides a structured model adapter for route,
+child, multiattachment, state and phase decisions, retaining every event once.
+The mock only validates the JSON/storage contract. No real model has been run
+through this writer. The store does not yet validate the truth of generated
+state text against source text, and real event extraction/subject attribution
+requires validation before a live LoCoMo/LongMemEval progression comparison.
 
 ## Attachment calibration
 
@@ -63,9 +66,9 @@ balanced accuracy 0.9752, one false attachment and one missed attachment.
 This is an interface check, not a result against baseline RAG.
 
 The separate `representation_rag_benchmark.py` runs source-level dense append
-RAG with a pinned encoder. Its CI pilot uses the existing top-eight retrieval
-comparison convention and 4,800-character LoCoMo context budget, explicitly
-as a diagnostic operating point, with 180 deterministic sampled questions.
+RAG with a pinned encoder. Its CI pilot ranks the entire index under the
+existing 4,800-character LoCoMo context budget, with 180 deterministic sampled
+questions. An optional top-eight diagnostic is available through search depth.
 It does not construct progressions; real writer traces and held-out attachment
 labels are still required to evaluate the representation intervention.
 
