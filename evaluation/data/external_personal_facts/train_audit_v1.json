@@ -1,0 +1,42 @@
+{
+  "source": "adugeen/personal-facts-msc",
+  "revision": "22854562a2934ea07983ecda4f4fd8ff3aef2e85",
+  "split": "train",
+  "source_sha256": "f7f7fab70fcfc949abc743480fbf189d5956fc2d05cbd0628147aa76d1551b8b",
+  "rows": 2223,
+  "durable_self_candidates": 1368,
+  "counts": {
+    "main_category": {
+      "Characteristics": 230,
+      "Demographics": 144,
+      "Experience": 308,
+      "Goals and plans": 268,
+      "None": 339,
+      "Possessions": 143,
+      "Preferences": 458,
+      "Relationships": 35,
+      "Routine activities": 298
+    },
+    "time": {
+      "Future": 261,
+      "None": 340,
+      "Past": 290,
+      "Present": 1332
+    },
+    "referent": {
+      "None": 340,
+      "Other": 155,
+      "Self": 1728
+    },
+    "duration": {
+      "Long-term": 1505,
+      "None": 340,
+      "Short-term": 378
+    },
+    "broken": {
+      "No": 1884,
+      "Yes": 339
+    }
+  },
+  "limitations": "Single annotator, MSC-derived, no progression graph or conversation ID; no independent sequence evaluation."
+}
