@@ -5,6 +5,7 @@ on:
     branches: [master]
     paths:
       - 'src/progression_memory/maintenance/calibrated_progression.py'
+      - 'src/progression_memory/maintenance/model_progression_writer.py'
       - 'src/progression_memory/evaluation/representation_rag.py'
       - 'src/progression_memory/benchmarks/calibrate_progression.py'
       - 'src/progression_memory/benchmarks/representation_rag_benchmark.py'
