@@ -1,0 +1,31 @@
+name: representation-rag-contract
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'src/progression_memory/maintenance/calibrated_progression.py'
+      - 'src/progression_memory/evaluation/representation_rag.py'
+      - 'src/progression_memory/benchmarks/calibrate_progression.py'
+      - 'evaluation/progression_calibration_scenarios.json'
+      - 'tests/test_calibrated_progression.py'
+      - '.github/workflows/representation-rag-contract.yml'
+  workflow_dispatch:
+
+jobs:
+  synthetic-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install -e '.[dev]'
+      - run: pytest -q tests/test_calibrated_progression.py
+      - run: >-
+          python -m progression_memory.benchmarks.calibrate_progression
+          --output evaluation/results/ci/progression_attachment_synthetic.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: progression-attachment-synthetic
+          path: evaluation/results/ci/progression_attachment_synthetic.json
