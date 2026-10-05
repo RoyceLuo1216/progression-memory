@@ -5,7 +5,7 @@
 | `progression_attachment/msc_train_pairs_v1.json` | 100 pairs from 25 events, 6 MSC conversations; 33 positive | Provisional event-to-candidate attachment | Same underlying MSC source as Personal Facts; conversation-held-out within this file only. Review labels before estimating accuracy. |
 | `progression_routing/career_school_trace_v1.json` | 29 fictional events | Full action, hierarchy, subject and state contract | Constructed example; validates storage, not generalization. |
 | `../progression_calibration_scenarios.json` | 25 invented scenarios × 4 candidates = 100 pairs | Synthetic attachment calibration | Prototype contract only. |
-| `external_personal_facts/train_audit_v1.json` | 2,223 published train facts, 1,368 self/long-term/valid candidates | Referent, temporal class, duration, validity, fact paraphrase | MSC-derived, single annotator, no conversation IDs; raw data fetched by pinned CI importer. Not independent of MSC pairs. |
+| `external_personal_facts/train/` | 2,223 published train facts, 1,368 self/long-term/valid candidates | Referent, temporal class, duration, validity, fact paraphrase | MSC-derived, single annotator, no conversation IDs; normalized source training rows checked in, raw Parquet fetched by pinned CI importer. Not independent of MSC pairs. |
 | `external_alpsbench/dev_task2_audit_v1.json` | 469 dev update cases | Before/after memory sets and source evidence | Real WildChat-derived dialogue; every case has one removed and two added IDs. Pin and fetch via CI; no hierarchy or representative no-op labels. Test held out. |
 
 **Do not sum these counts into a model training size.** Pairs from one event
