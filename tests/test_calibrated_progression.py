@@ -5,7 +5,9 @@ import numpy as np
 import pytest
 
 from progression_memory.benchmarks.calibrate_progression import load_pairs
+from progression_memory.benchmarks.representation_rag_benchmark import evaluate
 from progression_memory.evaluation.representation_rag import records, retrieve
+from progression_memory.evaluation.retrieval import RetrievalDocument, RetrievalQuery
 from progression_memory.maintenance.calibrated_progression import (
     Action, Decision, Event, LinearAttachmentModel, Memory,
 )
@@ -68,3 +70,19 @@ def test_shared_dense_retrieval_counts_only_delivered_sources():
         assert set(result.source_event_ids) == set(memory.events)
         assert result.used_chars <= 1000
         assert {doc.id for doc in result.context if not doc.id.startswith("summary:")} == set(memory.events)
+
+
+def test_paired_rag_uses_identical_sources_and_reader():
+    memory = career_memory()
+    documents = tuple(RetrievalDocument(e.id, e.text) for e in memory.events.values())
+    query = RetrievalQuery("q", "Shopify offer", frozenset({"e3"}), documents,
+                           "temporal", "Shopify")
+    append = evaluate([query], TinyEncoder(), representation="append",
+                      search_depth=len(documents), context_chars=1000)
+    progression = evaluate([query], TinyEncoder(), representation="progression",
+                           search_depth=len(records(memory, "progression")),
+                           context_chars=1000, memory_by_corpus={id(documents): memory})
+    assert append["overall"]["retrieval_recall"] == 1.0
+    assert progression["overall"]["retrieval_recall"] == 1.0
+    assert append["reader"] == progression["reader"]
+    assert append["question_ids_sha256"] == progression["question_ids_sha256"]
