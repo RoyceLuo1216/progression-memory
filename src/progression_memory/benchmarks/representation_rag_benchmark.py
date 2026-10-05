@@ -13,7 +13,9 @@ from progression_memory.evaluation.qa import MultiEvidenceExtractiveReader, answ
 from progression_memory.evaluation.representation_rag import records
 from progression_memory.evaluation.retrieval import RetrievalQuery
 from progression_memory.evaluation.semantic import SemanticIndex, TextEmbedder
-from progression_memory.maintenance.calibrated_progression import Event, Memory
+from progression_memory.maintenance.calibrated_progression import (
+    Action, Decision, Event, Memory, TargetUpdate,
+)
 from progression_memory.evaluation.progressions import parse_timestamp
 
 
@@ -37,6 +39,32 @@ def append_memory(query: RetrievalQuery) -> Memory:
         memory.events[source.id] = Event(source.id, "corpus", source.text,
                                          parse_timestamp(source.timestamp, ordinal), source.id)
     return memory
+
+
+def replay_decisions(query: RetrievalQuery, rows: list[dict]) -> Memory:
+    """Replay an independently produced writer trace against original sources."""
+    if len(rows) != len(query.documents):
+        raise ValueError("writer trace must cover every source event in order")
+    memory = Memory()
+    for ordinal, (source, row) in enumerate(zip(query.documents, rows, strict=True)):
+        if row.get("source_id") != source.id:
+            raise ValueError("writer trace source order/id mismatch")
+        raw = row["decision"]
+        decision = Decision(
+            action=Action(raw["action"]), target_ids=tuple(raw.get("target_ids", [])),
+            parent_id=raw.get("parent_id"), identity=raw.get("identity", ""),
+            scope=raw.get("scope", ""), state=raw.get("state", ""),
+            change=raw.get("change", ""), new_segment=raw.get("new_segment", False),
+            reason=raw["reason"],
+            target_updates=tuple(TargetUpdate(**item) for item in raw.get("target_updates", [])),
+        )
+        memory.apply(Event(source.id, row["subject_id"], source.text,
+                           parse_timestamp(source.timestamp, ordinal), source.id), decision)
+    return memory
+
+
+def corpus_key(query: RetrievalQuery, dataset: str) -> str:
+    return query.id.rsplit(":q", 1)[0] if dataset == "locomo" else query.id
 
 
 def evaluate(
@@ -118,6 +146,10 @@ def evaluate(
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--dataset", choices=("locomo", "longmemeval"), required=True)
+    parser.add_argument("--representation", choices=("append", "structure", "progression"),
+                        default="append")
+    parser.add_argument("--decision-traces", type=Path,
+                        help="JSON map of corpus key to ordered per-source writer decisions")
     parser.add_argument("--data-path", type=Path, required=True)
     parser.add_argument("--semantic-model", required=True)
     parser.add_argument("--model-revision", required=True)
@@ -134,12 +166,24 @@ def main() -> None:
         if args.sample_size < 1:
             raise ValueError("sample-size must be positive")
         queries = sorted(queries, key=lambda q: hashlib.sha256(q.id.encode()).hexdigest())[:args.sample_size]
+    memories = None
+    if args.representation != "append":
+        if args.decision_traces is None:
+            raise ValueError("progression representations require audited writer decisions")
+        traces = json.loads(args.decision_traces.read_text())
+        memories = {}
+        for query in queries:
+            key = id(query.documents)
+            if key not in memories:
+                name = corpus_key(query, args.dataset)
+                memories[key] = replay_decisions(query, traces[name])
     result = evaluate(queries, PinnedEncoder(args.semantic_model, args.model_revision),
-                      representation="append", search_depth=search_depth,
-                      context_chars=args.context_chars)
+                      representation=args.representation, search_depth=search_depth,
+                      context_chars=args.context_chars, memory_by_corpus=memories)
     result.update(dataset=args.dataset, dataset_sha256=hashlib.sha256(args.data_path.read_bytes()).hexdigest(),
                   encoder=args.semantic_model, encoder_revision=args.model_revision,
-                  note="Dense source RAG control with deterministic reader; no progression writer executed.")
+                  writer_trace=str(args.decision_traces) if args.decision_traces else None,
+                  note="Deterministic reader; progression mode replays supplied writer decisions.")
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(result, indent=2) + "\n")
     print(json.dumps({key: result[key] for key in ("dataset", "question_count", "overall")}, indent=2))
