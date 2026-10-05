@@ -1,0 +1,39 @@
+{
+  "dataset": "locomo",
+  "dataset_sha256": "79fa87e90f04081343b8c8debecb80a9a6842b76a7aa537dc9fdf651ea698ff4",
+  "question_count": 180,
+  "question_ids_sha256": "1a2969c14c42a9bd9125c1a7d75a8874c709bf2dd6ceabc2c421707cc225c9cd",
+  "sample": "First 180 question IDs by SHA256 hash order; identical for both controls",
+  "reader": "multi_evidence_extractive",
+  "context_char_budget": 4800,
+  "ranked_index": "all source records, no top-k truncation",
+  "systems": {
+    "bm25_append": {
+      "source_evidence_recall": 0.6942195767195768,
+      "answer_contains": 0.08333333333333333,
+      "token_f1": 0.041715111488363044,
+      "mean_context_chars": 4792.038888888889
+    },
+    "dense_append": {
+      "encoder": "sentence-transformers/all-MiniLM-L6-v2",
+      "revision": "1110a243fdf4706b3f48f1d95db1a4f5529b4d41",
+      "source_evidence_recall": 0.5867261904761906,
+      "answer_contains": 0.09444444444444444,
+      "token_f1": 0.05140445369032533,
+      "mean_context_chars": 4792.077777777778,
+      "workflow": "https://github.com/RoyceLuo1216/progression-memory/actions/runs/37362412873"
+    }
+  },
+  "dense_minus_bm25_paired": {
+    "source_evidence_recall": -0.10749338624338625,
+    "source_recall_improved_questions": 30,
+    "source_recall_regressed_questions": 45,
+    "answer_contains": 0.011111111111111112,
+    "answer_improved_questions": 7,
+    "answer_regressed_questions": 5,
+    "token_f1": 0.009689342201962296,
+    "token_f1_improved_questions": 32,
+    "token_f1_regressed_questions": 28
+  },
+  "limitations": "Diagnostic sample and deterministic weak reader. No progression writer or official QA judge was run. Dense artifact contains per-question source IDs. BM25 comparison was run locally on the same verified dataset and question IDs."
+}
