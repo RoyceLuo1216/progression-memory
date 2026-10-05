@@ -12,7 +12,7 @@ from progression_memory.evaluation.retrieval import RetrievalDocument, Retrieval
 from progression_memory.maintenance.calibrated_progression import (
     Action, Decision, Event, LinearAttachmentModel, Memory, TargetUpdate,
 )
-from progression_memory.maintenance.model_progression_writer import ModelProgressionWriter
+from progression_memory.maintenance.model_progression_writer import ModelProgressionWriter, construct
 
 
 class TinyEncoder:
@@ -95,6 +95,9 @@ def test_model_writer_structured_contract():
     decision = ModelProgressionWriter(FakeModel()).decide(event, memory)
     memory.apply(event, decision)
     assert memory.progressions["progression:0"].current_state.evidence_ids == {"e1"}
+    with pytest.raises(ValueError, match="unresolved subject"):
+        construct((RetrievalDocument("e2", "Unknown: mentioned work"),),
+                  lambda document: None, ModelProgressionWriter(FakeModel()))
 
 
 def test_shared_dense_retrieval_counts_only_delivered_sources():
