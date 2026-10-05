@@ -76,6 +76,15 @@ class Decision:
     change: str = ""
     new_segment: bool = False
     reason: str = ""
+    target_updates: tuple[TargetUpdate, ...] = ()
+
+
+@dataclass(frozen=True)
+class TargetUpdate:
+    progression_id: str
+    state: str
+    change: str
+    new_segment: bool
 
 
 class ScriptedWriter:
@@ -110,8 +119,17 @@ class Memory:
             targets = [self.progressions[target] for target in decision.target_ids]
             if any(p.subject_id != event.subject_id for p in targets):
                 raise ValueError("cross-subject attachment")
+            if decision.target_updates:
+                ids = [update.progression_id for update in decision.target_updates]
+                if len(ids) != len(set(ids)) or set(ids) != set(decision.target_ids):
+                    raise ValueError("target updates must match attachment targets exactly")
+                if any(not update.state for update in decision.target_updates):
+                    raise ValueError("each attachment needs a state")
+            elif decision.action == Action.MULTI_ATTACH:
+                raise ValueError("multiattach requires a distinct update per target")
         elif decision.action in (Action.CREATE_ROOT, Action.CREATE_CHILD):
-            if decision.target_ids or not decision.identity or not decision.scope or not decision.state:
+            if (decision.target_ids or decision.target_updates or not decision.identity
+                    or not decision.scope or not decision.state):
                 raise ValueError("new progression requires identity, scope and state")
             if decision.action == Action.CREATE_CHILD:
                 parent = self.progressions[decision.parent_id or ""]
@@ -124,12 +142,12 @@ class Memory:
                 raise ValueError("duplicate progression identity")
             targets = []
         elif decision.action == Action.NO_UPDATE:
-            if decision.target_ids or decision.parent_id:
+            if decision.target_ids or decision.parent_id or decision.target_updates:
                 raise ValueError("no_update cannot target a progression")
             targets = []
         else:
             raise ValueError(decision.action)
-        if targets and not decision.state:
+        if targets and not (decision.state or decision.target_updates):
             raise ValueError("attachment must supply evidence-backed state")
 
         self.events[event.id] = event
@@ -144,17 +162,22 @@ class Memory:
             targets = [created]
         for progression in targets:
             before = progression.current_state
-            after = State(decision.state, before.evidence_ids | {event.id})
-            if decision.new_segment or not progression.segment_ids:
+            update = next((row for row in decision.target_updates
+                           if row.progression_id == progression.id), None)
+            state = update.state if update else decision.state
+            change = update.change if update else decision.change
+            new_segment = update.new_segment if update else decision.new_segment
+            after = State(state, before.evidence_ids | {event.id})
+            if new_segment or not progression.segment_ids:
                 sid = f"segment:{len(self.segments)}"
-                segment = Segment(sid, progression.id, [event.id], before, after, decision.change)
+                segment = Segment(sid, progression.id, [event.id], before, after, change)
                 self.segments[sid] = segment
                 progression.segment_ids.append(sid)
             else:
                 segment = self.segments[progression.segment_ids[-1]]
                 segment.event_ids.append(event.id)
                 segment.after = after
-                segment.change = decision.change
+                segment.change = change
             progression.current_state = after
 
 
