@@ -93,12 +93,19 @@ class ModelProgressionWriter:
                                              for target in parsed.target_updates))
 
 
-def construct(documents, subject_id: str, writer: ModelProgressionWriter) -> Memory:
-    """Build once per corpus, in source order, retaining every original event."""
+def construct(documents, subject_resolver, writer: ModelProgressionWriter) -> Memory:
+    """Build in source order; caller must resolve each event's actual subject.
+
+    Conversations with multiple speakers cannot use a conversation-wide subject
+    ID. Ambiguous attribution is rejected until a grounded resolver exists.
+    """
     from progression_memory.evaluation.progressions import parse_timestamp
 
     memory = Memory()
     for ordinal, document in enumerate(documents):
+        subject_id = subject_resolver(document)
+        if not subject_id:
+            raise ValueError(f"unresolved subject for source {document.id}")
         event = Event(document.id, subject_id, document.text,
                       parse_timestamp(document.timestamp, ordinal), document.id)
         decision = writer.decide(event, memory)
