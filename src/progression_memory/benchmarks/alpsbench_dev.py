@@ -108,7 +108,7 @@ def audit(inputs: list[dict], references: list[dict], input_sha: str, reference_
             "sessions": len({row["session_id"] for row in inputs}),
             "sample_input_types": {k: type(v).__name__ for k, v in inputs[0].items()},
             "sample_reference_types": {k: type(v).__name__ for k, v in references[0].items()},
-            "limitations": "Development set; benchmark update actions do not label progression hierarchy or phase. Test split untouched."}
+            "limitations": "Development set with a fixed remove-one/add-two pattern. It does not sample general no-op/add/modify action prevalence or label progression hierarchy/phase. Test split untouched."}
 
 
 def main() -> None:
