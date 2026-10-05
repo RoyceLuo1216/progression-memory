@@ -1,0 +1,50 @@
+name: dense-rag-control
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'src/progression_memory/benchmarks/representation_rag_benchmark.py'
+      - '.github/workflows/dense-rag-control.yml'
+  workflow_dispatch:
+    inputs:
+      sample_size:
+        description: 'Question sample (0 = all)'
+        default: '180'
+        required: true
+
+jobs:
+  locomo:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install -e '.[semantic,dev]'
+      - name: Fetch checksum-verified LoCoMo
+        run: |
+          mkdir -p evaluation/data
+          curl -fsSL --retry 3 https://raw.githubusercontent.com/snap-research/locomo/main/data/locomo10.json -o evaluation/data/locomo10.json
+          echo '79fa87e90f04081343b8c8debecb80a9a6842b76a7aa537dc9fdf651ea698ff4  evaluation/data/locomo10.json' | sha256sum -c -
+      - name: Run pinned dense RAG baseline
+        env:
+          REQUESTED_SAMPLE: ${{ inputs.sample_size }}
+        run: |
+          mkdir -p evaluation/results/ci/dense-rag
+          args=()
+          sample="${REQUESTED_SAMPLE:-180}"
+          if [ "$sample" != 0 ]; then args+=(--sample-size "$sample"); fi
+          python -m progression_memory.benchmarks.representation_rag_benchmark \
+            --dataset locomo --data-path evaluation/data/locomo10.json \
+            --semantic-model sentence-transformers/all-MiniLM-L6-v2 \
+            --model-revision 1110a243fdf4706b3f48f1d95db1a4f5529b4d41 \
+            --search-depth 8 --context-chars 4800 "${args[@]}" \
+            --output evaluation/results/ci/dense-rag/locomo.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: dense-rag-locomo
+          path: evaluation/results/ci/dense-rag/locomo.json
+          if-no-files-found: warn
