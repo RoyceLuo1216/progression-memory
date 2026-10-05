@@ -32,6 +32,8 @@ jobs:
             --export-dir "$RUNNER_TEMP/personal-facts-shards"
           cmp "$RUNNER_TEMP/personal-facts-audit.json" \
             evaluation/data/external_personal_facts/train_audit_v1.json
+          diff -rq "$RUNNER_TEMP/personal-facts-shards" \
+            evaluation/data/external_personal_facts/train
       - uses: actions/upload-artifact@v4
         with:
           name: external-personal-facts-train-audit
