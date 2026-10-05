@@ -29,6 +29,8 @@ jobs:
             --inputs "$RUNNER_TEMP/alps-input.jsonl" \
             --references "$RUNNER_TEMP/alps-reference.jsonl" \
             --output "$RUNNER_TEMP/alps-dev-audit.json"
+          cmp "$RUNNER_TEMP/alps-dev-audit.json" \
+            evaluation/data/external_alpsbench/dev_task2_audit_v1.json
       - uses: actions/upload-artifact@v4
         with:
           name: alpsbench-dev-update-audit
