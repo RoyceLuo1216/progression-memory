@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import json
 import math
+from collections import Counter
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import StrEnum
@@ -16,9 +17,7 @@ from pathlib import Path
 
 import numpy as np
 
-from progression_memory.evaluation.progressions import hashed_embedding
 from progression_memory.evaluation.retrieval import tokenize
-from progression_memory.routing.router import cosine_similarity
 
 
 class Action(StrEnum):
@@ -164,16 +163,22 @@ def _overlap(left: str, right: str) -> float:
     return len(a & b) / len(a | b) if a | b else 0.0
 
 
+def _cosine_tokens(left: str, right: str) -> float:
+    a, b = Counter(tokenize(left)), Counter(tokenize(right))
+    numerator = sum(count * b.get(token, 0) for token, count in a.items())
+    denominator = math.sqrt(sum(count * count for count in a.values()) *
+                            sum(count * count for count in b.values()))
+    return numerator / denominator if denominator else 0.0
+
+
 def features(event: Event, progression: Progression, last_time: datetime | None = None) -> np.ndarray:
     """Observable proposal features. No manually weighted composite score."""
-    e = hashed_embedding(event.text)
-    identity = hashed_embedding(progression.identity + " " + progression.scope)
-    state = hashed_embedding(progression.current_state.text)
+    identity = progression.identity + " " + progression.scope
+    state = progression.current_state.text
     days = abs((event.time - last_time).total_seconds()) / 86400 if event.time and last_time else 0.0
     return np.array([
-        cosine_similarity(e, identity), cosine_similarity(e, state),
-        _overlap(event.text, progression.identity + " " + progression.scope),
-        _overlap(event.text, progression.current_state.text),
+        _cosine_tokens(event.text, identity), _cosine_tokens(event.text, state),
+        _overlap(event.text, identity), _overlap(event.text, state),
         float(event.subject_id == progression.subject_id), math.log1p(days),
     ], dtype=float)
 
