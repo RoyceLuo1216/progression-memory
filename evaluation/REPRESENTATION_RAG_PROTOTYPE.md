@@ -32,6 +32,9 @@ The mock only validates the JSON/storage contract. No real model has been run
 through this writer. The store does not yet validate the truth of generated
 state text against source text, and real event extraction/subject attribution
 requires validation before a live LoCoMo/LongMemEval progression comparison.
+The model construction adapter explicitly requires a per-event subject resolver;
+it rejects unresolved subjects rather than merging a multi-speaker conversation
+under one synthetic identity.
 
 ## Attachment calibration
 
