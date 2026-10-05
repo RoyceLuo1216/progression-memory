@@ -72,8 +72,22 @@ The separate `representation_rag_benchmark.py` runs source-level dense append
 RAG with a pinned encoder. Its CI pilot ranks the entire index under the
 existing 4,800-character LoCoMo context budget, with 180 deterministic sampled
 questions. An optional top-eight diagnostic is available through search depth.
-It does not construct progressions; real writer traces and held-out attachment
+The CI pilot runs append only; real writer traces and held-out attachment
 labels are still required to evaluate the representation intervention.
+The same CLI accepts `--representation structure` or `progression` with
+`--decision-traces TRACE.json`. The trace is keyed by LoCoMo conversation ID
+(or LongMemEval question ID), with one ordered row per original source:
+
+```json
+{"conv-id": [{"source_id": "turn-id", "subject_id": "person-id",
+  "decision": {"action": "no_update", "reason": "No ongoing process"}}]}
+```
+
+The replay validates source coverage/order, subject links and state storage;
+query ranking, reader and budget are otherwise identical. A real trace must
+be produced without inspecting QA labels and must archive model revision and
+prompt provenance alongside the JSON. The 100 synthetic candidate labels do
+not constitute such a trace.
 
 ## Next implementation gates
 
