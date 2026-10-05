@@ -1,4 +1,5 @@
 from datetime import datetime
+import json
 from pathlib import Path
 
 import numpy as np
@@ -9,8 +10,9 @@ from progression_memory.benchmarks.representation_rag_benchmark import evaluate
 from progression_memory.evaluation.representation_rag import records, retrieve
 from progression_memory.evaluation.retrieval import RetrievalDocument, RetrievalQuery
 from progression_memory.maintenance.calibrated_progression import (
-    Action, Decision, Event, LinearAttachmentModel, Memory,
+    Action, Decision, Event, LinearAttachmentModel, Memory, TargetUpdate,
 )
+from progression_memory.maintenance.model_progression_writer import ModelProgressionWriter
 
 
 class TinyEncoder:
@@ -60,6 +62,39 @@ def test_multiattach_is_atomic_on_invalid_target():
                      Decision(Action.MULTI_ATTACH, ("progression:1", "missing"),
                               state="An offer", reason="Two processes"))
     assert "e5" not in memory.events
+
+
+def test_multiattach_has_separate_states_and_single_source():
+    memory = career_memory()
+    memory.apply(Event("e5", "user", "Started a job search", None, "e5"),
+                 Decision(Action.CREATE_CHILD, parent_id="progression:0",
+                          identity="Job search", scope="New roles", state="Searching",
+                          reason="Distinct job search"))
+    memory.apply(Event("e6", "user", "Shopify offer", None, "e6"),
+                 Decision(Action.MULTI_ATTACH, ("progression:1", "progression:2"),
+                          target_updates=(
+                              TargetUpdate("progression:1", "Has a Shopify offer", "Offer", True),
+                              TargetUpdate("progression:2", "Comparing an offer", "Offer received", True),
+                          ), reason="An offer affects work and the search"))
+    assert memory.progressions["progression:1"].current_state.text != memory.progressions["progression:2"].current_state.text
+    assert set(memory.events) == {"e1", "e2", "e3", "e4", "e5", "e6"}
+
+
+def test_model_writer_structured_contract():
+    class FakeModel:
+        def generate_messages(self, messages, json_schema=None):
+            assert "CURRENT" in messages[0]["content"]
+            assert json_schema is not None
+            return json.dumps({"action": "create_root", "target_ids": [], "parent_id": None,
+                               "identity": "Career", "scope": "Work", "state": "Started working",
+                               "change": "Started", "new_segment": True, "target_updates": [],
+                               "reason": "Current event starts work"})
+
+    memory = Memory()
+    event = Event("e1", "user", "Started working", None, "e1")
+    decision = ModelProgressionWriter(FakeModel()).decide(event, memory)
+    memory.apply(event, decision)
+    assert memory.progressions["progression:0"].current_state.evidence_ids == {"e1"}
 
 
 def test_shared_dense_retrieval_counts_only_delivered_sources():
