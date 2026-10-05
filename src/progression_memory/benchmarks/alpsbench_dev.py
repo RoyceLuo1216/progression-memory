@@ -53,7 +53,12 @@ def audit(inputs: list[dict], references: list[dict], input_sha: str, reference_
     for row in references:
         walk(row["gold"])
     input_shapes = Counter()
-    for row in inputs:
+    deltas = Counter()
+    controls = Counter()
+    selected_present = Counter()
+    per_case = Counter()
+    for input_row, reference_row in zip(inputs, references, strict=True):
+        row = input_row
         def profile(value, path="input", depth=0):
             input_shapes[f"{path}:{type(value).__name__}"] += 1
             if depth >= 3:
@@ -65,6 +70,25 @@ def audit(inputs: list[dict], references: list[dict], input_sha: str, reference_
                 for item in value:
                     profile(item, path + "[]", depth + 1)
         profile(row["input"])
+        before = row["input"]["memory"]
+        after = reference_row["gold"]["answer"]
+        if not isinstance(before, list) or not isinstance(after, list):
+            raise ValueError("memory update must contain before/after lists")
+        old = {item["memory_id"]: item for item in before}
+        new = {item["memory_id"]: item for item in after}
+        if len(old) != len(before) or len(new) != len(after):
+            raise ValueError("duplicate memory IDs")
+        added = set(new) - set(old)
+        removed = set(old) - set(new)
+        changed = {key for key in set(old) & set(new)
+                   if old[key]["value"] != new[key]["value"]}
+        retained = set(old) & set(new) - changed
+        deltas.update(added=len(added), removed=len(removed), changed=len(changed), retained=len(retained))
+        per_case[(len(added), len(removed), len(changed))] += 1
+        controls.update({str(k) + "=" + str(v): 1 for k, v in
+                         row["input"]["metadata"]["controls"].items()})
+        selected_present["in_before" if row["input"]["metadata"]["selected_memory_id"] in old
+                         else "absent"] += 1
     return {"source": "Cosineyx/Alpsbench", "revision": REVISION,
             "split": "dev/task2", "rows": len(inputs),
             "input_sha256": input_sha, "reference_sha256": reference_sha,
@@ -75,6 +99,10 @@ def audit(inputs: list[dict], references: list[dict], input_sha: str, reference_
             "gold_scalar_labels": scalar_gold,
             "gold_shapes": dict(sorted(nested_shapes.items())),
             "input_shapes": dict(sorted(input_shapes.items())),
+            "id_based_deltas": dict(sorted(deltas.items())),
+            "delta_pattern_counts": {str(k): v for k, v in sorted(per_case.items())},
+            "control_flags": dict(sorted(controls.items())),
+            "selected_id_presence": dict(sorted(selected_present.items())),
             "operation_labels": dict(sorted(operation_labels.items())),
             "strata": dict(sorted(Counter(row.get("stratum") for row in inputs).items())),
             "sessions": len({row["session_id"] for row in inputs}),
