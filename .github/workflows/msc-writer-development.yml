@@ -6,6 +6,7 @@ on:
     paths:
       - '.github/workflows/msc-writer-development.yml'
       - 'src/progression_memory/benchmarks/msc_writer_development.py'
+      - 'src/progression_memory/benchmarks/calibrate_progression.py'
       - 'tests/test_msc_writer_development.py'
       - 'tests/test_msc_attachment_pairs.py'
       - 'evaluation/data/progression_attachment/**'
@@ -42,8 +43,15 @@ jobs:
             "$RUNNER_TEMP/msc-dev-audit.json" "$RUNNER_TEMP/msc-train-pairs.json"
           cmp "$RUNNER_TEMP/msc-train-pairs.json" \
             evaluation/data/progression_attachment/msc_train_pairs_v1.json
+          python -m progression_memory.benchmarks.calibrate_progression \
+            --real-pairs evaluation/data/progression_attachment/msc_train_pairs_v1.json \
+            --output "$RUNNER_TEMP/msc-attachment-exploratory.json"
       - uses: actions/upload-artifact@v4
         with:
           name: msc-train-writer-audit-queue
           path: ${{ runner.temp }}/msc-dev-audit.json
           retention-days: 14
+      - uses: actions/upload-artifact@v4
+        with:
+          name: msc-attachment-exploratory
+          path: ${{ runner.temp }}/msc-attachment-exploratory.json
