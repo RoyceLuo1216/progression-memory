@@ -1,0 +1,35 @@
+name: personal-facts-development
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - '.github/workflows/personal-facts-development.yml'
+      - 'src/progression_memory/benchmarks/personal_facts_dev.py'
+      - 'tests/test_personal_facts_dev.py'
+      - 'evaluation/data/external_personal_facts/**'
+  workflow_dispatch:
+
+jobs:
+  audit-train:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install -e '.[dev]' pyarrow
+      - run: pytest -q tests/test_personal_facts_dev.py
+      - name: Download pinned train labels
+        run: |
+          curl --fail --location --retry 3 --silent --show-error \
+            https://huggingface.co/datasets/adugeen/personal-facts-msc/resolve/22854562a2934ea07983ecda4f4fd8ff3aef2e85/data/train-00000-of-00001.parquet \
+            -o "$RUNNER_TEMP/personal-facts-train.parquet"
+          python -m progression_memory.benchmarks.personal_facts_dev \
+            --train-parquet "$RUNNER_TEMP/personal-facts-train.parquet" \
+            --output "$RUNNER_TEMP/personal-facts-audit.json"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: external-personal-facts-train-audit
+          path: ${{ runner.temp }}/personal-facts-audit.json
