@@ -41,7 +41,7 @@ def append_memory(query: RetrievalQuery) -> Memory:
 
 def evaluate(
     queries: list[RetrievalQuery], embedder: TextEmbedder, *,
-    representation: str, search_depth: int, context_chars: int,
+    representation: str, search_depth: int | None, context_chars: int,
     memory_by_corpus: dict[int, Memory] | None = None,
 ) -> dict:
     """Identical ranker, reader, budget and source metric for either store.
@@ -49,7 +49,7 @@ def evaluate(
     A prepared progression memory is keyed by id(query.documents). If omitted,
     the source observations are stored independently as ordinary RAG chunks.
     """
-    if search_depth < 1 or context_chars < 0:
+    if (search_depth is not None and search_depth < 1) or context_chars < 0:
         raise ValueError("search depth and context budget must be explicit")
     reader = MultiEvidenceExtractiveReader()
     indexes: dict[int, tuple[Memory, SemanticIndex]] = {}
@@ -121,11 +121,13 @@ def main() -> None:
     parser.add_argument("--data-path", type=Path, required=True)
     parser.add_argument("--semantic-model", required=True)
     parser.add_argument("--model-revision", required=True)
-    parser.add_argument("--search-depth", type=int, required=True)
+    parser.add_argument("--search-depth", required=True,
+                        help="Positive integer or 'all' to rank the full index")
     parser.add_argument("--context-chars", type=int, required=True)
     parser.add_argument("--sample-size", type=int)
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
+    search_depth = None if args.search_depth == "all" else int(args.search_depth)
     queries = (load_locomo(args.data_path) if args.dataset == "locomo"
                else load_longmemeval(args.data_path))
     if args.sample_size is not None:
@@ -133,7 +135,7 @@ def main() -> None:
             raise ValueError("sample-size must be positive")
         queries = sorted(queries, key=lambda q: hashlib.sha256(q.id.encode()).hexdigest())[:args.sample_size]
     result = evaluate(queries, PinnedEncoder(args.semantic_model, args.model_revision),
-                      representation="append", search_depth=args.search_depth,
+                      representation="append", search_depth=search_depth,
                       context_chars=args.context_chars)
     result.update(dataset=args.dataset, dataset_sha256=hashlib.sha256(args.data_path.read_bytes()).hexdigest(),
                   encoder=args.semantic_model, encoder_revision=args.model_revision,
