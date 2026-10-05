@@ -1,0 +1,43 @@
+name: msc-writer-development
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - '.github/workflows/msc-writer-development.yml'
+      - 'src/progression_memory/benchmarks/msc_writer_development.py'
+      - 'tests/test_msc_writer_development.py'
+  workflow_dispatch:
+
+jobs:
+  audit-queue:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install -e '.[dev]'
+      - run: pytest -q tests/test_msc_writer_development.py
+      - name: Fetch pinned official MSC corpus
+        run: |
+          curl --fail --location --retry 3 --silent --show-error \
+            https://parl.ai/downloads/msc/msc_v0.1.tar.gz -o "$RUNNER_TEMP/msc_v0.1.tar.gz"
+          echo 'e640e37cf4317cd09fc02a4cd57ef130a185f23635f4003b0cee341ffcb45e60  '"$RUNNER_TEMP/msc_v0.1.tar.gz" | sha256sum -c -
+          mkdir -p "$RUNNER_TEMP/msc"
+          tar -xzf "$RUNNER_TEMP/msc_v0.1.tar.gz" -C "$RUNNER_TEMP/msc"
+          find "$RUNNER_TEMP/msc" -path '*/msc_dialogue/session_2/train.txt' -print
+      - name: Prepare real conversation review queue
+        run: |
+          corpus=$(find "$RUNNER_TEMP/msc" -path '*/msc_dialogue/session_2/train.txt' -print -quit)
+          test -n "$corpus"
+          root=$(dirname "$(dirname "$(dirname "$corpus")")")
+          python -m progression_memory.benchmarks.msc_writer_development \
+            --data-root "$root" --conversations 12 \
+            --output "$RUNNER_TEMP/msc-dev-audit.json"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: msc-train-writer-audit-queue
+          path: ${{ runner.temp }}/msc-dev-audit.json
+          retention-days: 14
