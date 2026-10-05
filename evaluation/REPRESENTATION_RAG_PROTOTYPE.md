@@ -39,8 +39,9 @@ These examples are invented and are **not** benchmark labels or evidence that
 the routing model generalizes to real dialogue.
 
 The exploratory model fits ordinary least squares to binary attachment labels.
-It uses cosine and token-overlap signals for identity and state, plus subject
-match and log time gap. There are no manually selected score weights. The
+It uses exact token-count cosine and token-overlap signals for identity and
+state, plus subject match and log time gap. This synthetic prototype does not
+claim to learn a semantic embedding. There are no manually selected score weights. The
 attachment cutoff maximizes balanced accuracy over leave-one-scenario-out
 scores; the model is then refitted on the full synthetic set. Scores are linear
 regression outputs, not calibrated probabilities. Selecting the cutoff using
@@ -58,8 +59,15 @@ python -m pytest -q tests/test_calibrated_progression.py
 ```
 
 Observed synthetic leave-one-scenario-out fit: 100 pairs, 25 scenarios,
-balanced accuracy 0.9683, two false attachments and one missed attachment.
+balanced accuracy 0.9752, one false attachment and one missed attachment.
 This is an interface check, not a result against baseline RAG.
+
+The separate `representation_rag_benchmark.py` runs source-level dense append
+RAG with a pinned encoder. Its CI pilot uses the existing top-eight retrieval
+comparison convention and 4,800-character LoCoMo context budget, explicitly
+as a diagnostic operating point, with 180 deterministic sampled questions.
+It does not construct progressions; real writer traces and held-out attachment
+labels are still required to evaluate the representation intervention.
 
 ## Next implementation gates
 
