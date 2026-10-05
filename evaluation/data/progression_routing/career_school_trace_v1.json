@@ -1,0 +1,558 @@
+{
+  "dataset": "fictional career and education timeline",
+  "status": "human-authored routing contract; not real conversation training data",
+  "subject_policy": "Track user; retain but do not attach third-party or incidental evidence",
+  "rows": [
+    {
+      "source_id": "career-school:01",
+      "time": "2022-05-01",
+      "text": "I want to study computer science after high school.",
+      "speaker_id": "user",
+      "subject_id": "user",
+      "decision": {
+        "action": "create_root",
+        "identity": "Education",
+        "scope": "Formal learning and credentials",
+        "state": "Plans to study computer science after high school",
+        "change": "Plans to study computer science after high school",
+        "new_segment": true,
+        "reason": "Long-term education goal"
+      }
+    },
+    {
+      "source_id": "career-school:02",
+      "time": "2022-09-01",
+      "text": "I enrolled in a computer science degree at Northbridge University.",
+      "speaker_id": "user",
+      "subject_id": "user",
+      "decision": {
+        "action": "create_child",
+        "parent_id": "progression:0",
+        "identity": "Northbridge University degree",
+        "scope": "Undergraduate degree and milestones",
+        "state": "Enrolled in a computer science degree at Northbridge University",
+        "change": "Enrolled in a computer science degree at Northbridge University",
+        "new_segment": true,
+        "reason": "A particular degree is a durable part of education"
+      }
+    },
+    {
+      "source_id": "career-school:03",
+      "time": "2022-09-15",
+      "text": "My first year began with introductory programming and calculus.",
+      "speaker_id": "user",
+      "subject_id": "user",
+      "decision": {
+        "action": "create_child",
+        "parent_id": "progression:1",
+        "identity": "University year one",
+        "scope": "First academic year of the Northbridge degree",
+        "state": "Taking introductory programming and calculus in year one",
+        "change": "Taking introductory programming and calculus in year one",
+        "new_segment": true,
+        "reason": "A bounded academic year has its own courses and milestones"
+      }
+    },
+    {
+      "source_id": "career-school:04",
+      "time": "2023-01-10",
+      "text": "I finished introductory programming and started data structures this term.",
+      "speaker_id": "user",
+      "subject_id": "user",
+      "decision": {
+        "action": "attach",
+        "target_ids": [
+          "progression:2"
+        ],
+        "state": "Finished introductory programming; taking data structures in year one",
+        "change": "Course changed within year one",
+        "new_segment": false,
+        "reason": "Same academic year continues"
+      }
+    },
+    {
+      "source_id": "career-school:05",
+      "time": "2023-05-01",
+      "text": "I completed my first year of the degree.",
+      "speaker_id": "user",
+      "subject_id": "user",
+      "decision": {
+        "action": "multi_attach",
+        "target_ids": [
+          "progression:2",
+          "progression:1"
+        ],
+        "target_updates": [
+          {
+            "progression_id": "progression:2",
+            "state": "Completed year one",
+            "change": "Year one completed",
+            "new_segment": true
+          },
+          {
+            "progression_id": "progression:1",
+            "state": "Completed the first year of the Northbridge degree",
+            "change": "Degree advanced by one year",
+            "new_segment": false
+          }
+        ],
+        "reason": "Completes the year and advances its parent degree"
+      }
+    },
+    {
+      "source_id": "career-school:06",
+      "time": "2023-09-01",
+      "text": "I began my second year at Northbridge, studying databases and statistics.",
+      "speaker_id": "user",
+      "subject_id": "user",
+      "decision": {
+        "action": "create_child",
+        "parent_id": "progression:1",
+        "identity": "University year two",
+        "scope": "Second academic year of the Northbridge degree",
+        "state": "Studying databases and statistics in year two",
+        "change": "Studying databases and statistics in year two",
+        "new_segment": true,
+        "reason": "New bounded academic year under the same degree"
+      }
+    },
+    {
+      "source_id": "career-school:07",
+      "time": "2024-01-15",
+      "text": "I struggled with my statistics course, so I joined weekly study sessions.",
+      "speaker_id": "user",
+      "subject_id": "user",
+      "decision": {
+        "action": "attach",
+        "target_ids": [
+          "progression:3"
+        ],
+        "state": "Taking statistics and attending weekly study sessions after struggling",
+        "change": "Added study sessions",
+        "new_segment": false,
+        "reason": "The same second-year coursework evolves"
+      }
+    },
+    {
+      "source_id": "career-school:08",
+      "time": "2024-05-01",
+      "text": "I completed my second year at Northbridge.",
+      "speaker_id": "user",
+      "subject_id": "user",
+      "decision": {
+        "action": "multi_attach",
+        "target_ids": [
+          "progression:3",
+          "progression:1"
+        ],
+        "target_updates": [
+          {
+            "progression_id": "progression:3",
+            "state": "Completed year two",
+            "change": "Year two completed",
+            "new_segment": true
+          },
+          {
+            "progression_id": "progression:1",
+            "state": "Completed two years of the Northbridge degree",
+            "change": "Degree advanced through year two",
+            "new_segment": false
+          }
+        ],
+        "reason": "Closes the bounded year and advances the degree"
+      }
+    },
+    {
+      "source_id": "career-school:09",
+      "time": "2024-09-01",
+      "text": "I started my third year and enrolled in machine learning.",
+      "speaker_id": "user",
+      "subject_id": "user",
+      "decision": {
+        "action": "create_child",
+        "parent_id": "progression:1",
+        "identity": "University year three",
+        "scope": "Third academic year of the Northbridge degree",
+        "state": "Taking machine learning in year three",
+        "change": "Taking machine learning in year three",
+        "new_segment": true,
+        "reason": "New bounded academic year under the degree"
+      }
+    },
+    {
+      "source_id": "career-school:10",
+      "time": "2024-10-01",
+      "text": "I began a research project on conversational memory with a professor.",
+      "speaker_id": "user",
+      "subject_id": "user",
+      "decision": {
+        "action": "create_child",
+        "parent_id": "progression:1",
+        "identity": "Conversational memory research",
+        "scope": "Research project within university",
+        "state": "Started a conversational memory project with a professor",
+        "change": "Started a conversational memory project with a professor",
+        "new_segment": true,
+        "reason": "Research is a distinct process that may span academic years"
+      }
+    },
+    {
+      "source_id": "career-school:11",
+      "time": "2025-02-01",
+      "text": "Our memory project moved from lexical matching to semantic embeddings.",
+      "speaker_id": "user",
+      "subject_id": "user",
+      "decision": {
+        "action": "attach",
+        "target_ids": [
+          "progression:5"
+        ],
+        "state": "Memory project moved from lexical matching to semantic embeddings",
+        "change": "Changed retrieval method",
+        "new_segment": true,
+        "reason": "Same research project, new technical phase"
+      }
+    },
+    {
+      "source_id": "career-school:12",
+      "time": "2025-03-01",
+      "text": "I started comparing master's programs for after graduation.",
+      "speaker_id": "user",
+      "subject_id": "user",
+      "decision": {
+        "action": "create_child",
+        "parent_id": "progression:0",
+        "identity": "Graduate school applications",
+        "scope": "Selecting and applying to master's programs",
+        "state": "Comparing master's programs after graduation",
+        "change": "Comparing master's programs after graduation",
+        "new_segment": true,
+        "reason": "A new application process within education"
+      }
+    },
+    {
+      "source_id": "career-school:13",
+      "time": "2025-04-01",
+      "text": "I shortlisted three master's programs and began drafting applications.",
+      "speaker_id": "user",
+      "subject_id": "user",
+      "decision": {
+        "action": "attach",
+        "target_ids": [
+          "progression:6"
+        ],
+        "state": "Shortlisted three master's programs and drafting applications",
+        "change": "From comparison to applications",
+        "new_segment": true,
+        "reason": "Same admissions process moves to application phase"
+      }
+    },
+    {
+      "source_id": "career-school:14",
+      "time": "2025-04-15",
+      "text": "I want software work experience before graduating.",
+      "speaker_id": "user",
+      "subject_id": "user",
+      "decision": {
+        "action": "create_root",
+        "identity": "Career",
+        "scope": "Employment and professional goals",
+        "state": "Wants software work experience before graduating",
+        "change": "Wants software work experience before graduating",
+        "new_segment": true,
+        "reason": "New ongoing employment goal distinct from formal education"
+      }
+    },
+    {
+      "source_id": "career-school:15",
+      "time": "2025-04-20",
+      "text": "I began applying for software internships.",
+      "speaker_id": "user",
+      "subject_id": "user",
+      "decision": {
+        "action": "create_child",
+        "parent_id": "progression:7",
+        "identity": "Internship search",
+        "scope": "Applications, interviews and offers for internships",
+        "state": "Applying for software internships",
+        "change": "Applying for software internships",
+        "new_segment": true,
+        "reason": "A particular job search under the career goal"
+      }
+    },
+    {
+      "source_id": "career-school:16",
+      "time": "2025-05-01",
+      "text": "I interviewed for a bank software internship.",
+      "speaker_id": "user",
+      "subject_id": "user",
+      "decision": {
+        "action": "attach",
+        "target_ids": [
+          "progression:8"
+        ],
+        "state": "Applying and interviewing for software internships, including a bank role",
+        "change": "Reached interview stage",
+        "new_segment": true,
+        "reason": "Interview advances the same search"
+      }
+    },
+    {
+      "source_id": "career-school:17",
+      "time": "2025-06-01",
+      "text": "I started a software internship at Meridian Bank.",
+      "speaker_id": "user",
+      "subject_id": "user",
+      "decision": {
+        "action": "create_child",
+        "parent_id": "progression:7",
+        "identity": "Meridian Bank internship",
+        "scope": "Employment at Meridian Bank",
+        "state": "Started a software internship at Meridian Bank",
+        "change": "Started a software internship at Meridian Bank",
+        "new_segment": true,
+        "reason": "A particular employer is distinct from searching for a job"
+      }
+    },
+    {
+      "source_id": "career-school:18",
+      "time": "2025-08-01",
+      "text": "At Meridian Bank, I built an internal reporting dashboard.",
+      "speaker_id": "user",
+      "subject_id": "user",
+      "decision": {
+        "action": "attach",
+        "target_ids": [
+          "progression:9"
+        ],
+        "state": "Working at Meridian Bank; built an internal reporting dashboard",
+        "change": "Built a dashboard",
+        "new_segment": false,
+        "reason": "Work at the same employer continues"
+      }
+    },
+    {
+      "source_id": "career-school:19",
+      "time": "2025-08-15",
+      "text": "My friend got promoted at Meridian Bank.",
+      "speaker_id": "user",
+      "subject_id": "friend",
+      "decision": {
+        "action": "no_update",
+        "reason": "This promotion concerns a friend, not the tracked user's bank career"
+      }
+    },
+    {
+      "source_id": "career-school:20",
+      "time": "2025-12-01",
+      "text": "My Meridian Bank internship ended, and I am looking for another software internship.",
+      "speaker_id": "user",
+      "subject_id": "user",
+      "decision": {
+        "action": "multi_attach",
+        "target_ids": [
+          "progression:9",
+          "progression:8"
+        ],
+        "target_updates": [
+          {
+            "progression_id": "progression:9",
+            "state": "Meridian Bank internship ended",
+            "change": "Internship ended",
+            "new_segment": true
+          },
+          {
+            "progression_id": "progression:8",
+            "state": "Searching for another software internship after Meridian Bank",
+            "change": "Search resumed",
+            "new_segment": true
+          }
+        ],
+        "reason": "Job ending and renewed search are separate processes for the same person"
+      }
+    },
+    {
+      "source_id": "career-school:21",
+      "time": "2026-01-01",
+      "text": "I applied to a software internship at Harbor Software.",
+      "speaker_id": "user",
+      "subject_id": "user",
+      "decision": {
+        "action": "attach",
+        "target_ids": [
+          "progression:8"
+        ],
+        "state": "Searching again; applied to Harbor Software",
+        "change": "Applied to another company",
+        "new_segment": false,
+        "reason": "Advances the resumed internship search"
+      }
+    },
+    {
+      "source_id": "career-school:22",
+      "time": "2026-05-01",
+      "text": "I started my internship at Harbor Software.",
+      "speaker_id": "user",
+      "subject_id": "user",
+      "decision": {
+        "action": "create_child",
+        "parent_id": "progression:7",
+        "identity": "Harbor Software internship",
+        "scope": "Employment at Harbor Software",
+        "state": "Started an internship at Harbor Software",
+        "change": "Started an internship at Harbor Software",
+        "new_segment": true,
+        "reason": "A new employer is a distinct child of career"
+      }
+    },
+    {
+      "source_id": "career-school:23",
+      "time": "2026-06-01",
+      "text": "At Harbor Software, I worked on the delivery prediction service.",
+      "speaker_id": "user",
+      "subject_id": "user",
+      "decision": {
+        "action": "attach",
+        "target_ids": [
+          "progression:10"
+        ],
+        "state": "Working at Harbor Software on the delivery prediction service",
+        "change": "Worked on delivery predictions",
+        "new_segment": false,
+        "reason": "Work at the same employer continues"
+      }
+    },
+    {
+      "source_id": "career-school:24",
+      "time": "2026-08-01",
+      "text": "Harbor Software offered me a full-time return role after my internship.",
+      "speaker_id": "user",
+      "subject_id": "user",
+      "decision": {
+        "action": "multi_attach",
+        "target_ids": [
+          "progression:10",
+          "progression:8"
+        ],
+        "target_updates": [
+          {
+            "progression_id": "progression:10",
+            "state": "Received a full-time return offer from Harbor Software",
+            "change": "Internship led to a return offer",
+            "new_segment": true
+          },
+          {
+            "progression_id": "progression:8",
+            "state": "Internship search culminated in a Harbor Software return offer",
+            "change": "Offer received",
+            "new_segment": true
+          }
+        ],
+        "reason": "The offer changes both the employer relationship and job search"
+      }
+    },
+    {
+      "source_id": "career-school:25",
+      "time": "2026-08-10",
+      "text": "I watched a film last night.",
+      "speaker_id": "user",
+      "subject_id": "user",
+      "decision": {
+        "action": "no_update",
+        "reason": "One-off viewing provides no ongoing goal, interest or state change in this trace"
+      }
+    },
+    {
+      "source_id": "career-school:26",
+      "time": "2026-09-01",
+      "text": "I accepted an offer to start a master's degree next year.",
+      "speaker_id": "user",
+      "subject_id": "user",
+      "decision": {
+        "action": "multi_attach",
+        "target_ids": [
+          "progression:6",
+          "progression:0"
+        ],
+        "target_updates": [
+          {
+            "progression_id": "progression:6",
+            "state": "Accepted an offer for a master's degree starting next year",
+            "change": "Admissions process concluded",
+            "new_segment": true
+          },
+          {
+            "progression_id": "progression:0",
+            "state": "Plans to begin a master's degree next year after accepting an offer",
+            "change": "Education plan advanced",
+            "new_segment": true
+          }
+        ],
+        "reason": "Acceptance concludes applications and advances the broad education plan"
+      }
+    },
+    {
+      "source_id": "career-school:27",
+      "time": "2027-05-01",
+      "text": "I graduated from Northbridge University with my computer science degree.",
+      "speaker_id": "user",
+      "subject_id": "user",
+      "decision": {
+        "action": "multi_attach",
+        "target_ids": [
+          "progression:1",
+          "progression:0"
+        ],
+        "target_updates": [
+          {
+            "progression_id": "progression:1",
+            "state": "Graduated from Northbridge with a computer science degree",
+            "change": "Degree completed",
+            "new_segment": true
+          },
+          {
+            "progression_id": "progression:0",
+            "state": "Completed the Northbridge computer science degree; master's planned",
+            "change": "Undergraduate degree completed",
+            "new_segment": true
+          }
+        ],
+        "reason": "Degree completion updates the particular degree and broad education path"
+      }
+    },
+    {
+      "source_id": "career-school:28",
+      "time": "2027-09-01",
+      "text": "I began the master's program in computer science.",
+      "speaker_id": "user",
+      "subject_id": "user",
+      "decision": {
+        "action": "create_child",
+        "parent_id": "progression:0",
+        "identity": "Computer science master's degree",
+        "scope": "Postgraduate study after Northbridge",
+        "state": "Began a master's program in computer science",
+        "change": "Began a master's program in computer science",
+        "new_segment": true,
+        "reason": "New degree is distinct from the admissions process"
+      }
+    },
+    {
+      "source_id": "career-school:29",
+      "time": "2027-10-01",
+      "text": "In my master's program, I started a course on machine learning systems.",
+      "speaker_id": "user",
+      "subject_id": "user",
+      "decision": {
+        "action": "attach",
+        "target_ids": [
+          "progression:11"
+        ],
+        "state": "Studying machine learning systems in the computer science master's program",
+        "change": "Started a course",
+        "new_segment": false,
+        "reason": "Coursework within the same degree"
+      }
+    }
+  ]
+}
