@@ -7,6 +7,7 @@ on:
       - 'src/progression_memory/maintenance/calibrated_progression.py'
       - 'src/progression_memory/evaluation/representation_rag.py'
       - 'src/progression_memory/benchmarks/calibrate_progression.py'
+      - 'src/progression_memory/benchmarks/representation_rag_benchmark.py'
       - 'evaluation/progression_calibration_scenarios.json'
       - 'tests/test_calibrated_progression.py'
       - '.github/workflows/representation-rag-contract.yml'
