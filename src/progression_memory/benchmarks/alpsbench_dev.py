@@ -21,11 +21,31 @@ def audit(inputs: list[dict], references: list[dict], input_sha: str, reference_
         raise ValueError("input/reference row count mismatch")
     if not inputs:
         raise ValueError("empty update development set")
+    keys = ("benchmark_id", "canonical_id", "session_id", "task")
+    if any(any(left.get(key) != right.get(key) for key in keys)
+           for left, right in zip(inputs, references, strict=True)):
+        raise ValueError("input/reference IDs or order mismatch")
+    if any(not isinstance(row.get("input"), dict) for row in inputs) or any(
+            not isinstance(row.get("gold"), dict) for row in references):
+        raise ValueError("unexpected nested update schema")
+    gold_keys = Counter(k for row in references for k in row["gold"])
+    scalar_gold = {}
+    for key in gold_keys:
+        values = [row["gold"].get(key) for row in references]
+        if all(value is None or isinstance(value, (str, int, bool)) for value in values):
+            frequencies = Counter(str(value) for value in values)
+            if len(frequencies) <= 20 and all(len(value) <= 50 for value in frequencies):
+                scalar_gold[key] = dict(sorted(frequencies.items()))
     return {"source": "Cosineyx/Alpsbench", "revision": REVISION,
             "split": "dev/task2", "rows": len(inputs),
             "input_sha256": input_sha, "reference_sha256": reference_sha,
             "input_keys": dict(sorted(Counter(k for row in inputs for k in row).items())),
             "reference_keys": dict(sorted(Counter(k for row in references for k in row).items())),
+            "input_nested_keys": dict(sorted(Counter(k for row in inputs for k in row["input"]).items())),
+            "gold_nested_keys": dict(sorted(gold_keys.items())),
+            "gold_scalar_labels": scalar_gold,
+            "strata": dict(sorted(Counter(row.get("stratum") for row in inputs).items())),
+            "sessions": len({row["session_id"] for row in inputs}),
             "sample_input_types": {k: type(v).__name__ for k, v in inputs[0].items()},
             "sample_reference_types": {k: type(v).__name__ for k, v in references[0].items()},
             "limitations": "Development set; benchmark update actions do not label progression hierarchy or phase. Test split untouched."}
