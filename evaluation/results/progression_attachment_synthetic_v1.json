@@ -1,0 +1,55 @@
+{
+  "mean": [
+    0.0817907849563923,
+    0.10172323186443424,
+    0.05106421356421356,
+    0.057833333333333334,
+    1.0,
+    0.0
+  ],
+  "scale": [
+    0.1779326135675095,
+    0.20590875611563067,
+    0.09995440394266421,
+    0.1284459094828923,
+    1.0,
+    1.0
+  ],
+  "coefficients": [
+    0.2799999999999998,
+    0.0012544536848482276,
+    0.05000122446586357,
+    0.254045090120817,
+    0.16269853179377972,
+    0.0,
+    0.0
+  ],
+  "threshold": 0.2555358108812053,
+  "report": {
+    "rows": 100,
+    "scenarios": 25,
+    "out_of_fold_balanced_accuracy": 0.9682539682539683,
+    "out_of_fold_false_attachments": 2,
+    "out_of_fold_missed_attachments": 1,
+    "threshold": 0.2555358108812053,
+    "coefficients": [
+      0.2799999999999998,
+      0.0012544536848482276,
+      0.05000122446586357,
+      0.254045090120817,
+      0.16269853179377972,
+      0.0,
+      0.0
+    ],
+    "feature_order": [
+      "identity_cosine",
+      "state_cosine",
+      "identity_overlap",
+      "state_overlap",
+      "same_subject",
+      "log_days_since_update"
+    ],
+    "dataset": "evaluation/progression_calibration_scenarios.json",
+    "limitations": "Synthetic examples; no validation on real writes."
+  }
+}
