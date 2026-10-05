@@ -36,6 +36,22 @@ def audit(inputs: list[dict], references: list[dict], input_sha: str, reference_
             frequencies = Counter(str(value) for value in values)
             if len(frequencies) <= 20 and all(len(value) <= 50 for value in frequencies):
                 scalar_gold[key] = dict(sorted(frequencies.items()))
+    nested_shapes = Counter()
+    operation_labels = Counter()
+    def walk(value, path="gold", depth=0):
+        nested_shapes[f"{path}:{type(value).__name__}"] += 1
+        if depth >= 4:
+            return
+        if isinstance(value, dict):
+            for key, item in value.items():
+                if key.casefold() in ("action", "operation", "update_type") and isinstance(item, str):
+                    operation_labels[item] += 1
+                walk(item, f"{path}.{key}", depth + 1)
+        elif isinstance(value, list):
+            for item in value:
+                walk(item, path + "[]", depth + 1)
+    for row in references:
+        walk(row["gold"])
     return {"source": "Cosineyx/Alpsbench", "revision": REVISION,
             "split": "dev/task2", "rows": len(inputs),
             "input_sha256": input_sha, "reference_sha256": reference_sha,
@@ -44,6 +60,8 @@ def audit(inputs: list[dict], references: list[dict], input_sha: str, reference_
             "input_nested_keys": dict(sorted(Counter(k for row in inputs for k in row["input"]).items())),
             "gold_nested_keys": dict(sorted(gold_keys.items())),
             "gold_scalar_labels": scalar_gold,
+            "gold_shapes": dict(sorted(nested_shapes.items())),
+            "operation_labels": dict(sorted(operation_labels.items())),
             "strata": dict(sorted(Counter(row.get("stratum") for row in inputs).items())),
             "sessions": len({row["session_id"] for row in inputs}),
             "sample_input_types": {k: type(v).__name__ for k, v in inputs[0].items()},
