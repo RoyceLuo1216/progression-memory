@@ -52,6 +52,19 @@ def audit(inputs: list[dict], references: list[dict], input_sha: str, reference_
                 walk(item, path + "[]", depth + 1)
     for row in references:
         walk(row["gold"])
+    input_shapes = Counter()
+    for row in inputs:
+        def profile(value, path="input", depth=0):
+            input_shapes[f"{path}:{type(value).__name__}"] += 1
+            if depth >= 3:
+                return
+            if isinstance(value, dict):
+                for key, item in value.items():
+                    profile(item, f"{path}.{key}", depth + 1)
+            elif isinstance(value, list):
+                for item in value:
+                    profile(item, path + "[]", depth + 1)
+        profile(row["input"])
     return {"source": "Cosineyx/Alpsbench", "revision": REVISION,
             "split": "dev/task2", "rows": len(inputs),
             "input_sha256": input_sha, "reference_sha256": reference_sha,
@@ -61,6 +74,7 @@ def audit(inputs: list[dict], references: list[dict], input_sha: str, reference_
             "gold_nested_keys": dict(sorted(gold_keys.items())),
             "gold_scalar_labels": scalar_gold,
             "gold_shapes": dict(sorted(nested_shapes.items())),
+            "input_shapes": dict(sorted(input_shapes.items())),
             "operation_labels": dict(sorted(operation_labels.items())),
             "strata": dict(sorted(Counter(row.get("stratum") for row in inputs).items())),
             "sessions": len({row["session_id"] for row in inputs}),
