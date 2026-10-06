@@ -1,0 +1,15 @@
+{
+  "annotation_status": "small manually authored diagnostic; not official MSC QA or independently adjudicated",
+  "questions": [
+    {"conversation_id": "train:ordered_909", "question": "Why is the speaker getting divorced?", "answer": "He wasn't in love any more", "evidence": ["s2:t2"], "category": "change"},
+    {"conversation_id": "train:ordered_909", "question": "What pet is the speaker considering getting after the divorce?", "answer": "dog", "evidence": ["s2:t8", "s3:t2"], "category": "evolving"},
+    {"conversation_id": "train:ordered_909", "question": "How does the proposed dog fit into the speaker's exercise plans?", "answer": "help motivate me to exercise more", "evidence": ["s3:t0", "s3:t2"], "category": "evolving"},
+    {"conversation_id": "train:ordered_909", "question": "Which places did the speaker consider visiting after the divorce?", "answer": "Barcelona", "evidence": ["s2:t8", "s2:t10"], "category": "evolving"},
+    {"conversation_id": "train:ordered_909", "question": "Why did the speaker previously travel to Mexico City?", "answer": "Vacation and visiting family", "evidence": ["s3:t8", "s3:t10"], "category": "fact"},
+    {"conversation_id": "train:ordered_7748", "question": "What happened to the football player at practice?", "answer": "busted my leg up pretty bad", "evidence": ["s3:t0"], "category": "change"},
+    {"conversation_id": "train:ordered_7748", "question": "Which activities can the player no longer do because of the injury?", "answer": "play footbal nor surf", "evidence": ["s3:t0", "s3:t4"], "category": "evolving"},
+    {"conversation_id": "train:ordered_7748", "question": "What is the player studying in college?", "answer": "marine biology", "evidence": ["s2:t4"], "category": "fact"},
+    {"conversation_id": "train:ordered_7748", "question": "How long will the player be unable to walk on the injured leg?", "answer": "A couple of weeks", "evidence": ["s3:t8"], "category": "change"},
+    {"conversation_id": "train:ordered_7748", "question": "Where does the other speaker live?", "answer": "Atlantic ocean", "evidence": ["s2:t1"], "category": "fact"}
+  ]
+}
