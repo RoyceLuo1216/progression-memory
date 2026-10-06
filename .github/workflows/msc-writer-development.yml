@@ -10,6 +10,8 @@ on:
       - 'tests/test_msc_writer_development.py'
       - 'tests/test_msc_attachment_pairs.py'
       - 'evaluation/data/progression_attachment/**'
+      - 'evaluation/data/progression_routing/msc_graph_traces_v1.json'
+      - 'tests/test_msc_graph_traces.py'
   workflow_dispatch:
 
 jobs:
@@ -22,7 +24,7 @@ jobs:
         with:
           python-version: '3.11'
       - run: python -m pip install -e '.[dev]'
-      - run: pytest -q tests/test_msc_writer_development.py tests/test_msc_attachment_pairs.py
+      - run: pytest -q tests/test_msc_writer_development.py tests/test_msc_attachment_pairs.py tests/test_msc_graph_traces.py
       - name: Fetch pinned official MSC corpus
         run: |
           curl --fail --location --retry 3 --silent --show-error \
@@ -41,6 +43,8 @@ jobs:
             --output "$RUNNER_TEMP/msc-dev-audit.json"
           python evaluation/data/progression_attachment/build_msc_pairs.py \
             "$RUNNER_TEMP/msc-dev-audit.json" "$RUNNER_TEMP/msc-train-pairs.json"
+          MSC_DEV_AUDIT_PATH="$RUNNER_TEMP/msc-dev-audit.json" \
+            pytest -q tests/test_msc_graph_traces.py
           cmp "$RUNNER_TEMP/msc-train-pairs.json" \
             evaluation/data/progression_attachment/msc_train_pairs_v1.json
           python -m progression_memory.benchmarks.calibrate_progression \
