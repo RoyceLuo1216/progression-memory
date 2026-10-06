@@ -1,6 +1,6 @@
 {
   "source": "Meta/ParlAI Multi-Session Chat v0.1 train; local msc-dev-audit.json",
-  "annotation_status": "model-proposed silver with four user review corrections; full adjudication pending",
+  "annotation_status": "model-proposed silver with user and second-pass audit corrections; full adjudication pending",
   "format": "Source references are s<session>:t<turn>; speaker/subject are participant slots 0 or 1; source text is rehydrated from the pinned MSC audit, not redistributed here.",
   "traces": [
     {
@@ -582,11 +582,11 @@
           "subject": 1,
           "action": "create_root",
           "evidence": "Owns a cat who usually watches through the window",
-          "identity": "Bella the cat",
-          "scope": "Bella the cat",
+          "identity": "Cat ownership",
+          "scope": "Cat ownership",
           "state": "Owns a cat who usually watches through the window",
           "segment": true,
-          "label_origin": "model_authored",
+          "label_origin": "second_pass_audit_correction",
           "review_priority": "high"
         },
         {
@@ -1696,11 +1696,11 @@
           "subject": 0,
           "action": "create_root",
           "evidence": "Finished developing a new phone app",
-          "identity": "Lostfound app",
-          "scope": "Lostfound app",
+          "identity": "Phone app project",
+          "scope": "Phone app project",
           "state": "Finished developing a new phone app",
           "segment": true,
-          "label_origin": "model_authored",
+          "label_origin": "second_pass_audit_correction",
           "review_priority": "high"
         },
         {
@@ -3111,10 +3111,14 @@
         {
           "ref": "s3:t1",
           "subject": 1,
-          "action": "no_update",
-          "evidence": "No durable process update selected; inspect original turn",
-          "review_priority": "high",
-          "label_origin": "default_no_update"
+          "action": "create_root",
+          "evidence": "Previously ate ten wedding cakes in an eating competition",
+          "identity": "Competitive eating",
+          "scope": "Competitive eating",
+          "state": "Previously ate ten wedding cakes in an eating competition",
+          "segment": true,
+          "label_origin": "second_pass_audit_correction",
+          "review_priority": "high"
         },
         {
           "ref": "s3:t2",
@@ -3145,7 +3149,7 @@
           "state": "Spring and summer are busiest for wedding cake work",
           "segment": false,
           "targets": [
-            6
+            7
           ],
           "label_origin": "model_authored",
           "review_priority": "normal"
@@ -3179,14 +3183,15 @@
         {
           "ref": "s3:t7",
           "subject": 1,
-          "action": "create_root",
+          "action": "attach",
           "evidence": "Began competitive eating after a dance show",
-          "identity": "Competitive eating",
-          "scope": "Competitive eating",
           "state": "Began competitive eating after a dance show",
-          "segment": true,
-          "label_origin": "model_authored",
-          "review_priority": "high"
+          "segment": false,
+          "targets": [
+            6
+          ],
+          "label_origin": "second_pass_audit_correction",
+          "review_priority": "normal"
         },
         {
           "ref": "s3:t8",
@@ -3199,10 +3204,15 @@
         {
           "ref": "s3:t9",
           "subject": 1,
-          "action": "no_update",
-          "evidence": "No durable process update selected; inspect original turn",
-          "review_priority": "high",
-          "label_origin": "default_no_update"
+          "action": "attach",
+          "evidence": "Interested in practicing competitive eating with friend’s cakes",
+          "state": "Interested in practicing competitive eating with friend’s cakes",
+          "segment": false,
+          "targets": [
+            6
+          ],
+          "label_origin": "second_pass_audit_correction",
+          "review_priority": "normal"
         },
         {
           "ref": "s3:t10",
@@ -3245,7 +3255,7 @@
           "state": "Enjoys cakes and participates in eating competitions",
           "segment": false,
           "targets": [
-            7
+            6
           ],
           "label_origin": "model_authored",
           "review_priority": "normal"
@@ -3258,7 +3268,7 @@
           "state": "Paid for wedding cakes except when baking for friends or family",
           "segment": false,
           "targets": [
-            6
+            7
           ],
           "label_origin": "model_authored",
           "review_priority": "normal"
@@ -3291,11 +3301,17 @@
         },
         {
           "ref": "s4:t5",
-          "subject": 1,
-          "action": "no_update",
-          "evidence": "No durable process update selected; inspect original turn",
+          "subject": 0,
+          "action": "attach",
+          "evidence": "Friend is available to teach dance on Sunday afternoon before the wedding",
+          "state": "Friend is available to teach dance on Sunday afternoon before the wedding",
+          "segment": false,
+          "targets": [
+            2
+          ],
+          "label_origin": "second_pass_audit_correction",
           "review_priority": "high",
-          "label_origin": "default_no_update"
+          "review_issue": "Friend’s scheduling offer advances recipient’s dance lessons; check target-directed update policy"
         },
         {
           "ref": "s4:t6",
@@ -3318,7 +3334,7 @@
           "state": "Wants to attempt Nathan’s hot dog challenge; qualification is difficult",
           "segment": false,
           "targets": [
-            7
+            6
           ],
           "label_origin": "model_authored",
           "review_priority": "normal"
@@ -3355,7 +3371,7 @@
           "state": "Plans to use cake as eating practice for hot dog challenge",
           "segment": false,
           "targets": [
-            7
+            6
           ],
           "label_origin": "model_authored",
           "review_priority": "normal"
