@@ -1,0 +1,942 @@
+{
+  "source": "Meta/ParlAI Multi-Session Chat v0.1 train; pinned 48-conversation expansion audit",
+  "annotation_status": "single-model provisional silver; independent review pending",
+  "traces": [
+    {
+      "conversation_id": "train:ordered_1628",
+      "split": "development",
+      "rows": [
+        {
+          "ref": "s2:t0",
+          "subject": 0,
+          "action": "create_root",
+          "evidence": "Painted a tree landscape and wants to share it",
+          "identity": "Art practice",
+          "scope": "Art practice",
+          "state": "Painted a tree landscape and wants to share it",
+          "segment": true,
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s2:t1",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect source",
+          "label_origin": "default_no_update",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s2:t2",
+          "subject": 0,
+          "action": "create_root",
+          "evidence": "Hides time spent painting from wife",
+          "identity": "Marriage strain",
+          "scope": "Marriage strain",
+          "state": "Hides time spent painting from wife",
+          "segment": true,
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s2:t3",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect source",
+          "label_origin": "default_no_update",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s2:t4",
+          "subject": 0,
+          "action": "attach",
+          "evidence": "Wife dismisses speaker’s passion for art as a dead end",
+          "state": "Wife dismisses speaker’s passion for art as a dead end",
+          "segment": false,
+          "targets": [
+            1
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s2:t5",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect source",
+          "label_origin": "default_no_update",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s2:t6",
+          "subject": 0,
+          "action": "multi_attach",
+          "evidence": "Speaker links funding and pursuit of art with lack of spousal support",
+          "updates": [
+            {
+              "state": "Using saved lottery winnings to pursue art despite uncertainty",
+              "target": 0
+            },
+            {
+              "state": "Feels unsupported by wife while pursuing art",
+              "target": 1
+            }
+          ],
+          "targets": [
+            0,
+            1
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s2:t7",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect source",
+          "label_origin": "default_no_update",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s2:t8",
+          "subject": 0,
+          "action": "attach",
+          "evidence": "Speculates wife may object to time spent on art or hold gendered views",
+          "state": "Speculates wife may object to time spent on art or hold gendered views",
+          "segment": false,
+          "targets": [
+            1
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s2:t9",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect source",
+          "label_origin": "default_no_update",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s2:t10",
+          "subject": 0,
+          "action": "attach",
+          "evidence": "Has tried including wife in art to share that part of life",
+          "state": "Has tried including wife in art to share that part of life",
+          "segment": false,
+          "targets": [
+            1
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s2:t11",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect source",
+          "label_origin": "default_no_update",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s3:t0",
+          "subject": 0,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect source",
+          "label_origin": "default_no_update",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s3:t1",
+          "subject": 1,
+          "action": "create_root",
+          "evidence": "Helps people set up home offices for remote work and answers their support questions",
+          "identity": "IT work",
+          "scope": "IT work",
+          "state": "Helps people set up home offices for remote work and answers their support questions",
+          "segment": true,
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s3:t2",
+          "subject": 0,
+          "action": "attach",
+          "evidence": "Working on a new piece in a basement studio and seeks feedback",
+          "state": "Working on a new piece in a basement studio and seeks feedback",
+          "segment": false,
+          "targets": [
+            0
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s3:t3",
+          "subject": 1,
+          "action": "attach",
+          "evidence": "Often handles frustrated support callers by phone or email",
+          "state": "Often handles frustrated support callers by phone or email",
+          "segment": false,
+          "targets": [
+            2
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s3:t4",
+          "subject": 0,
+          "action": "attach",
+          "evidence": "Believes marriage may not work out; wife views art as idleness",
+          "state": "Believes marriage may not work out; wife views art as idleness",
+          "segment": false,
+          "targets": [
+            1
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s3:t5",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect source",
+          "label_origin": "default_no_update",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s3:t6",
+          "subject": 0,
+          "action": "attach",
+          "evidence": "Hopes artwork will gain attention and support future change",
+          "state": "Hopes artwork will gain attention and support future change",
+          "segment": false,
+          "targets": [
+            0
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s3:t7",
+          "subject": 1,
+          "action": "create_root",
+          "evidence": "Creates art inspired by childhood in London and scenery in Austria",
+          "identity": "Art practice",
+          "scope": "Art practice",
+          "state": "Creates art inspired by childhood in London and scenery in Austria",
+          "segment": true,
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s3:t8",
+          "subject": 0,
+          "action": "create_root",
+          "evidence": "Interested in visiting art-making friend in Austria",
+          "identity": "Austria visit",
+          "scope": "Austria visit",
+          "state": "Interested in visiting art-making friend in Austria",
+          "segment": true,
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s3:t9",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect source",
+          "label_origin": "default_no_update",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s3:t10",
+          "subject": 0,
+          "action": "attach",
+          "evidence": "Agrees to visit Austria and asks to stay with friend",
+          "state": "Agrees to visit Austria and asks to stay with friend",
+          "segment": false,
+          "targets": [
+            4
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s3:t11",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect source",
+          "label_origin": "default_no_update",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s4:t0",
+          "subject": 0,
+          "action": "multi_attach",
+          "evidence": "Booking and cover story update existing travel and marriage processes",
+          "updates": [
+            {
+              "state": "Booked ticket to Austria to visit artist friend",
+              "target": 4
+            },
+            {
+              "state": "Concealed Austria trip from wife by claiming it was a nearby art exhibition",
+              "target": 1
+            }
+          ],
+          "targets": [
+            4,
+            1
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s4:t1",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect source",
+          "label_origin": "default_no_update",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s4:t2",
+          "subject": 0,
+          "action": "attach",
+          "evidence": "Feels wife is uninterested in art and must pursue it alone",
+          "state": "Feels wife is uninterested in art and must pursue it alone",
+          "segment": false,
+          "targets": [
+            1
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s4:t3",
+          "subject": 1,
+          "action": "attach",
+          "evidence": "Likes exhibitions and artist interaction but hesitates to display own art",
+          "state": "Likes exhibitions and artist interaction but hesitates to display own art",
+          "segment": false,
+          "targets": [
+            3
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s4:t4",
+          "subject": 0,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect source",
+          "label_origin": "default_no_update",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s4:t5",
+          "subject": 1,
+          "action": "attach",
+          "evidence": "Prefers sculpture to painting and doubts quality despite boyfriend’s praise",
+          "state": "Prefers sculpture to painting and doubts quality despite boyfriend’s praise",
+          "segment": false,
+          "targets": [
+            3
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s4:t6",
+          "subject": 0,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect source",
+          "label_origin": "default_no_update",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s4:t7",
+          "subject": 1,
+          "action": "attach",
+          "evidence": "Started with computer 3D art because IT work allowed practice without a workshop",
+          "state": "Started with computer 3D art because IT work allowed practice without a workshop",
+          "segment": false,
+          "targets": [
+            3
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s4:t8",
+          "subject": 0,
+          "action": "attach",
+          "evidence": "Wife becomes bored discussing art; speaker perceives different interests",
+          "state": "Wife becomes bored discussing art; speaker perceives different interests",
+          "segment": false,
+          "targets": [
+            1
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s4:t9",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect source",
+          "label_origin": "default_no_update",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s4:t10",
+          "subject": 0,
+          "action": "attach",
+          "evidence": "Uncertain about long-term marriage plans despite shared history",
+          "state": "Uncertain about long-term marriage plans despite shared history",
+          "segment": false,
+          "targets": [
+            1
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s4:t11",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect source",
+          "label_origin": "default_no_update",
+          "review_priority": "high"
+        }
+      ]
+    },
+    {
+      "conversation_id": "train:ordered_909",
+      "split": "holdout_review",
+      "rows": [
+        {
+          "ref": "s2:t0",
+          "subject": 0,
+          "action": "create_root",
+          "evidence": "Getting a divorce",
+          "identity": "Divorce",
+          "scope": "Divorce",
+          "state": "Getting a divorce",
+          "segment": true,
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s2:t1",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect source",
+          "label_origin": "default_no_update",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s2:t2",
+          "subject": 0,
+          "action": "attach",
+          "evidence": "Husband says he is no longer in love; speaker fears weight gain contributed",
+          "state": "Husband says he is no longer in love; speaker fears weight gain contributed",
+          "segment": false,
+          "targets": [
+            0
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s2:t3",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect source",
+          "label_origin": "default_no_update",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s2:t4",
+          "subject": 0,
+          "action": "attach",
+          "evidence": "Still has some affection for husband but feels rejected",
+          "state": "Still has some affection for husband but feels rejected",
+          "segment": false,
+          "targets": [
+            0
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s2:t5",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect source",
+          "label_origin": "default_no_update",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s2:t6",
+          "subject": 0,
+          "action": "attach",
+          "evidence": "Trying to remain optimistic through divorce",
+          "state": "Trying to remain optimistic through divorce",
+          "segment": false,
+          "targets": [
+            0
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s2:t7",
+          "subject": 1,
+          "action": "create_root",
+          "evidence": "Dog Mack damaged garden flowers",
+          "identity": "Mack the dog",
+          "scope": "Mack the dog",
+          "state": "Dog Mack damaged garden flowers",
+          "segment": true,
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s2:t8",
+          "subject": 0,
+          "action": "create_root",
+          "evidence": "Considering getting a dog after divorce",
+          "identity": "Considering a dog",
+          "scope": "Considering a dog",
+          "state": "Considering getting a dog after divorce",
+          "segment": true,
+          "label_origin": "model_authored",
+          "review_priority": "high",
+          "review_issue": "Turn starts a dog decision and mentions post-divorce travel; current contract cannot create two new progressions from one turn"
+        },
+        {
+          "ref": "s2:t9",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect source",
+          "label_origin": "default_no_update",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s2:t10",
+          "subject": 0,
+          "action": "create_root",
+          "evidence": "Interested in visiting Madrid or Tuscany after divorce",
+          "identity": "Post-divorce travel",
+          "scope": "Post-divorce travel",
+          "state": "Interested in visiting Madrid or Tuscany after divorce",
+          "segment": true,
+          "label_origin": "model_authored",
+          "review_priority": "high",
+          "review_issue": "Madrid/Tuscany is the first labeled travel progression, but Barcelona was mentioned two turns earlier"
+        },
+        {
+          "ref": "s2:t11",
+          "subject": 1,
+          "action": "create_root",
+          "evidence": "Cannot afford travel this year because loan remains unpaid",
+          "identity": "Loan repayment",
+          "scope": "Loan repayment",
+          "state": "Cannot afford travel this year because loan remains unpaid",
+          "segment": true,
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s3:t0",
+          "subject": 0,
+          "action": "create_root",
+          "evidence": "Planned weight loss to feel better independently of divorce",
+          "identity": "Fitness plan",
+          "scope": "Fitness plan",
+          "state": "Planned weight loss to feel better independently of divorce",
+          "segment": true,
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s3:t1",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect source",
+          "label_origin": "default_no_update",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s3:t2",
+          "subject": 0,
+          "action": "multi_attach",
+          "evidence": "The proposed dog supports companionship and the existing exercise plan",
+          "updates": [
+            {
+              "state": "Considering a dog for companionship and daily exercise",
+              "target": 2
+            },
+            {
+              "state": "Considering dog walks as motivation to exercise during weight loss",
+              "target": 5
+            }
+          ],
+          "targets": [
+            2,
+            5
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s3:t3",
+          "subject": 1,
+          "action": "attach",
+          "evidence": "Mack is aging but remains affectionate",
+          "state": "Mack is aging but remains affectionate",
+          "segment": false,
+          "targets": [
+            1
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s3:t4",
+          "subject": 0,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect source",
+          "label_origin": "default_no_update",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s3:t5",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect source",
+          "label_origin": "default_no_update",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s3:t6",
+          "subject": 0,
+          "action": "attach",
+          "evidence": "Already knows some Spanish and previously traveled in Mexico",
+          "state": "Already knows some Spanish and previously traveled in Mexico",
+          "segment": false,
+          "targets": [
+            3
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s3:t7",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect source",
+          "label_origin": "default_no_update",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s3:t8",
+          "subject": 0,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect source",
+          "label_origin": "default_no_update",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s3:t9",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect source",
+          "label_origin": "default_no_update",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s3:t10",
+          "subject": 0,
+          "action": "attach",
+          "evidence": "Suggests planning a future Mexico trip together",
+          "state": "Suggests planning a future Mexico trip together",
+          "segment": false,
+          "targets": [
+            3
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s3:t11",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect source",
+          "label_origin": "default_no_update",
+          "review_priority": "high"
+        }
+      ]
+    },
+    {
+      "conversation_id": "train:ordered_7748",
+      "split": "holdout_review",
+      "rows": [
+        {
+          "ref": "s2:t0",
+          "subject": 0,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect source",
+          "label_origin": "default_no_update",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s2:t1",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect source",
+          "label_origin": "default_no_update",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s2:t2",
+          "subject": 0,
+          "action": "create_root",
+          "evidence": "Plays quarterback",
+          "identity": "Playing football",
+          "scope": "Playing football",
+          "state": "Plays quarterback",
+          "segment": true,
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s2:t3",
+          "subject": 1,
+          "action": "create_root",
+          "evidence": "Lives on a boat in the Atlantic Ocean",
+          "identity": "Life on boat",
+          "scope": "Life on boat",
+          "state": "Lives on a boat in the Atlantic Ocean",
+          "segment": true,
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s2:t4",
+          "subject": 0,
+          "action": "create_root",
+          "evidence": "Studying marine biology in college",
+          "identity": "Marine biology studies",
+          "scope": "Marine biology studies",
+          "state": "Studying marine biology in college",
+          "segment": true,
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s2:t5",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect source",
+          "label_origin": "default_no_update",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s2:t6",
+          "subject": 0,
+          "action": "create_root",
+          "evidence": "Surfs in Hawaii and enjoys it",
+          "identity": "Surfing",
+          "scope": "Surfing",
+          "state": "Surfs in Hawaii and enjoys it",
+          "segment": true,
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s2:t7",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect source",
+          "label_origin": "default_no_update",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s2:t8",
+          "subject": 0,
+          "action": "attach",
+          "evidence": "Practices surfing and finds it worthwhile despite difficulty",
+          "state": "Practices surfing and finds it worthwhile despite difficulty",
+          "segment": false,
+          "targets": [
+            3
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s2:t9",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect source",
+          "label_origin": "default_no_update",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s2:t10",
+          "subject": 0,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect source",
+          "label_origin": "default_no_update",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s2:t11",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect source",
+          "label_origin": "default_no_update",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s3:t0",
+          "subject": 0,
+          "action": "create_and_attach",
+          "evidence": "One injury begins recovery and interrupts existing football activity",
+          "identity": "Leg injury",
+          "scope": "Leg injury",
+          "state": "Leg injured during football practice",
+          "updates": [
+            {
+              "state": "Leg injured at football practice; playing is interrupted",
+              "target": 0
+            }
+          ],
+          "segment": true,
+          "targets": [
+            0
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s3:t1",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect source",
+          "label_origin": "default_no_update",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s3:t2",
+          "subject": 0,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect source",
+          "label_origin": "default_no_update",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s3:t3",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect source",
+          "label_origin": "default_no_update",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s3:t4",
+          "subject": 0,
+          "action": "multi_attach",
+          "evidence": "Speaker says injured leg prevents both sports and shifts attention to study",
+          "updates": [
+            {
+              "state": "Cannot currently play football because of injured leg",
+              "target": 0
+            },
+            {
+              "state": "Cannot currently surf because of injured leg",
+              "target": 3
+            },
+            {
+              "state": "Plans to focus more on studies while unable to play sports",
+              "target": 2
+            }
+          ],
+          "targets": [
+            0,
+            3,
+            2
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s3:t5",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect source",
+          "label_origin": "default_no_update",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s3:t6",
+          "subject": 0,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect source",
+          "label_origin": "default_no_update",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s3:t7",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect source",
+          "label_origin": "default_no_update",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s3:t8",
+          "subject": 0,
+          "action": "attach",
+          "evidence": "Expects a couple of weeks without walking on injured leg",
+          "state": "Expects a couple of weeks without walking on injured leg",
+          "segment": false,
+          "targets": [
+            4
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s3:t9",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect source",
+          "label_origin": "default_no_update",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s3:t10",
+          "subject": 0,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect source",
+          "label_origin": "default_no_update",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s3:t11",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect source",
+          "label_origin": "default_no_update",
+          "review_priority": "high"
+        }
+      ]
+    }
+  ]
+}
