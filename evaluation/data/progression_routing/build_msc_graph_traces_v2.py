@@ -287,9 +287,24 @@ def build():
             row['label_origin'] = 'model_authored'
             row['review_priority'] = 'high' if row['action'] in ('create_root','multi_attach') else 'normal'
             if trace['conversation_id'] == 'train:ordered_416' and row['ref'] == 's3:t2':
+                row.update(action='create_and_attach', identity='Family bereavement',
+                           scope='Managing the death of husband and its effect on family life',
+                           state='Husband has died; grieving and reconsidering wishes he had expressed',
+                           targets=[1],
+                           updates=[dict(target=1, state=(
+                               'After husband’s death, reconsidering a pet snake and asking which kind to get'),
+                               segment=True)],
+                           label_origin='second_pass_audit_correction')
                 row['review_priority'] = 'high'
-                row['review_issue'] = ('Husband’s death first appears here; one-action schema cannot '
-                                       'attach snake decision and create bereavement root together')
+                row['review_issue'] = ('First evidence for bereavement and a change to snake decision '
+                                       'are represented by one atomic composite write')
+            if trace['conversation_id'] == 'train:ordered_416' and row['ref'] == 's3:t8':
+                row.clear()
+                row.update(ref='s3:t8', subject=0, action='attach', targets=[4],
+                           state=('Husband has died; plans family dinner with sister and his relatives, '
+                                  'and feels uneasy around his relatives'),
+                           evidence='Family dinner with husband’s relatives is emotionally difficult',
+                           label_origin='second_pass_audit_correction', review_priority='high')
     review_issues = {
         ('train:ordered_7807', 's3:t4'):
             'Layoff phrasing does not establish that employment was part of the Lostfound app',
