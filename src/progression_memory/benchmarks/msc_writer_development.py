@@ -51,7 +51,7 @@ def sample_audit(conversations: dict[str, list[dict]], count: int) -> dict:
             "annotation_contract": {
                 "subject_id": "Speaker ID is a candidate, not a factual subject label. Annotate who each claim describes or abstain.",
                 "event": "Extract only assertions about a durable goal, interest or life process with an exact source_id.",
-                "routing": "Record no_update, attach, create_root, create_child, or multi_attach against prior process IDs.",
+                "routing": "Record no_update, attach, create_root, create_child, multi_attach, or create_and_attach against prior process IDs.",
                 "state": "State and change must be entailed by cited source turns; mark ungrounded claims.",
                 "review": "Have a separate human review labels before fitting or claiming a gain."},
             "conversations": [{"initial_data_id": key,
