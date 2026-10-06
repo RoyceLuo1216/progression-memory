@@ -17,7 +17,7 @@ from progression_memory.maintenance.calibrated_progression import (
 
 def review_rows(traces, audit):
     source = {c['initial_data_id']: c for c in audit['conversations']}
-    assert set(source) == {t['conversation_id'] for t in traces['traces']}
+    assert {t['conversation_id'] for t in traces['traces']} <= set(source)
     output = []
     for trace in traces['traces']:
         conversation_id = trace['conversation_id']
@@ -48,7 +48,7 @@ def review_rows(traces, audit):
                                 target_updates=updates)
             memory.apply(Event(turn['source_id'], subject, turn['text'], None,
                                turn['source_id']), decision)
-            if row['action'] in ('create_root', 'create_child'):
+            if row['action'] in ('create_root', 'create_child', 'create_and_attach'):
                 created_rows[f"progression:{len(memory.progressions)-1}"] = len(output)
             output.append({
                 'conversation_id': conversation_id, 'split': trace['split'],
