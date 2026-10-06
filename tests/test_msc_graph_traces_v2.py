@@ -36,6 +36,13 @@ def test_silver_trace_rebuilds_and_exposes_defaults():
         assert row['state'] and row['label_origin'] == 'user_review_correction'
     assert traces['train:ordered_416']['s3:t2']['review_issue']
     assert traces['train:ordered_7807']['s3:t4']['review_issue']
+    assert traces['train:ordered_2281']['s2:t5']['identity'] == 'Cat ownership'
+    assert traces['train:ordered_7807']['s2:t0']['identity'] == 'Phone app project'
+    assert traces['train:ordered_792']['s3:t1']['action'] == 'create_root'
+    assert traces['train:ordered_792']['s3:t7']['action'] == 'attach'
+    assert traces['train:ordered_792']['s3:t9']['action'] == 'attach'
+    assert (traces['train:ordered_792']['s4:t5']['subject'],
+            traces['train:ordered_792']['s4:t5']['targets']) == (0, [2])
 
 
 def test_silver_trace_replays_pinned_audit_if_available():
@@ -49,3 +56,4 @@ def test_silver_trace_replays_pinned_audit_if_available():
     assert len(rows) == 309
     assert sum(r['review_priority'] == 'high' for r in rows) >= 116
     assert len({r['source_id'] for r in rows}) == 309
+    assert sum(r['final_process_events'] == 1 for r in rows) >= 25
