@@ -65,6 +65,25 @@ independently verified state entailment check yet.
    evidence before mutation. Commit the event once and all effects atomically.
    A failed validation leaves the event, graph and segments untouched.
 
+```text
+for source_turn in chronological_order:
+    store_raw(source_turn)
+    claims = identify_grounded_personal_claims(source_turn)
+    if claims cannot be safely attributed:
+        defer graph writing; keep raw source available
+        continue
+    candidates = retrieve_same_subject_processes(claims, shared_encoder)
+    proposal = decide_process_identity_hierarchy_and_state(claims, candidates)
+    validate_subjects_targets_parents_and_source_entailment(proposal)
+    atomically_apply(proposal, source_turn.id)
+    reembed_each_changed_current_state()
+```
+
+The atomic decision and replay exist in the prototype. Claim decomposition,
+source entailment validation, persistent embeddings, and a raw-only abstention
+path still need implementation. The current `construct` rejects unresolved
+subjects; it does not silently assign one.
+
 `create_and_attach` currently allows **one** new progression plus any number
 of existing targets. A single turn that starts two independent new processes
 still needs event decomposition or a general multi-operation transaction.
@@ -130,4 +149,6 @@ all labels remain model-authored until source-grounded independent review.
 The baseline 12-conversation set still contains many default no-update
 placeholders and singleton roots that need process-versus-fact adjudication.
 The prototype writer also operates at one turn per event and cannot yet
-decompose a turn into multiple independently attributed assertions.
+decompose a turn into multiple independently attributed assertions. Its
+`Event` has one subject ID, so a mixed-subject turn also needs decomposition
+before the production writer can represent every claim faithfully.
