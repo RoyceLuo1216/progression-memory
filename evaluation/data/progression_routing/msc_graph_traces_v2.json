@@ -1,0 +1,3344 @@
+{
+  "source": "Meta/ParlAI Multi-Session Chat v0.1 train; local msc-dev-audit.json",
+  "annotation_status": "single-model provisional silver; all defaults and hierarchy require human review",
+  "format": "Source references are s<session>:t<turn>; speaker/subject are participant slots 0 or 1; source text is rehydrated from the pinned MSC audit, not redistributed here.",
+  "traces": [
+    {
+      "conversation_id": "train:ordered_416",
+      "rows": [
+        {
+          "ref": "s2:t0",
+          "subject": 0,
+          "action": "no_update",
+          "evidence": "Asks about keeping snakes; no personal commitment.",
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s2:t1",
+          "subject": 1,
+          "action": "create_root",
+          "identity": "Keeping pet snakes",
+          "scope": "Ownership and care of Rattles and Chomper",
+          "state": "Owns snakes and enjoys caring for them; they require affection",
+          "evidence": "Describes own snakes and their care.",
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s2:t2",
+          "subject": 0,
+          "action": "create_root",
+          "identity": "Considering a pet snake",
+          "scope": "Household decision about a pet snake",
+          "state": "Husband wanted a snake; speaker preferred a dog",
+          "evidence": "Describes a household pet preference.",
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s2:t3",
+          "subject": 1,
+          "action": "attach",
+          "targets": [
+            0
+          ],
+          "state": "Owns affectionate snakes that enjoy mice as food",
+          "evidence": "Describes what own snakes eat.",
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s2:t4",
+          "subject": 0,
+          "action": "create_root",
+          "identity": "Carter the dog",
+          "scope": "Ownership and care of Carter",
+          "state": "Has a dog named Carter",
+          "evidence": "Says the household got a dog named Carter.",
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s2:t5",
+          "subject": 1,
+          "action": "attach",
+          "targets": [
+            0
+          ],
+          "state": "Owns snakes named Rattles and Chomper that enjoy mice",
+          "evidence": "Names own snakes.",
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s2:t6",
+          "subject": 0,
+          "action": "no_update",
+          "evidence": "Asks about the other participant's snakes.",
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s2:t7",
+          "subject": 1,
+          "action": "attach",
+          "targets": [
+            0
+          ],
+          "state": "Owns milk snakes named Rattles and Chomper; avoids rattlesnakes",
+          "evidence": "Identifies species and preference.",
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s2:t8",
+          "subject": 0,
+          "action": "no_update",
+          "evidence": "Asks a question about milk snakes.",
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s2:t9",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "Provides general information about milk snakes without a new personal state.",
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s2:t10",
+          "subject": 0,
+          "action": "no_update",
+          "evidence": "Asks whether people visit the snakes.",
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s2:t11",
+          "subject": 1,
+          "action": "create_root",
+          "identity": "Social connection",
+          "scope": "Friendship and social isolation",
+          "state": "Spends much time alone and reports few friends",
+          "evidence": "Describes own isolation.",
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s3:t0",
+          "subject": 0,
+          "action": "no_update",
+          "evidence": "Asks about the other participant's snake food.",
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s3:t1",
+          "subject": 1,
+          "action": "attach",
+          "targets": [
+            0
+          ],
+          "state": "Owns milk snakes Rattles and Chomper; feeding mice is relatively expensive",
+          "evidence": "Describes cost of feeding own snakes.",
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s3:t2",
+          "subject": 0,
+          "action": "attach",
+          "targets": [
+            1
+          ],
+          "state": "After husband's death, reconsidering a pet snake and asking which kind to get",
+          "segment": true,
+          "evidence": "Says husband died and has reconsidered a snake.",
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s3:t3",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "Gives advice about corn snakes; no personal process change.",
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s3:t4",
+          "subject": 0,
+          "action": "attach",
+          "targets": [
+            1
+          ],
+          "state": "Unsure about getting a snake because Carter may not tolerate it",
+          "evidence": "Expresses concern about dog's response to a snake.",
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s3:t5",
+          "subject": 1,
+          "action": "attach",
+          "targets": [
+            0
+          ],
+          "state": "Owns milk snakes; has considered other pets but remains drawn to reptiles",
+          "evidence": "Describes pet interests and lack of other pets.",
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s3:t6",
+          "subject": 0,
+          "action": "multi_attach",
+          "targets": [
+            1,
+            2
+          ],
+          "updates": [
+            {
+              "target": 1,
+              "state": "Still considering a snake later; Carter's reaction to a former cat raises concern"
+            },
+            {
+              "target": 2,
+              "state": "Carter is a large Labrador; household rehomed a cat he disliked"
+            }
+          ],
+          "evidence": "Describes Carter, the former cat, and postpones the snake decision.",
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s3:t7",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "Offers advice and mentions an uncle's former dog; no own process update.",
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s3:t8",
+          "subject": 0,
+          "action": "create_root",
+          "identity": "Family bereavement",
+          "scope": "Managing reminders of deceased husband at family gatherings",
+          "state": "Plans dinner with sister and husband's relatives; uneasy around the relatives",
+          "evidence": "Describes upcoming family dinner and discomfort.",
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s3:t9",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "Asks a follow-up question.",
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s3:t10",
+          "subject": 0,
+          "action": "attach",
+          "targets": [
+            4
+          ],
+          "state": "Frequently sees husband's relatives; their presence is a painful reminder of him",
+          "evidence": "Explains why visits with husband's relatives are difficult.",
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s3:t11",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "Offers sympathy and references a friend's loss; no personal process update.",
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        }
+      ],
+      "split": "training_review"
+    },
+    {
+      "conversation_id": "train:ordered_4998",
+      "rows": [
+        {
+          "ref": "s2:t0",
+          "subject": 0,
+          "action": "no_update",
+          "evidence": "Asks about other participant's work.",
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s2:t1",
+          "subject": 1,
+          "action": "create_root",
+          "identity": "Career at current employer",
+          "scope": "Work, advancement and dissatisfaction at current job",
+          "state": "Overlooked for a promotion after years of work; dissatisfied",
+          "evidence": "Reports missed promotion and frustration.",
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s2:t2",
+          "subject": 1,
+          "action": "create_root",
+          "identity": "Potential career change",
+          "scope": "Considering a job at the other participant's plant",
+          "state": "Has been offered the possibility of working at the plant",
+          "evidence": "The offer addresses participant 1, although participant 0 speaks.",
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s2:t3",
+          "subject": 1,
+          "action": "attach",
+          "targets": [
+            1
+          ],
+          "state": "Considering plant job but hesitant about moving across the country and changing careers",
+          "evidence": "Expresses hesitation about the offer.",
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s2:t4",
+          "subject": 0,
+          "action": "create_root",
+          "identity": "Career at the power plant",
+          "scope": "Work and advancement at the plant",
+          "state": "Works at a power plant; values steady income, colleagues and good pay",
+          "evidence": "Describes own plant work and income.",
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s2:t5",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "Acknowledges advice and asks about other participant's week.",
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s2:t6",
+          "subject": 0,
+          "action": "no_update",
+          "evidence": "Mentions eating cakes; no durable evolving process.",
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s2:t7",
+          "subject": 1,
+          "action": "attach",
+          "targets": [
+            0
+          ],
+          "state": "Overlooked for promotion after years of work; current job supplies free cakes",
+          "evidence": "Connects free cakes to own job.",
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s2:t8",
+          "subject": 0,
+          "action": "no_update",
+          "evidence": "Mentions food preference, without a durable changing process.",
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s2:t9",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "Asks about the other person's dinner.",
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s2:t10",
+          "subject": 0,
+          "action": "no_update",
+          "evidence": "Describes dinner and suggests a future shared meal.",
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s2:t11",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "Accepts a meal suggestion; no career change.",
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s3:t0",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "Asks whether participant 1 has considered the plant job; offer unchanged.",
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s3:t1",
+          "subject": 1,
+          "action": "multi_attach",
+          "targets": [
+            0,
+            1
+          ],
+          "updates": [
+            {
+              "target": 0,
+              "state": "Overlooked for promotion after years at current job; now wants a new job",
+              "segment": true
+            },
+            {
+              "target": 1,
+              "state": "Now seriously considering plant work and asking about the role",
+              "segment": true
+            }
+          ],
+          "evidence": "Says they need a new job and asks about the plant role.",
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s3:t2",
+          "subject": 0,
+          "action": "attach",
+          "targets": [
+            2
+          ],
+          "state": "Works as an engineer at the plant; may ask boss about an opening for friend",
+          "evidence": "Identifies own engineering role and offers referral.",
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s3:t3",
+          "subject": 1,
+          "action": "attach",
+          "targets": [
+            1
+          ],
+          "state": "Enthusiastic about a possible plant referral but concerned about safety",
+          "evidence": "Welcomes offer and asks about earthquake risks.",
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s3:t4",
+          "subject": 0,
+          "action": "no_update",
+          "evidence": "Explains safety precautions; no changed career state.",
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s3:t5",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "Jokes about fictional plant employees; no real update.",
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s3:t6",
+          "subject": 0,
+          "action": "attach",
+          "targets": [
+            2
+          ],
+          "state": "Engineer at plant; gets along with boss and hopes extra hours will yield a raise",
+          "evidence": "Describes own boss and raise goal.",
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s3:t7",
+          "subject": 1,
+          "action": "multi_attach",
+          "targets": [
+            0,
+            1
+          ],
+          "updates": [
+            {
+              "target": 0,
+              "state": "Still frustrated by lack of advancement at current employer and considering leaving"
+            },
+            {
+              "target": 1,
+              "state": "Considering plant job and assessing its advancement opportunities"
+            }
+          ],
+          "evidence": "Contrasts stalled advancement with hoped-for growth at plant.",
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s3:t8",
+          "subject": 0,
+          "action": "no_update",
+          "evidence": "Encourages friend's prospects; own job unchanged.",
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s3:t9",
+          "subject": 1,
+          "action": "attach",
+          "targets": [
+            1
+          ],
+          "state": "Plant job sounds appealing, but leaving long-held current job feels scary",
+          "evidence": "States conflict between changing jobs and staying.",
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s3:t10",
+          "subject": 0,
+          "action": "no_update",
+          "evidence": "Comments on change and cakes; own career unchanged.",
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s3:t11",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "Jokes about cakes and asks a flavor preference; job decision unchanged.",
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        }
+      ],
+      "split": "training_review"
+    },
+    {
+      "conversation_id": "train:ordered_2281",
+      "rows": [
+        {
+          "ref": "s2:t0",
+          "subject": 0,
+          "action": "create_root",
+          "evidence": "Takes a dog for walks; dog chased a squirrel",
+          "identity": "Dog ownership",
+          "scope": "Dog ownership",
+          "state": "Takes a dog for walks; dog chased a squirrel",
+          "segment": true,
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s2:t1",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s2:t2",
+          "subject": 0,
+          "action": "attach",
+          "evidence": "Dog chased a squirrel for around ten minutes without catching it",
+          "state": "Dog chased a squirrel for around ten minutes without catching it",
+          "segment": false,
+          "targets": [
+            0
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s2:t3",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s2:t4",
+          "subject": 0,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s2:t5",
+          "subject": 1,
+          "action": "create_root",
+          "evidence": "Owns a cat who usually watches through the window",
+          "identity": "Bella the cat",
+          "scope": "Bella the cat",
+          "state": "Owns a cat who usually watches through the window",
+          "segment": true,
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s2:t6",
+          "subject": 0,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s2:t7",
+          "subject": 1,
+          "action": "create_root",
+          "evidence": "Considering another pet dog and whether it would get along with Bella",
+          "identity": "Considering a dog",
+          "scope": "Considering a dog",
+          "state": "Considering another pet dog and whether it would get along with Bella",
+          "segment": true,
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s2:t8",
+          "subject": 0,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s2:t9",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s2:t10",
+          "subject": 0,
+          "action": "create_root",
+          "evidence": "Highly allergic to cats and cannot keep one in the house",
+          "identity": "Cat allergy",
+          "scope": "Cat allergy",
+          "state": "Highly allergic to cats and cannot keep one in the house",
+          "segment": true,
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s2:t11",
+          "subject": 1,
+          "action": "create_root",
+          "evidence": "Has not recently read the Bible and intends to resume reading",
+          "identity": "Bible reading",
+          "scope": "Bible reading",
+          "state": "Has not recently read the Bible and intends to resume reading",
+          "segment": true,
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s3:t0",
+          "subject": 0,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s3:t1",
+          "subject": 1,
+          "action": "create_root",
+          "evidence": "Writing a new book",
+          "identity": "Writing a book",
+          "scope": "Writing a book",
+          "state": "Writing a new book",
+          "segment": true,
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s3:t2",
+          "subject": 0,
+          "action": "attach",
+          "evidence": "Owns Waylon, a black Labrador who has killed wild rabbits",
+          "state": "Owns Waylon, a black Labrador who has killed wild rabbits",
+          "segment": false,
+          "targets": [
+            0
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s3:t3",
+          "subject": 1,
+          "action": "attach",
+          "evidence": "May call a shelter to find a dog suited to cats",
+          "state": "May call a shelter to find a dog suited to cats",
+          "segment": false,
+          "targets": [
+            2
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s3:t4",
+          "subject": 0,
+          "action": "attach",
+          "evidence": "Got Waylon a few months earlier; he is settling in and friendly to people",
+          "state": "Got Waylon a few months earlier; he is settling in and friendly to people",
+          "segment": false,
+          "targets": [
+            0
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s3:t5",
+          "subject": 1,
+          "action": "attach",
+          "evidence": "Bella is a rescue cat owned for seven years",
+          "state": "Bella is a rescue cat owned for seven years",
+          "segment": false,
+          "targets": [
+            1
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s3:t6",
+          "subject": 0,
+          "action": "create_child",
+          "evidence": "Takes Waylon out on a leash so wild rabbits can escape the yard",
+          "identity": "Protecting yard rabbits",
+          "scope": "Protecting yard rabbits",
+          "state": "Takes Waylon out on a leash so wild rabbits can escape the yard",
+          "segment": true,
+          "parent": 0,
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s3:t7",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s3:t8",
+          "subject": 0,
+          "action": "attach",
+          "evidence": "Leash strategy seems to help; rabbits may be learning to avoid yard",
+          "state": "Leash strategy seems to help; rabbits may be learning to avoid yard",
+          "segment": false,
+          "targets": [
+            6
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s3:t9",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s3:t10",
+          "subject": 0,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s3:t11",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s4:t0",
+          "subject": 0,
+          "action": "attach",
+          "evidence": "Took Waylon for a hike",
+          "state": "Took Waylon for a hike",
+          "segment": false,
+          "targets": [
+            0
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s4:t1",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s4:t2",
+          "subject": 0,
+          "action": "attach",
+          "evidence": "Waylon enjoys running and hiking with owner",
+          "state": "Waylon enjoys running and hiking with owner",
+          "segment": false,
+          "targets": [
+            0
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s4:t3",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s4:t4",
+          "subject": 0,
+          "action": "attach",
+          "evidence": "Waylon is five years old and enjoys hiking",
+          "state": "Waylon is five years old and enjoys hiking",
+          "segment": false,
+          "targets": [
+            0
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s4:t5",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s4:t6",
+          "subject": 0,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s4:t7",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s4:t8",
+          "subject": 0,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s4:t9",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s4:t10",
+          "subject": 0,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        }
+      ],
+      "split": "training_review"
+    },
+    {
+      "conversation_id": "train:ordered_4419",
+      "rows": [
+        {
+          "ref": "s2:t0",
+          "subject": 0,
+          "action": "create_root",
+          "evidence": "Took children fishing together",
+          "identity": "Fishing with children",
+          "scope": "Fishing with children",
+          "state": "Took children fishing together",
+          "segment": true,
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s2:t1",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s2:t2",
+          "subject": 0,
+          "action": "attach",
+          "evidence": "Older children help younger ones bait hooks; family caught fish for a picnic",
+          "state": "Older children help younger ones bait hooks; family caught fish for a picnic",
+          "segment": false,
+          "targets": [
+            0
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s2:t3",
+          "subject": 1,
+          "action": "create_root",
+          "evidence": "Moved to a warmer area closer to ponds and lakes",
+          "identity": "Recent relocation",
+          "scope": "Recent relocation",
+          "state": "Moved to a warmer area closer to ponds and lakes",
+          "segment": true,
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s2:t4",
+          "subject": 0,
+          "action": "create_root",
+          "evidence": "Children spend time outdoors in a warm climate",
+          "identity": "Raising children",
+          "scope": "Raising children",
+          "state": "Children spend time outdoors in a warm climate",
+          "segment": true,
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s2:t5",
+          "subject": 1,
+          "action": "create_child",
+          "evidence": "Plans to buy fishing gear in spring after moving near ponds",
+          "identity": "Family fishing plans",
+          "scope": "Family fishing plans",
+          "state": "Plans to buy fishing gear in spring after moving near ponds",
+          "segment": true,
+          "parent": 1,
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s2:t6",
+          "subject": 0,
+          "action": "attach",
+          "evidence": "Children swim often during hot summers and spend much time outside",
+          "state": "Children swim often during hot summers and spend much time outside",
+          "segment": false,
+          "targets": [
+            2
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s2:t7",
+          "subject": 1,
+          "action": "create_root",
+          "evidence": "In a difficult new pre-med semester and looking forward to clinical work",
+          "identity": "Pre-med degree",
+          "scope": "Pre-med degree",
+          "state": "In a difficult new pre-med semester and looking forward to clinical work",
+          "segment": true,
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s2:t8",
+          "subject": 0,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s2:t9",
+          "subject": 1,
+          "action": "create_child",
+          "evidence": "Near end of undergraduate study; expects further medical education",
+          "identity": "Medical school planning",
+          "scope": "Medical school planning",
+          "state": "Near end of undergraduate study; expects further medical education",
+          "segment": true,
+          "parent": 4,
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s2:t10",
+          "subject": 0,
+          "action": "create_root",
+          "evidence": "Majored in music at college and did not pursue postgraduate study",
+          "identity": "Music education",
+          "scope": "Music education",
+          "state": "Majored in music at college and did not pursue postgraduate study",
+          "segment": true,
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s2:t11",
+          "subject": 1,
+          "action": "attach",
+          "evidence": "Undecided whether to stay locally for medical school or seek a stronger school elsewhere",
+          "state": "Undecided whether to stay locally for medical school or seek a stronger school elsewhere",
+          "segment": false,
+          "targets": [
+            5
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s3:t0",
+          "subject": 0,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s3:t1",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s3:t2",
+          "subject": 0,
+          "action": "attach",
+          "evidence": "Makes individual quality time for each child",
+          "state": "Makes individual quality time for each child",
+          "segment": false,
+          "targets": [
+            2
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s3:t3",
+          "subject": 1,
+          "action": "create_root",
+          "evidence": "Has two children and would like more",
+          "identity": "Growing family",
+          "scope": "Growing family",
+          "state": "Has two children and would like more",
+          "segment": true,
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s3:t4",
+          "subject": 0,
+          "action": "attach",
+          "evidence": "Has at least three children and finds a large family busy",
+          "state": "Has at least three children and finds a large family busy",
+          "segment": false,
+          "targets": [
+            2
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s3:t5",
+          "subject": 1,
+          "action": "attach",
+          "evidence": "Hopes to take children fishing and teach them skills",
+          "state": "Hopes to take children fishing and teach them skills",
+          "segment": false,
+          "targets": [
+            3
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s3:t6",
+          "subject": 0,
+          "action": "attach",
+          "evidence": "Four children enjoy fishing; another skips the trips and may feel excluded",
+          "state": "Four children enjoy fishing; another skips the trips and may feel excluded",
+          "segment": false,
+          "targets": [
+            0
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s3:t7",
+          "subject": 1,
+          "action": "attach",
+          "evidence": "Juggles work, school and quality time with two children",
+          "state": "Juggles work, school and quality time with two children",
+          "segment": false,
+          "targets": [
+            7
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s3:t8",
+          "subject": 0,
+          "action": "create_child",
+          "evidence": "Trying group music lessons so all children can take part together",
+          "identity": "Children’s music lessons",
+          "scope": "Children’s music lessons",
+          "state": "Trying group music lessons so all children can take part together",
+          "segment": true,
+          "parent": 2,
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s3:t9",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s3:t10",
+          "subject": 0,
+          "action": "attach",
+          "evidence": "Children are trying piano; all interested and two showing aptitude",
+          "state": "Children are trying piano; all interested and two showing aptitude",
+          "segment": false,
+          "targets": [
+            8
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s3:t11",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        }
+      ],
+      "split": "training_review"
+    },
+    {
+      "conversation_id": "train:ordered_6210",
+      "rows": [
+        {
+          "ref": "s2:t0",
+          "subject": 0,
+          "action": "create_root",
+          "evidence": "Bought shirts for friend’s children",
+          "identity": "Gifts for friend’s family",
+          "scope": "Gifts for friend’s family",
+          "state": "Bought shirts for friend’s children",
+          "segment": true,
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s2:t1",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s2:t2",
+          "subject": 0,
+          "action": "attach",
+          "evidence": "Agrees to look for a shirt for friend’s wife",
+          "state": "Agrees to look for a shirt for friend’s wife",
+          "segment": false,
+          "targets": [
+            0
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s2:t3",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s2:t4",
+          "subject": 0,
+          "action": "attach",
+          "evidence": "Plans to find a shirt and pink lip gloss for friend’s wife",
+          "state": "Plans to find a shirt and pink lip gloss for friend’s wife",
+          "segment": false,
+          "targets": [
+            0
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s2:t5",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s2:t6",
+          "subject": 0,
+          "action": "create_root",
+          "evidence": "Recently purchased several Gucci pieces",
+          "identity": "Fashion shopping",
+          "scope": "Fashion shopping",
+          "state": "Recently purchased several Gucci pieces",
+          "segment": true,
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s2:t7",
+          "subject": 1,
+          "action": "create_root",
+          "evidence": "Bought heart-shaped muffin pans to make muffins for family",
+          "identity": "Baking for family",
+          "scope": "Baking for family",
+          "state": "Bought heart-shaped muffin pans to make muffins for family",
+          "segment": true,
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s2:t8",
+          "subject": 0,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s2:t9",
+          "subject": 1,
+          "action": "attach",
+          "evidence": "Plans to try banana-pecan muffins and serve friend at dinner",
+          "state": "Plans to try banana-pecan muffins and serve friend at dinner",
+          "segment": false,
+          "targets": [
+            2
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s2:t10",
+          "subject": 0,
+          "action": "create_root",
+          "evidence": "Feels lonely while single and values time with friend’s family",
+          "identity": "Social connection",
+          "scope": "Social connection",
+          "state": "Feels lonely while single and values time with friend’s family",
+          "segment": true,
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s2:t11",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s3:t0",
+          "subject": 0,
+          "action": "attach",
+          "evidence": "Bought lip gloss for friend’s wife",
+          "state": "Bought lip gloss for friend’s wife",
+          "segment": false,
+          "targets": [
+            0
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s3:t1",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s3:t2",
+          "subject": 0,
+          "action": "attach",
+          "evidence": "Bought a bag, shoes and shirts",
+          "state": "Bought a bag, shoes and shirts",
+          "segment": false,
+          "targets": [
+            1
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s3:t3",
+          "subject": 1,
+          "action": "create_root",
+          "evidence": "Wife uses makeup and workout-clothing subscription boxes",
+          "identity": "Household subscriptions",
+          "scope": "Household subscriptions",
+          "state": "Wife uses makeup and workout-clothing subscription boxes",
+          "segment": true,
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s3:t4",
+          "subject": 0,
+          "action": "create_root",
+          "evidence": "Considering subscription boxes but undecided among options",
+          "identity": "Exploring subscriptions",
+          "scope": "Exploring subscriptions",
+          "state": "Considering subscription boxes but undecided among options",
+          "segment": true,
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s3:t5",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s3:t6",
+          "subject": 0,
+          "action": "attach",
+          "evidence": "Shops both online and in stores, preferring online variety",
+          "state": "Shops both online and in stores, preferring online variety",
+          "segment": false,
+          "targets": [
+            1
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s3:t7",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s3:t8",
+          "subject": 0,
+          "action": "attach",
+          "evidence": "Interested in trying GreenChef using a coupon",
+          "state": "Interested in trying GreenChef using a coupon",
+          "segment": false,
+          "targets": [
+            5
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s3:t9",
+          "subject": 1,
+          "action": "attach",
+          "evidence": "Family uses GreenChef; twins prefer plain food; interested in baking box",
+          "state": "Family uses GreenChef; twins prefer plain food; interested in baking box",
+          "segment": false,
+          "targets": [
+            4
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s3:t10",
+          "subject": 0,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s3:t11",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        }
+      ],
+      "split": "training_review"
+    },
+    {
+      "conversation_id": "train:ordered_3280",
+      "rows": [
+        {
+          "ref": "s2:t0",
+          "subject": 0,
+          "action": "create_root",
+          "evidence": "Ended relationship with boyfriend after meeting Thor",
+          "identity": "Dating and relationships",
+          "scope": "Dating and relationships",
+          "state": "Ended relationship with boyfriend after meeting Thor",
+          "segment": true,
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s2:t1",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s2:t2",
+          "subject": 0,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s2:t3",
+          "subject": 1,
+          "action": "create_root",
+          "evidence": "Selected for first team this weekend",
+          "identity": "Soccer career",
+          "scope": "Soccer career",
+          "state": "Selected for first team this weekend",
+          "segment": true,
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s2:t4",
+          "subject": 0,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s2:t5",
+          "subject": 1,
+          "action": "attach",
+          "evidence": "Will play West Ham United in an important match",
+          "state": "Will play West Ham United in an important match",
+          "segment": false,
+          "targets": [
+            1
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s2:t6",
+          "subject": 0,
+          "action": "create_root",
+          "evidence": "Wants to attend friend’s match subject to work schedule",
+          "identity": "Attending soccer match",
+          "scope": "Attending soccer match",
+          "state": "Wants to attend friend’s match subject to work schedule",
+          "segment": true,
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s2:t7",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s2:t8",
+          "subject": 0,
+          "action": "attach",
+          "evidence": "Plans to ask boss for time off and bring an office friend",
+          "state": "Plans to ask boss for time off and bring an office friend",
+          "segment": false,
+          "targets": [
+            2
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s2:t9",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s2:t10",
+          "subject": 0,
+          "action": "attach",
+          "evidence": "Hopes to meet group for lunch before match",
+          "state": "Hopes to meet group for lunch before match",
+          "segment": false,
+          "targets": [
+            2
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s2:t11",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s3:t0",
+          "subject": 0,
+          "action": "create_root",
+          "evidence": "Scored two goals at practice",
+          "identity": "Playing soccer",
+          "scope": "Playing soccer",
+          "state": "Scored two goals at practice",
+          "segment": true,
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s3:t1",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s3:t2",
+          "subject": 0,
+          "action": "attach",
+          "evidence": "Still plans to attend match with an office acquaintance",
+          "state": "Still plans to attend match with an office acquaintance",
+          "segment": false,
+          "targets": [
+            2
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s3:t3",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s3:t4",
+          "subject": 0,
+          "action": "create_child",
+          "evidence": "Trying to impress an office acquaintance at the match",
+          "identity": "Interest in coworker",
+          "scope": "Interest in coworker",
+          "state": "Trying to impress an office acquaintance at the match",
+          "segment": true,
+          "parent": 0,
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s3:t5",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s3:t6",
+          "subject": 0,
+          "action": "attach",
+          "evidence": "Feels ready to date again and considers coworker sweet",
+          "state": "Feels ready to date again and considers coworker sweet",
+          "segment": false,
+          "targets": [
+            4
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s3:t7",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s3:t8",
+          "subject": 0,
+          "action": "attach",
+          "evidence": "Shares college and musical interests with coworker, who supports them at work",
+          "state": "Shares college and musical interests with coworker, who supports them at work",
+          "segment": false,
+          "targets": [
+            4
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s3:t9",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s3:t10",
+          "subject": 0,
+          "action": "attach",
+          "evidence": "Hopes coworker likes them; cohabitation is only a distant possibility",
+          "state": "Hopes coworker likes them; cohabitation is only a distant possibility",
+          "segment": false,
+          "targets": [
+            4
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s3:t11",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        }
+      ],
+      "split": "training_review"
+    },
+    {
+      "conversation_id": "train:ordered_7807",
+      "rows": [
+        {
+          "ref": "s2:t0",
+          "subject": 0,
+          "action": "create_root",
+          "evidence": "Finished developing a new phone app",
+          "identity": "Lostfound app",
+          "scope": "Lostfound app",
+          "state": "Finished developing a new phone app",
+          "segment": true,
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s2:t1",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s2:t2",
+          "subject": 0,
+          "action": "attach",
+          "evidence": "App called Lostfound tracks misplaced objects and sends reminders",
+          "state": "App called Lostfound tracks misplaced objects and sends reminders",
+          "segment": false,
+          "targets": [
+            0
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s2:t3",
+          "subject": 1,
+          "action": "create_root",
+          "evidence": "Considering selling unneeded belongings for extra money",
+          "identity": "Additional income",
+          "scope": "Additional income",
+          "state": "Considering selling unneeded belongings for extra money",
+          "segment": true,
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s2:t4",
+          "subject": 0,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s2:t5",
+          "subject": 1,
+          "action": "create_root",
+          "evidence": "Plans a hike the following day",
+          "identity": "Hiking",
+          "scope": "Hiking",
+          "state": "Plans a hike the following day",
+          "segment": true,
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s2:t6",
+          "subject": 0,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s2:t7",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s2:t8",
+          "subject": 0,
+          "action": "create_root",
+          "evidence": "Buys discounted goods and resells on eBay and Amazon for profit",
+          "identity": "Online resale business",
+          "scope": "Online resale business",
+          "state": "Buys discounted goods and resells on eBay and Amazon for profit",
+          "segment": true,
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s2:t9",
+          "subject": 1,
+          "action": "attach",
+          "evidence": "May learn about buying and reselling from friend",
+          "state": "May learn about buying and reselling from friend",
+          "segment": false,
+          "targets": [
+            1
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s2:t10",
+          "subject": 0,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s2:t11",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s3:t0",
+          "subject": 0,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s3:t1",
+          "subject": 1,
+          "action": "attach",
+          "evidence": "Enjoyed hike and took pictures; wants to return",
+          "state": "Enjoyed hike and took pictures; wants to return",
+          "segment": false,
+          "targets": [
+            2
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s3:t2",
+          "subject": 0,
+          "action": "attach",
+          "evidence": "eBay and Amazon accounts suspended; resale income interrupted",
+          "state": "eBay and Amazon accounts suspended; resale income interrupted",
+          "segment": true,
+          "targets": [
+            3
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s3:t3",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s3:t4",
+          "subject": 0,
+          "action": "create_child",
+          "evidence": "Reports being laid off from app-related work; relation to ownership of app uncertain",
+          "identity": "App development job",
+          "scope": "App development job",
+          "state": "Reports being laid off from app-related work; relation to ownership of app uncertain",
+          "segment": true,
+          "parent": 0,
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s3:t5",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s3:t6",
+          "subject": 0,
+          "action": "create_root",
+          "evidence": "Worried about ability to support children after losing income",
+          "identity": "Family financial strain",
+          "scope": "Family financial strain",
+          "state": "Worried about ability to support children after losing income",
+          "segment": true,
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s3:t7",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s3:t8",
+          "subject": 0,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s3:t9",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s3:t10",
+          "subject": 0,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s3:t11",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        }
+      ],
+      "split": "development"
+    },
+    {
+      "conversation_id": "train:ordered_5704",
+      "rows": [
+        {
+          "ref": "s2:t0",
+          "subject": 0,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s2:t1",
+          "subject": 1,
+          "action": "create_root",
+          "evidence": "Sister Susan King has published books; newest is speaker’s favorite",
+          "identity": "Sister’s books",
+          "scope": "Sister’s books",
+          "state": "Sister Susan King has published books; newest is speaker’s favorite",
+          "segment": true,
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s2:t2",
+          "subject": 0,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s2:t3",
+          "subject": 1,
+          "action": "attach",
+          "evidence": "Sister releases books digitally and avoids paper copies",
+          "state": "Sister releases books digitally and avoids paper copies",
+          "segment": false,
+          "targets": [
+            0
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s2:t4",
+          "subject": 0,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s2:t5",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s2:t6",
+          "subject": 0,
+          "action": "create_root",
+          "evidence": "Plans to move to Australia; will store possessions in the US",
+          "identity": "Move to Australia",
+          "scope": "Move to Australia",
+          "state": "Plans to move to Australia; will store possessions in the US",
+          "segment": true,
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s2:t7",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s2:t8",
+          "subject": 0,
+          "action": "create_child",
+          "evidence": "Will rent Houston house to a friend while away",
+          "identity": "Houston house rental",
+          "scope": "Houston house rental",
+          "state": "Will rent Houston house to a friend while away",
+          "segment": true,
+          "parent": 1,
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s2:t9",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s2:t10",
+          "subject": 0,
+          "action": "attach",
+          "evidence": "Expects friends to visit after moving to Australia",
+          "state": "Expects friends to visit after moving to Australia",
+          "segment": false,
+          "targets": [
+            1
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s2:t11",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s3:t0",
+          "subject": 0,
+          "action": "create_root",
+          "evidence": "Started reading friend’s sister’s digital book",
+          "identity": "Reading Susan King’s book",
+          "scope": "Reading Susan King’s book",
+          "state": "Started reading friend’s sister’s digital book",
+          "segment": true,
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s3:t1",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s3:t2",
+          "subject": 0,
+          "action": "attach",
+          "evidence": "Halfway through the book and enjoying it",
+          "state": "Halfway through the book and enjoying it",
+          "segment": false,
+          "targets": [
+            3
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s3:t3",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s3:t4",
+          "subject": 0,
+          "action": "attach",
+          "evidence": "Intends to read another recommended book when time permits",
+          "state": "Intends to read another recommended book when time permits",
+          "segment": false,
+          "targets": [
+            3
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s3:t5",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s3:t6",
+          "subject": 0,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s3:t7",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s3:t8",
+          "subject": 0,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s3:t9",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        }
+      ],
+      "split": "development"
+    },
+    {
+      "conversation_id": "train:ordered_6469",
+      "rows": [
+        {
+          "ref": "s2:t0",
+          "subject": 0,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s2:t1",
+          "subject": 1,
+          "action": "create_root",
+          "evidence": "Previously acted in The Hobbit; says filming opportunities are scarce",
+          "identity": "Acting career",
+          "scope": "Acting career",
+          "state": "Previously acted in The Hobbit; says filming opportunities are scarce",
+          "segment": true,
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s2:t2",
+          "subject": 0,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s2:t3",
+          "subject": 1,
+          "action": "attach",
+          "evidence": "Local work now mostly independent or horror films",
+          "state": "Local work now mostly independent or horror films",
+          "segment": false,
+          "targets": [
+            0
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s2:t4",
+          "subject": 0,
+          "action": "create_root",
+          "evidence": "Interested primarily in boats and fishing rather than film",
+          "identity": "Boats and fishing",
+          "scope": "Boats and fishing",
+          "state": "Interested primarily in boats and fishing rather than film",
+          "segment": true,
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s2:t5",
+          "subject": 1,
+          "action": "attach",
+          "evidence": "Short stature limits acting roles, according to speaker",
+          "state": "Short stature limits acting roles, according to speaker",
+          "segment": false,
+          "targets": [
+            0
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s2:t6",
+          "subject": 0,
+          "action": "create_child",
+          "evidence": "Usually sells about five or six boats a year",
+          "identity": "Boat sales",
+          "scope": "Boat sales",
+          "state": "Usually sells about five or six boats a year",
+          "segment": true,
+          "parent": 1,
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s2:t7",
+          "subject": 1,
+          "action": "create_root",
+          "evidence": "Would like to visit friend’s island but gets seasick on boats",
+          "identity": "Visiting friend’s island",
+          "scope": "Visiting friend’s island",
+          "state": "Would like to visit friend’s island but gets seasick on boats",
+          "segment": true,
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s2:t8",
+          "subject": 0,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s2:t9",
+          "subject": 1,
+          "action": "attach",
+          "evidence": "May try anti-nausea medication; wants to fish on visit",
+          "state": "May try anti-nausea medication; wants to fish on visit",
+          "segment": false,
+          "targets": [
+            3
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s2:t10",
+          "subject": 0,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s2:t11",
+          "subject": 1,
+          "action": "attach",
+          "evidence": "May visit for a weekend in a few months and hike",
+          "state": "May visit for a weekend in a few months and hike",
+          "segment": false,
+          "targets": [
+            3
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s3:t0",
+          "subject": 0,
+          "action": "attach",
+          "evidence": "Planning fishing and hiking with visiting friend",
+          "state": "Planning fishing and hiking with visiting friend",
+          "segment": false,
+          "targets": [
+            1
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s3:t1",
+          "subject": 1,
+          "action": "attach",
+          "evidence": "Wants hiking and shore fishing without boating",
+          "state": "Wants hiking and shore fishing without boating",
+          "segment": false,
+          "targets": [
+            3
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s3:t2",
+          "subject": 0,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s3:t3",
+          "subject": 1,
+          "action": "attach",
+          "evidence": "Prefers a fishing spot on hiking trail and avoids boats",
+          "state": "Prefers a fishing spot on hiking trail and avoids boats",
+          "segment": false,
+          "targets": [
+            3
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s3:t4",
+          "subject": 0,
+          "action": "attach",
+          "evidence": "Identified river hiking and fishing spot; offers equipment",
+          "state": "Identified river hiking and fishing spot; offers equipment",
+          "segment": false,
+          "targets": [
+            1
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s3:t5",
+          "subject": 1,
+          "action": "attach",
+          "evidence": "Needs to borrow fishing equipment and is eager to hike",
+          "state": "Needs to borrow fishing equipment and is eager to hike",
+          "segment": false,
+          "targets": [
+            3
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s3:t6",
+          "subject": 0,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s3:t7",
+          "subject": 1,
+          "action": "create_root",
+          "evidence": "Fishes for leisure but does not eat fish",
+          "identity": "Recreational fishing",
+          "scope": "Recreational fishing",
+          "state": "Fishes for leisure but does not eat fish",
+          "segment": true,
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s3:t8",
+          "subject": 0,
+          "action": "create_root",
+          "evidence": "Dog enjoys fish treats",
+          "identity": "Dog care",
+          "scope": "Dog care",
+          "state": "Dog enjoys fish treats",
+          "segment": true,
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s3:t9",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s3:t10",
+          "subject": 0,
+          "action": "attach",
+          "evidence": "Cleans and cooks fish to avoid feeding dog bones",
+          "state": "Cleans and cooks fish to avoid feeding dog bones",
+          "segment": false,
+          "targets": [
+            5
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s3:t11",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        }
+      ],
+      "split": "holdout_review"
+    },
+    {
+      "conversation_id": "train:ordered_6340",
+      "rows": [
+        {
+          "ref": "s2:t0",
+          "subject": 0,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s2:t1",
+          "subject": 1,
+          "action": "create_root",
+          "evidence": "Has five active children and takes them to park in family car",
+          "identity": "Raising five children",
+          "scope": "Raising five children",
+          "state": "Has five active children and takes them to park in family car",
+          "segment": true,
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s2:t2",
+          "subject": 0,
+          "action": "create_root",
+          "evidence": "Has a baby and feels tired caring for the child",
+          "identity": "Raising baby",
+          "scope": "Raising baby",
+          "state": "Has a baby and feels tired caring for the child",
+          "segment": true,
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s2:t3",
+          "subject": 1,
+          "action": "create_root",
+          "evidence": "Misses working while caring for five children",
+          "identity": "Return to employment",
+          "scope": "Return to employment",
+          "state": "Misses working while caring for five children",
+          "segment": true,
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s2:t4",
+          "subject": 0,
+          "action": "create_root",
+          "evidence": "Employer offers flexibility after baby was born",
+          "identity": "Flexible employment",
+          "scope": "Flexible employment",
+          "state": "Employer offers flexibility after baby was born",
+          "segment": true,
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s2:t5",
+          "subject": 1,
+          "action": "attach",
+          "evidence": "Interested in a flexible position at friend’s company",
+          "state": "Interested in a flexible position at friend’s company",
+          "segment": false,
+          "targets": [
+            2
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s2:t6",
+          "subject": 0,
+          "action": "create_root",
+          "evidence": "Invites friend to Bruno Mars concert and offers to arrange sitter",
+          "identity": "Concert outing",
+          "scope": "Concert outing",
+          "state": "Invites friend to Bruno Mars concert and offers to arrange sitter",
+          "segment": true,
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s2:t7",
+          "subject": 1,
+          "action": "attach",
+          "evidence": "Finds a large family rewarding but demanding",
+          "state": "Finds a large family rewarding but demanding",
+          "segment": false,
+          "targets": [
+            0
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s2:t8",
+          "subject": 0,
+          "action": "create_child",
+          "evidence": "Discussed another child with spouse; postponing until baby is potty trained",
+          "identity": "Planning another child",
+          "scope": "Planning another child",
+          "state": "Discussed another child with spouse; postponing until baby is potty trained",
+          "segment": true,
+          "parent": 1,
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s2:t9",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s2:t10",
+          "subject": 0,
+          "action": "create_root",
+          "evidence": "Dogs are gentle with baby; wonders how they will respond to toddler behavior",
+          "identity": "Dogs around baby",
+          "scope": "Dogs around baby",
+          "state": "Dogs are gentle with baby; wonders how they will respond to toddler behavior",
+          "segment": true,
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s2:t11",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s3:t0",
+          "subject": 0,
+          "action": "create_child",
+          "evidence": "Started potty training baby daughter",
+          "identity": "Potty training daughter",
+          "scope": "Potty training daughter",
+          "state": "Started potty training baby daughter",
+          "segment": true,
+          "parent": 1,
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s3:t1",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s3:t2",
+          "subject": 0,
+          "action": "attach",
+          "evidence": "Potty training is harder than expected",
+          "state": "Potty training is harder than expected",
+          "segment": false,
+          "targets": [
+            7
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s3:t3",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s3:t4",
+          "subject": 0,
+          "action": "attach",
+          "evidence": "Considering pausing training until daughter is older",
+          "state": "Considering pausing training until daughter is older",
+          "segment": false,
+          "targets": [
+            7
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s3:t5",
+          "subject": 1,
+          "action": "create_root",
+          "evidence": "Current car is often unreliable",
+          "identity": "Unreliable car",
+          "scope": "Unreliable car",
+          "state": "Current car is often unreliable",
+          "segment": true,
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s3:t6",
+          "subject": 0,
+          "action": "create_root",
+          "evidence": "Bought a Subaru roomy enough for family and dogs",
+          "identity": "Family Subaru",
+          "scope": "Family Subaru",
+          "state": "Bought a Subaru roomy enough for family and dogs",
+          "segment": true,
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s3:t7",
+          "subject": 1,
+          "action": "create_child",
+          "evidence": "Considering night-time remote accounting to support family and afford car",
+          "identity": "Remote accounting search",
+          "scope": "Remote accounting search",
+          "state": "Considering night-time remote accounting to support family and afford car",
+          "segment": true,
+          "parent": 2,
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s3:t8",
+          "subject": 0,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s3:t9",
+          "subject": 1,
+          "action": "attach",
+          "evidence": "Has fifteen years of prior accounting experience and asks about online roles",
+          "state": "Has fifteen years of prior accounting experience and asks about online roles",
+          "segment": false,
+          "targets": [
+            10
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s3:t10",
+          "subject": 0,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s3:t11",
+          "subject": 1,
+          "action": "attach",
+          "evidence": "Welcomes friend’s offer to check remote accounting openings",
+          "state": "Welcomes friend’s offer to check remote accounting openings",
+          "segment": false,
+          "targets": [
+            10
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        }
+      ],
+      "split": "holdout_review"
+    },
+    {
+      "conversation_id": "train:ordered_6729",
+      "rows": [
+        {
+          "ref": "s2:t0",
+          "subject": 0,
+          "action": "create_root",
+          "evidence": "Boyfriend in Italy booked a visit",
+          "identity": "Relationship with boyfriend",
+          "scope": "Relationship with boyfriend",
+          "state": "Boyfriend in Italy booked a visit",
+          "segment": true,
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s2:t1",
+          "subject": 1,
+          "action": "create_root",
+          "evidence": "Wants to visit opera houses and Stradivarius workshop in Italy",
+          "identity": "Italy travel interest",
+          "scope": "Italy travel interest",
+          "state": "Wants to visit opera houses and Stradivarius workshop in Italy",
+          "segment": true,
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s2:t2",
+          "subject": 0,
+          "action": "attach",
+          "evidence": "Boyfriend lives in Italy; has visited him several times",
+          "state": "Boyfriend lives in Italy; has visited him several times",
+          "segment": false,
+          "targets": [
+            0
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s2:t3",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s2:t4",
+          "subject": 0,
+          "action": "attach",
+          "evidence": "Boyfriend is an Italian-born chef working at family restaurant",
+          "state": "Boyfriend is an Italian-born chef working at family restaurant",
+          "segment": false,
+          "targets": [
+            0
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s2:t5",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s2:t6",
+          "subject": 0,
+          "action": "attach",
+          "evidence": "Boyfriend is from Sicily and has relatives throughout Italy",
+          "state": "Boyfriend is from Sicily and has relatives throughout Italy",
+          "segment": false,
+          "targets": [
+            0
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s2:t7",
+          "subject": 1,
+          "action": "create_root",
+          "evidence": "Grandmother is energetic; went bowling together",
+          "identity": "Life with grandmother",
+          "scope": "Life with grandmother",
+          "state": "Grandmother is energetic; went bowling together",
+          "segment": true,
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s2:t8",
+          "subject": 0,
+          "action": "create_root",
+          "evidence": "Lives with mother and younger brother; hopes to move in with boyfriend",
+          "identity": "Current housing",
+          "scope": "Current housing",
+          "state": "Lives with mother and younger brother; hopes to move in with boyfriend",
+          "segment": true,
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s2:t9",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s2:t10",
+          "subject": 0,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s2:t11",
+          "subject": 1,
+          "action": "create_root",
+          "evidence": "Plays violin daily and hopes to start teaching lessons",
+          "identity": "Violin teaching plans",
+          "scope": "Violin teaching plans",
+          "state": "Plays violin daily and hopes to start teaching lessons",
+          "segment": true,
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s3:t0",
+          "subject": 0,
+          "action": "create_child",
+          "evidence": "Boyfriend invited speaker to move in",
+          "identity": "Moving in with boyfriend",
+          "scope": "Moving in with boyfriend",
+          "state": "Boyfriend invited speaker to move in",
+          "segment": true,
+          "parent": 0,
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s3:t1",
+          "subject": 1,
+          "action": "attach",
+          "evidence": "Still lives with grandmother who is from Italy",
+          "state": "Still lives with grandmother who is from Italy",
+          "segment": false,
+          "targets": [
+            2
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s3:t2",
+          "subject": 0,
+          "action": "attach",
+          "evidence": "Plans to start in Sicily, then possibly move to Venice in a few years",
+          "state": "Plans to start in Sicily, then possibly move to Venice in a few years",
+          "segment": false,
+          "targets": [
+            5
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s3:t3",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s3:t4",
+          "subject": 0,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s3:t5",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s3:t6",
+          "subject": 0,
+          "action": "create_root",
+          "evidence": "Wants to see Rome after moving to Italy",
+          "identity": "Exploring Italy",
+          "scope": "Exploring Italy",
+          "state": "Wants to see Rome after moving to Italy",
+          "segment": true,
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s3:t7",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s3:t8",
+          "subject": 0,
+          "action": "attach",
+          "evidence": "Plans to explore Italy gradually, including Colosseum and Trevi Fountain",
+          "state": "Plans to explore Italy gradually, including Colosseum and Trevi Fountain",
+          "segment": false,
+          "targets": [
+            6
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s3:t9",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s3:t10",
+          "subject": 0,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s3:t11",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        }
+      ],
+      "split": "training_review"
+    },
+    {
+      "conversation_id": "train:ordered_792",
+      "rows": [
+        {
+          "ref": "s2:t0",
+          "subject": 0,
+          "action": "create_root",
+          "evidence": "Finishing a cake for friend",
+          "identity": "Making cakes",
+          "scope": "Making cakes",
+          "state": "Finishing a cake for friend",
+          "segment": true,
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s2:t1",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s2:t2",
+          "subject": 0,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s2:t3",
+          "subject": 1,
+          "action": "create_root",
+          "evidence": "Plans to celebrate group’s strong performance by sharing cake",
+          "identity": "Dance group",
+          "scope": "Dance group",
+          "state": "Plans to celebrate group’s strong performance by sharing cake",
+          "segment": true,
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s2:t4",
+          "subject": 0,
+          "action": "create_root",
+          "evidence": "Considering beginner dance group despite little experience",
+          "identity": "Learning dance",
+          "scope": "Learning dance",
+          "state": "Considering beginner dance group despite little experience",
+          "segment": true,
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s2:t5",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s2:t6",
+          "subject": 0,
+          "action": "create_root",
+          "evidence": "Enjoys walking in nature",
+          "identity": "Nature walks",
+          "scope": "Nature walks",
+          "state": "Enjoys walking in nature",
+          "segment": true,
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s2:t7",
+          "subject": 1,
+          "action": "create_root",
+          "evidence": "Reads a little but is easily distracted",
+          "identity": "Reading habit",
+          "scope": "Reading habit",
+          "state": "Reads a little but is easily distracted",
+          "segment": true,
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s2:t8",
+          "subject": 0,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s2:t9",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s2:t10",
+          "subject": 0,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s2:t11",
+          "subject": 1,
+          "action": "create_root",
+          "evidence": "Attends church each Sunday with parents",
+          "identity": "Church attendance",
+          "scope": "Church attendance",
+          "state": "Attends church each Sunday with parents",
+          "segment": true,
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s3:t0",
+          "subject": 0,
+          "action": "attach",
+          "evidence": "Completed and handed over friend’s cake",
+          "state": "Completed and handed over friend’s cake",
+          "segment": false,
+          "targets": [
+            0
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s3:t1",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s3:t2",
+          "subject": 0,
+          "action": "create_child",
+          "evidence": "Perfecting cake skills for wedding season",
+          "identity": "Wedding cake business",
+          "scope": "Wedding cake business",
+          "state": "Perfecting cake skills for wedding season",
+          "segment": true,
+          "parent": 0,
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s3:t3",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s3:t4",
+          "subject": 0,
+          "action": "attach",
+          "evidence": "Spring and summer are busiest for wedding cake work",
+          "state": "Spring and summer are busiest for wedding cake work",
+          "segment": false,
+          "targets": [
+            6
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s3:t5",
+          "subject": 1,
+          "action": "attach",
+          "evidence": "Offers dance lessons in exchange for cakes",
+          "state": "Offers dance lessons in exchange for cakes",
+          "segment": false,
+          "targets": [
+            1
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s3:t6",
+          "subject": 0,
+          "action": "attach",
+          "evidence": "Interested in trading cakes for dance lessons",
+          "state": "Interested in trading cakes for dance lessons",
+          "segment": false,
+          "targets": [
+            2
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s3:t7",
+          "subject": 1,
+          "action": "create_root",
+          "evidence": "Began competitive eating after a dance show",
+          "identity": "Competitive eating",
+          "scope": "Competitive eating",
+          "state": "Began competitive eating after a dance show",
+          "segment": true,
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s3:t8",
+          "subject": 0,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s3:t9",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s3:t10",
+          "subject": 0,
+          "action": "create_root",
+          "evidence": "Follows Harry Potter actors in other shows",
+          "identity": "Harry Potter interest",
+          "scope": "Harry Potter interest",
+          "state": "Follows Harry Potter actors in other shows",
+          "segment": true,
+          "label_origin": "model_authored",
+          "review_priority": "high"
+        },
+        {
+          "ref": "s3:t11",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s4:t0",
+          "subject": 0,
+          "action": "attach",
+          "evidence": "Considering taking friend up on cake-for-dance-lessons offer",
+          "state": "Considering taking friend up on cake-for-dance-lessons offer",
+          "segment": true,
+          "targets": [
+            2
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s4:t1",
+          "subject": 1,
+          "action": "attach",
+          "evidence": "Enjoys cakes and participates in eating competitions",
+          "state": "Enjoys cakes and participates in eating competitions",
+          "segment": false,
+          "targets": [
+            7
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s4:t2",
+          "subject": 0,
+          "action": "attach",
+          "evidence": "Paid for wedding cakes except when baking for friends or family",
+          "state": "Paid for wedding cakes except when baking for friends or family",
+          "segment": false,
+          "targets": [
+            6
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s4:t3",
+          "subject": 1,
+          "action": "attach",
+          "evidence": "Dancing helps offset competitive eating; available for lessons",
+          "state": "Dancing helps offset competitive eating; available for lessons",
+          "segment": false,
+          "targets": [
+            1
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s4:t4",
+          "subject": 0,
+          "action": "attach",
+          "evidence": "Wants lessons soon to prepare for a wedding next Friday",
+          "state": "Wants lessons soon to prepare for a wedding next Friday",
+          "segment": false,
+          "targets": [
+            2
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s4:t5",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s4:t6",
+          "subject": 0,
+          "action": "attach",
+          "evidence": "Using nature walks to get back in shape",
+          "state": "Using nature walks to get back in shape",
+          "segment": false,
+          "targets": [
+            3
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s4:t7",
+          "subject": 1,
+          "action": "attach",
+          "evidence": "Wants to attempt Nathan’s hot dog challenge; qualification is difficult",
+          "state": "Wants to attempt Nathan’s hot dog challenge; qualification is difficult",
+          "segment": false,
+          "targets": [
+            7
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        },
+        {
+          "ref": "s4:t8",
+          "subject": 0,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s4:t9",
+          "subject": 1,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s4:t10",
+          "subject": 0,
+          "action": "no_update",
+          "evidence": "No durable process update selected; inspect original turn",
+          "review_priority": "high",
+          "label_origin": "default_no_update"
+        },
+        {
+          "ref": "s4:t11",
+          "subject": 1,
+          "action": "attach",
+          "evidence": "Plans to use cake as eating practice for hot dog challenge",
+          "state": "Plans to use cake as eating practice for hot dog challenge",
+          "segment": false,
+          "targets": [
+            7
+          ],
+          "label_origin": "model_authored",
+          "review_priority": "normal"
+        }
+      ],
+      "split": "training_review"
+    }
+  ]
+}
