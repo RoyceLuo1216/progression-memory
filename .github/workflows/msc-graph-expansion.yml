@@ -1,0 +1,38 @@
+name: msc-graph-expansion
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - '.github/workflows/msc-graph-expansion.yml'
+  workflow_dispatch:
+
+jobs:
+  source-queue:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Fetch pinned official MSC corpus
+        run: |
+          curl --fail --location --retry 3 --silent --show-error \
+            https://parl.ai/downloads/msc/msc_v0.1.tar.gz -o "$RUNNER_TEMP/msc_v0.1.tar.gz"
+          echo 'e640e37cf4317cd09fc02a4cd57ef130a185f23635f4003b0cee341ffcb45e60  '"$RUNNER_TEMP/msc_v0.1.tar.gz" | sha256sum -c -
+          mkdir -p "$RUNNER_TEMP/msc"
+          tar -xzf "$RUNNER_TEMP/msc_v0.1.tar.gz" -C "$RUNNER_TEMP/msc"
+      - name: Sample additional complete train conversations
+        run: |
+          corpus=$(find "$RUNNER_TEMP/msc" -path '*/msc_dialogue/session_2/train.txt' -print -quit)
+          test -n "$corpus"
+          root=$(dirname "$(dirname "$(dirname "$corpus")")")
+          PYTHONPATH=src python -m progression_memory.benchmarks.msc_writer_development \
+            --data-root "$root" --conversations 48 \
+            --output "$RUNNER_TEMP/msc-expansion-audit.json"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: msc-expansion-source-queue
+          path: ${{ runner.temp }}/msc-expansion-audit.json
+          retention-days: 14
