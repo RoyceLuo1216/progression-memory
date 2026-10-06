@@ -29,6 +29,12 @@ CONVERSATIONS = {
 # fitting, including the earlier 100 attachment pairs (0, 1, 2, 7, 10, 11).
 DEV = {'train:ordered_7807', 'train:ordered_5704'}
 HOLDOUT = {'train:ordered_6469', 'train:ordered_6340'}
+USER_CORRECTIONS = {
+    ('train:ordered_6210', 's3:t7'),
+    ('train:ordered_7807', 's2:t10'),
+    ('train:ordered_6340', 's3:t10'),
+    ('train:ordered_6469', 's3:t6'),
+}
 ANNOTATIONS = {}
 
 
@@ -111,6 +117,7 @@ attach(3,'s3:t2',0,'Fashion shopping','Bought a bag, shoes and shirts')
 root(3,'s3:t3',1,'Household subscriptions','Wife uses makeup and workout-clothing subscription boxes')
 root(3,'s3:t4',0,'Exploring subscriptions','Considering subscription boxes but undecided among options')
 attach(3,'s3:t6',0,'Fashion shopping','Shops both online and in stores, preferring online variety')
+attach(3,'s3:t7',1,'Household subscriptions','Household has a GreenChef subscription and regularly receives coupon codes')
 attach(3,'s3:t8',0,'Exploring subscriptions','Interested in trying GreenChef using a coupon')
 attach(3,'s3:t9',1,'Household subscriptions','Family uses GreenChef; twins prefer plain food; interested in baking box')
 
@@ -135,6 +142,7 @@ root(5,'s2:t3',1,'Additional income','Considering selling unneeded belongings fo
 root(5,'s2:t5',1,'Hiking','Plans a hike the following day')
 root(5,'s2:t8',0,'Online resale business','Buys discounted goods and resells on eBay and Amazon for profit')
 attach(5,'s2:t9',1,'Additional income','May learn about buying and reselling from friend')
+attach(5,'s2:t10',0,'Online resale business','Plans another resale sourcing trip next Monday')
 attach(5,'s3:t1',1,'Hiking','Enjoyed hike and took pictures; wants to return')
 attach(5,'s3:t2',0,'Online resale business','eBay and Amazon accounts suspended; resale income interrupted',True)
 child(5,'s3:t4',0,'App development job','Lostfound app','Reports being laid off from app-related work; relation to ownership of app uncertain')
@@ -164,6 +172,7 @@ attach(8,'s3:t1',1,'Visiting friend’s island','Wants hiking and shore fishing 
 attach(8,'s3:t3',1,'Visiting friend’s island','Prefers a fishing spot on hiking trail and avoids boats')
 attach(8,'s3:t4',0,'Boats and fishing','Identified river hiking and fishing spot; offers equipment')
 attach(8,'s3:t5',1,'Visiting friend’s island','Needs to borrow fishing equipment and is eager to hike')
+attach(8,'s3:t6',0,'Boats and fishing','Enjoys eating fish caught while fishing, but is willing to release catches')
 root(8,'s3:t7',1,'Recreational fishing','Fishes for leisure but does not eat fish')
 root(8,'s3:t8',0,'Dog care','Dog enjoys fish treats')
 attach(8,'s3:t10',0,'Dog care','Cleans and cooks fish to avoid feeding dog bones')
@@ -185,6 +194,7 @@ root(9,'s3:t5',1,'Unreliable car','Current car is often unreliable')
 root(9,'s3:t6',0,'Family Subaru','Bought a Subaru roomy enough for family and dogs')
 child(9,'s3:t7',1,'Remote accounting search','Return to employment','Considering night-time remote accounting to support family and afford car')
 attach(9,'s3:t9',1,'Remote accounting search','Has fifteen years of prior accounting experience and asks about online roles')
+attach(9,'s3:t10',1,'Remote accounting search','Friend offers to check available online positions and send job descriptions')
 attach(9,'s3:t11',1,'Remote accounting search','Welcomes friend’s offer to check remote accounting openings')
 
 # 10: relationships, housing, move and travel plans are linked conservatively.
@@ -265,10 +275,27 @@ def build():
         for row in trace['rows']:
             row['label_origin'] = 'model_authored'
             row['review_priority'] = 'high' if row['action'] in ('create_root','multi_attach') else 'normal'
+            if trace['conversation_id'] == 'train:ordered_416' and row['ref'] == 's3:t2':
+                row['review_priority'] = 'high'
+                row['review_issue'] = ('Husband’s death first appears here; one-action schema cannot '
+                                       'attach snake decision and create bereavement root together')
+    review_issues = {
+        ('train:ordered_7807', 's3:t4'):
+            'Layoff phrasing does not establish that employment was part of the Lostfound app',
+        ('train:ordered_6469', 's3:t6'):
+            'Preference attachment depends on whether stable habits belong in this process',
+    }
+    for conversation_id, trace in traces.items():
+        for row in trace['rows']:
+            if (conversation_id, row['ref']) in USER_CORRECTIONS:
+                row['label_origin'] = 'user_review_correction'
+            if (conversation_id, row['ref']) in review_issues:
+                row['review_issue'] = review_issues[conversation_id, row['ref']]
+                row['review_priority'] = 'high'
     for conversation_id, trace in traces.items():
         trace['split'] = ('holdout_review' if conversation_id in HOLDOUT else
                           'development' if conversation_id in DEV else 'training_review')
-    return dict(source=v1['source'], annotation_status='single-model provisional silver; all defaults and hierarchy require human review',
+    return dict(source=v1['source'], annotation_status='model-proposed silver with four user review corrections; full adjudication pending',
                 format=v1['format'], traces=list(traces.values()))
 
 
