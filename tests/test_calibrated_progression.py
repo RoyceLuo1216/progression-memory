@@ -80,6 +80,42 @@ def test_multiattach_has_separate_states_and_single_source():
     assert set(memory.events) == {"e1", "e2", "e3", "e4", "e5", "e6"}
 
 
+def test_create_and_attach_shares_one_source_across_new_and_existing_processes():
+    memory = career_memory()
+    event = Event("e5", "user", "After losing my job, I started looking for another", None, "e5")
+    memory.apply(event, Decision(Action.CREATE_AND_ATTACH,
+        target_ids=("progression:0",), identity="Job search", scope="Finding new work",
+        state="Searching for work after losing job", change="Search begins",
+        target_updates=(TargetUpdate("progression:0", "Left former job and searching",
+                                     "Employment ended", True),),
+        reason="Same source starts a search and changes career state"))
+    assert memory.progressions["progression:2"].current_state.evidence_ids == {"e5"}
+    assert "e5" in memory.progressions["progression:0"].current_state.evidence_ids
+    assert len(memory.progressions["progression:0"].segment_ids) == 2
+    assert set(memory.events) == {"e1", "e2", "e3", "e4", "e5"}
+
+
+def test_create_and_attach_child_and_atomic_validation():
+    memory = career_memory()
+    before = (len(memory.events), len(memory.progressions), len(memory.segments))
+    event = Event("e5", "user", "Joined a new team while studying", None, "e5")
+    base = dict(action=Action.CREATE_AND_ATTACH, target_ids=("progression:1",),
+                parent_id="progression:0", identity="Team training", scope="New role learning",
+                state="Starting team training", reason="New child and employer update")
+    with pytest.raises(ValueError, match="target updates must match"):
+        memory.apply(event, Decision(**base, target_updates=(
+            TargetUpdate("progression:0", "Wrong target", "Change", False),)))
+    assert (len(memory.events), len(memory.progressions), len(memory.segments)) == before
+    with pytest.raises(KeyError):
+        memory.apply(event, Decision(**{**base, "parent_id": "missing"},
+            target_updates=(TargetUpdate("progression:1", "Working", "Change", False),)))
+    assert (len(memory.events), len(memory.progressions), len(memory.segments)) == before
+    memory.apply(event, Decision(**base, target_updates=(
+        TargetUpdate("progression:1", "Joined team and learning", "Role changed", False),)))
+    assert memory.progressions["progression:2"].parent_ids == {"progression:0"}
+    assert memory.progressions["progression:2"].current_state.evidence_ids == {"e5"}
+
+
 def test_model_writer_structured_contract():
     class FakeModel:
         def generate_messages(self, messages, json_schema=None):
