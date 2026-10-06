@@ -47,3 +47,25 @@ and full progression variants tie on retrieval, so this pilot attributes the
 gain over append to **grouping**, not to the added state text. The data are too
 small and the relevant process is defined by the same silver graph labels used
 to build the representation; this is not an independently adjudicated result.
+
+## Equal context budget follow-up
+
+[CI run 37464992798](https://github.com/RoyceLuo1216/progression-memory/actions/runs/37464992798)
+removed the top-record limit: all methods rank their whole index, then deliver
+source evidence within the **same** hard character cap. Mean recall:
+
+| Cap (characters) | Append | Structure | Structure + state |
+| ---: | ---: | ---: | ---: |
+| 200 | 0.091 | 0.121 | 0.121 |
+| 400 | 0.576 | 0.621 | 0.439 |
+| 800 | 0.833 | 0.848 | 0.758 |
+| 1,600 | 1.000 | 0.909 | 0.909 |
+| 4,800 | 1.000 | 1.000 | 1.000 |
+
+At 400 characters, mean delivered text is 362, 355 and 364 characters;
+at 800 it is 665, 666 and 693. Thus the tiny advantage from grouping alone
+at these caps is not due to substantially more delivered text. State text
+consumes budget without improving evidence recall, and the earlier top-record
+advantage does **not** survive as a meaningful improvement under matched
+character constraints. This is a small, label-conditioned continuation task,
+not a statistically powered QA evaluation.
