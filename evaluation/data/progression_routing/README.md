@@ -72,3 +72,33 @@ independent samples or measure accuracy against these same model labels.
 Review source entailment and routing disagreements before using them as
 training data, then obtain held-out conversation-level human labels for
 evaluation. The existing MSC attachment pairs overlap these conversations.
+
+## Twelve-conversation review set
+
+`msc_graph_traces_v2.json` covers every turn in the pinned 12-conversation
+MSC train audit (309 turns, both participants). Its authoring script is
+`build_msc_graph_traces_v2.py`. There are 65 proposed root creations, 13
+children, 89 attachments, 3 multiattachments, and 139 no-update decisions.
+Of the latter, **116 are default no-update placeholders** for turns not
+selected as changes. They are explicitly tagged `default_no_update` and
+must be reviewed before inclusion in supervised training. The 23 no-update
+labels from v1 were individually considered, but also need independent review.
+
+The source-backed review script validates chronological completeness, replay,
+subject consistency and target existence. In CI it exports a short-lived
+`msc-graph-review-queue` CSV with the source text, proposed label, subject,
+state, parent/targets, and empty reviewer fields. It is not checked into git.
+Review `high` priority rows first: all default no-updates, root/child choices,
+and multiattachments (197 rows). Then review every remaining state against
+its source turn, including cases where a turn contains multiple claims but
+the current writer contract permits only one creation action. A source-backed
+replay is an integrity check, **not** a semantic correctness score.
+
+Conversation-level partitions are `training_review` (8 conversations),
+`development` (2), and `holdout_review` (2). The latter two do not overlap
+the earlier 100 MSC attachment pairs. Freeze them out of fitting and prompt
+selection. These are model-produced labels across all partitions; only a
+separate reviewer can establish a usable validation reference. Twelve
+conversations and 13 provisional child examples are a starting annotation
+set, not adequate evidence of generalized writer quality. LoCoMo and
+LongMemEval remain untouched retrieval/QA benchmarks.
