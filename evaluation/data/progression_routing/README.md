@@ -50,3 +50,25 @@ no-update, subject, state, and segment boundary. It can validate storage and
 serve as a prompt example. It does **not** replace independently reviewed
 full-sequence labels on real dialogue, nor does it prove state entailment
 automatically. The separate MSC 100-pair file concerns attachment only.
+
+## Provisional real-conversation graph traces
+
+`msc_graph_traces_v1.json` annotates every turn in two **MSC train**
+conversations: `ordered_416` and `ordered_4998`. The 48 turns include 8 root
+creations, 14 attachments, 3 multiattachments, and 23 no-update decisions.
+The offer of a plant job is assigned to its recipient even though the other
+speaker makes the offer. Each updating row records a paraphrase of its source
+evidence and an explicit new state; a multiattach row gives each target its
+own state. The entire dialogue was visible during annotation. Raw MSC text
+is not included in the tracked file; the pinned audit artifact supplies it
+during CI replay (`MSC_DEV_AUDIT_PATH` for local testing).
+
+These are **single-model silver labels**, with no second annotator or
+adjudication. The replay checks chronological completeness, target existence,
+subject consistency, and storage invariants; it cannot establish that every
+paraphrase is entailed or every no-update is correct. There are no natural
+`create_child` cases in these two conversations. Do not pool turns as
+independent samples or measure accuracy against these same model labels.
+Review source entailment and routing disagreements before using them as
+training data, then obtain held-out conversation-level human labels for
+evaluation. The existing MSC attachment pairs overlap these conversations.
