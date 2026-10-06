@@ -11,7 +11,11 @@ on:
       - 'tests/test_msc_attachment_pairs.py'
       - 'evaluation/data/progression_attachment/**'
       - 'evaluation/data/progression_routing/msc_graph_traces_v1.json'
+      - 'evaluation/data/progression_routing/msc_graph_traces_v2.json'
+      - 'evaluation/data/progression_routing/build_msc_graph_traces_v2.py'
+      - 'evaluation/data/progression_routing/review_msc_graph_traces.py'
       - 'tests/test_msc_graph_traces.py'
+      - 'tests/test_msc_graph_traces_v2.py'
   workflow_dispatch:
 
 jobs:
@@ -24,7 +28,7 @@ jobs:
         with:
           python-version: '3.11'
       - run: python -m pip install -e '.[dev]'
-      - run: pytest -q tests/test_msc_writer_development.py tests/test_msc_attachment_pairs.py tests/test_msc_graph_traces.py
+      - run: pytest -q tests/test_msc_writer_development.py tests/test_msc_attachment_pairs.py tests/test_msc_graph_traces.py tests/test_msc_graph_traces_v2.py
       - name: Fetch pinned official MSC corpus
         run: |
           curl --fail --location --retry 3 --silent --show-error \
@@ -44,7 +48,11 @@ jobs:
           python evaluation/data/progression_attachment/build_msc_pairs.py \
             "$RUNNER_TEMP/msc-dev-audit.json" "$RUNNER_TEMP/msc-train-pairs.json"
           MSC_DEV_AUDIT_PATH="$RUNNER_TEMP/msc-dev-audit.json" \
-            pytest -q tests/test_msc_graph_traces.py
+            pytest -q tests/test_msc_graph_traces.py tests/test_msc_graph_traces_v2.py
+          python evaluation/data/progression_routing/review_msc_graph_traces.py \
+            "$RUNNER_TEMP/msc-dev-audit.json" \
+            evaluation/data/progression_routing/msc_graph_traces_v2.json \
+            "$RUNNER_TEMP/msc-graph-review.csv"
           cmp "$RUNNER_TEMP/msc-train-pairs.json" \
             evaluation/data/progression_attachment/msc_train_pairs_v1.json
           python -m progression_memory.benchmarks.calibrate_progression \
@@ -59,3 +67,8 @@ jobs:
         with:
           name: msc-attachment-exploratory
           path: ${{ runner.temp }}/msc-attachment-exploratory.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: msc-graph-review-queue
+          path: ${{ runner.temp }}/msc-graph-review.csv
+          retention-days: 14
