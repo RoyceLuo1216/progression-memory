@@ -22,6 +22,20 @@ def test_silver_trace_rebuilds_and_exposes_defaults():
     assert all(r['review_priority'] == 'high' for r in rows
                if r['label_origin'] == 'default_no_update')
     assert all(r['evidence'] for r in rows)
+    traces = {t['conversation_id']: {r['ref']: r for r in t['rows']}
+              for t in stored['traces']}
+    corrections = {
+        'train:ordered_6210': ('s3:t7', 4, 1),
+        'train:ordered_7807': ('s2:t10', 3, 0),
+        'train:ordered_6340': ('s3:t10', 10, 1),
+        'train:ordered_6469': ('s3:t6', 1, 0),
+    }
+    for conversation_id, (ref, target, subject) in corrections.items():
+        row = traces[conversation_id][ref]
+        assert (row['action'], row['targets'], row['subject']) == ('attach', [target], subject)
+        assert row['state'] and row['label_origin'] == 'user_review_correction'
+    assert traces['train:ordered_416']['s3:t2']['review_issue']
+    assert traces['train:ordered_7807']['s3:t4']['review_issue']
 
 
 def test_silver_trace_replays_pinned_audit_if_available():
