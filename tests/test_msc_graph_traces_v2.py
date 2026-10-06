@@ -35,6 +35,8 @@ def test_silver_trace_rebuilds_and_exposes_defaults():
         assert (row['action'], row['targets'], row['subject']) == ('attach', [target], subject)
         assert row['state'] and row['label_origin'] == 'user_review_correction'
     assert traces['train:ordered_416']['s3:t2']['review_issue']
+    assert traces['train:ordered_416']['s3:t2']['action'] == 'create_and_attach'
+    assert traces['train:ordered_416']['s3:t8']['action'] == 'attach'
     assert traces['train:ordered_7807']['s3:t4']['review_issue']
     assert traces['train:ordered_2281']['s2:t5']['identity'] == 'Cat ownership'
     assert traces['train:ordered_7807']['s2:t0']['identity'] == 'Phone app project'
