@@ -5,6 +5,11 @@ on:
     branches: [master]
     paths:
       - '.github/workflows/msc-graph-expansion.yml'
+      - 'evaluation/data/progression_routing/msc_graph_expansion_v1.json'
+      - 'evaluation/data/progression_routing/build_msc_graph_expansion.py'
+      - 'evaluation/data/progression_routing/review_msc_graph_traces.py'
+      - 'src/progression_memory/maintenance/calibrated_progression.py'
+      - 'tests/test_msc_graph_expansion.py'
   workflow_dispatch:
 
 jobs:
@@ -16,6 +21,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+      - run: python -m pip install -e '.[dev]'
+      - run: pytest -q tests/test_msc_graph_expansion.py tests/test_calibrated_progression.py
       - name: Fetch pinned official MSC corpus
         run: |
           curl --fail --location --retry 3 --silent --show-error \
@@ -31,8 +38,19 @@ jobs:
           PYTHONPATH=src python -m progression_memory.benchmarks.msc_writer_development \
             --data-root "$root" --conversations 48 \
             --output "$RUNNER_TEMP/msc-expansion-audit.json"
+          MSC_EXPANSION_AUDIT_PATH="$RUNNER_TEMP/msc-expansion-audit.json" \
+            pytest -q tests/test_msc_graph_expansion.py
+          python evaluation/data/progression_routing/review_msc_graph_traces.py \
+            "$RUNNER_TEMP/msc-expansion-audit.json" \
+            evaluation/data/progression_routing/msc_graph_expansion_v1.json \
+            "$RUNNER_TEMP/msc-expansion-review.csv"
       - uses: actions/upload-artifact@v4
         with:
           name: msc-expansion-source-queue
           path: ${{ runner.temp }}/msc-expansion-audit.json
+          retention-days: 14
+      - uses: actions/upload-artifact@v4
+        with:
+          name: msc-expansion-graph-review
+          path: ${{ runner.temp }}/msc-expansion-review.csv
           retention-days: 14
