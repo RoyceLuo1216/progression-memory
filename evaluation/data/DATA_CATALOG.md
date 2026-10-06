@@ -4,6 +4,7 @@
 |---|---:|---|---|
 | `progression_attachment/msc_train_pairs_v1.json` | 100 pairs from 25 events, 6 MSC conversations; 33 positive | Provisional event-to-candidate attachment | Same underlying MSC source as Personal Facts; conversation-held-out within this file only. Review labels before estimating accuracy. |
 | `progression_routing/career_school_trace_v1.json` | 29 fictional events | Full action, hierarchy, subject and state contract | Constructed example; validates storage, not generalization. |
+| `progression_routing/msc_graph_traces_v1.json` | 48 turns in 2 complete MSC train conversations; 25 updates, 23 no-op decisions | Provisional model-labeled subject, root, attach, multiattach, state and phase | Real conversation context, single annotator; replays against source in CI. No child actions occur in these two conversations. Not independently verified or gold. Overlaps the 100 attachment pairs. |
 | `../progression_calibration_scenarios.json` | 25 invented scenarios × 4 candidates = 100 pairs | Synthetic attachment calibration | Prototype contract only. |
 | `external_personal_facts/train/` | 2,223 published train facts, 1,368 self/long-term/valid candidates | Referent, temporal class, duration, validity, fact paraphrase | MSC-derived, single annotator, no conversation IDs; normalized source training rows checked in, raw Parquet fetched by pinned CI importer. Not independent of MSC pairs. |
 | `external_alpsbench/dev_task2_audit_v1.json` | 469 dev update cases | Before/after memory sets and source evidence | Real WildChat-derived dialogue; every case has one removed and two added IDs. Pin and fetch via CI; no hierarchy or representative no-op labels. Test held out. |
@@ -13,9 +14,11 @@ and updates from one conversation are correlated; each source labels a
 different question. LoCoMo and LongMemEval in `evaluation/data/` are held-out
 retrieval/QA benchmarks and must not supply writer training labels.
 
-There is still no independently reviewed **real full-sequence progression
-trace** with root/child/attach/multiattach/no-update, phase and grounded state
-labels. The next dataset milestone is a conversation-level reviewed set with
-disagreements recorded. Sample additional conversations for rare actions,
-then reserve whole people/conversations for validation. Synthetic or model
-generated labels can seed review, never serve as independent gold results.
+There are now two **provisional model-annotated real full-sequence traces**.
+Neither has independent review, neither includes a natural child creation,
+and they are too few and overlapping with the attachment pairs to establish
+writer performance. The next dataset milestone is independent review of these
+traces with disagreements recorded, followed by additional conversations for
+rare actions and a whole-conversation held-out validation partition. Model
+labels can seed training after audit but cannot serve as independent gold
+evaluation or evidence of a benchmark improvement.
