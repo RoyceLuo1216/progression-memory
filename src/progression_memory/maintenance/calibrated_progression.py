@@ -26,6 +26,7 @@ class Action(StrEnum):
     CREATE_ROOT = "create_root"
     CREATE_CHILD = "create_child"
     MULTI_ATTACH = "multi_attach"
+    CREATE_AND_ATTACH = "create_and_attach"
 
 
 @dataclass(frozen=True)
@@ -111,7 +112,11 @@ class Memory:
             raise ValueError("writer decision needs an auditable reason")
         if len(set(decision.target_ids)) != len(decision.target_ids):
             raise ValueError("duplicate target")
-        if decision.action in (Action.ATTACH, Action.MULTI_ATTACH):
+        creating = decision.action in (Action.CREATE_ROOT, Action.CREATE_CHILD,
+                                       Action.CREATE_AND_ATTACH)
+        attaching = decision.action in (Action.ATTACH, Action.MULTI_ATTACH,
+                                        Action.CREATE_AND_ATTACH)
+        if attaching:
             if len(decision.target_ids) < (2 if decision.action == Action.MULTI_ATTACH else 1):
                 raise ValueError("attachment targets missing")
             if decision.action == Action.ATTACH and len(decision.target_ids) != 1:
@@ -125,33 +130,36 @@ class Memory:
                     raise ValueError("target updates must match attachment targets exactly")
                 if any(not update.state for update in decision.target_updates):
                     raise ValueError("each attachment needs a state")
-            elif decision.action == Action.MULTI_ATTACH:
-                raise ValueError("multiattach requires a distinct update per target")
-        elif decision.action in (Action.CREATE_ROOT, Action.CREATE_CHILD):
-            if (decision.target_ids or decision.target_updates or not decision.identity
-                    or not decision.scope or not decision.state):
+            elif decision.action in (Action.MULTI_ATTACH, Action.CREATE_AND_ATTACH):
+                raise ValueError("multiple effects require a distinct update per existing target")
+        else:
+            targets = []
+        if creating:
+            if ((decision.action != Action.CREATE_AND_ATTACH and
+                 (decision.target_ids or decision.target_updates)) or
+                    not decision.identity or not decision.scope or not decision.state):
                 raise ValueError("new progression requires identity, scope and state")
-            if decision.action == Action.CREATE_CHILD:
+            if decision.action in (Action.CREATE_CHILD, Action.CREATE_AND_ATTACH) and decision.parent_id:
                 parent = self.progressions[decision.parent_id or ""]
                 if parent.subject_id != event.subject_id:
                     raise ValueError("cross-subject parent")
-            elif decision.parent_id is not None:
+            elif decision.action == Action.CREATE_CHILD:
+                raise ValueError("child requires parent")
+            elif decision.action == Action.CREATE_ROOT and decision.parent_id is not None:
                 raise ValueError("root cannot have a parent")
             if any(p.subject_id == event.subject_id and p.identity.casefold() == decision.identity.casefold()
                    for p in self.progressions.values()):
                 raise ValueError("duplicate progression identity")
-            targets = []
         elif decision.action == Action.NO_UPDATE:
             if decision.target_ids or decision.parent_id or decision.target_updates:
                 raise ValueError("no_update cannot target a progression")
-            targets = []
-        else:
+        elif not attaching:
             raise ValueError(decision.action)
         if targets and not (decision.state or decision.target_updates):
             raise ValueError("attachment must supply evidence-backed state")
 
         self.events[event.id] = event
-        if decision.action in (Action.CREATE_ROOT, Action.CREATE_CHILD):
+        if creating:
             pid = f"progression:{len(self.progressions)}"
             parent_ids = {decision.parent_id} if decision.parent_id else set()
             created = Progression(pid, event.subject_id, decision.identity, decision.scope,
@@ -159,7 +167,7 @@ class Memory:
             self.progressions[pid] = created
             if decision.parent_id:
                 self.progressions[decision.parent_id].child_ids.add(pid)
-            targets = [created]
+            targets.append(created)
         for progression in targets:
             before = progression.current_state
             update = next((row for row in decision.target_updates
