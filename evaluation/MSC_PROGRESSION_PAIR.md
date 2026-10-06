@@ -29,3 +29,21 @@ an independent QA test remains necessary before a general performance claim.
 CI: `msc-progression-pair.yml` downloads checksum-verified official MSC train,
 rebuilds the source audit, replays the stored held-out labels, and uploads the
 paired JSON result. The source dialogue is not committed to the repository.
+
+## First pinned dense run
+
+[CI run 37411886705](https://github.com/RoyceLuo1216/progression-memory/actions/runs/37411886705)
+passed. Mean latest-evidence recall across the 11 paired cases:
+
+| Top records | Append | Structure | Progression |
+| ---: | ---: | ---: | ---: |
+| 1 | 0.000 | 0.091 | 0.091 |
+| 3 | 0.364 | 0.636 | 0.636 |
+| 5 | 0.591 | 0.758 | 0.758 |
+
+At depth 5, complete-evidence rates are 0.545, 0.727 and 0.727 respectively.
+The average delivered context is 501, 619 and 952 characters. The structure
+and full progression variants tie on retrieval, so this pilot attributes the
+gain over append to **grouping**, not to the added state text. The data are too
+small and the relevant process is defined by the same silver graph labels used
+to build the representation; this is not an independently adjudicated result.
