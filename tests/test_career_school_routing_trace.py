@@ -33,7 +33,8 @@ def test_career_school_trace_replays_coherently():
             for target in raw["target_ids"]:
                 assert row["source_id"] in memory.progressions[target].current_state.evidence_ids
     assert len(rows) == 29
-    assert set(actions) == {action.value for action in Action}
+    assert set(actions) == {'no_update', 'attach', 'create_root',
+                            'create_child', 'multi_attach'}
     assert len(memory.progressions) == 12
     assert {p.identity for p in memory.progressions.values() if not p.parent_ids} == {"Education", "Career"}
     assert memory.progressions["progression:1"].child_ids >= {
