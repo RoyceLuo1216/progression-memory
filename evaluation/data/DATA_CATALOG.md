@@ -6,6 +6,7 @@
 | `progression_routing/career_school_trace_v1.json` | 29 fictional events | Full action, hierarchy, subject and state contract | Constructed example; validates storage, not generalization. |
 | `progression_routing/msc_graph_traces_v1.json` | 48 turns in 2 complete MSC train conversations; 25 updates, 23 no-op decisions | Provisional model-labeled subject, root, attach, multiattach, state and phase | Real conversation context, single annotator; replays against source in CI. No child actions occur in these two conversations. Not independently verified or gold. Overlaps the 100 attachment pairs. |
 | `progression_routing/msc_graph_traces_v2.json` | 309 turns from 12 complete MSC train conversations; 13 proposed children, 109 default no-update review placeholders; 28/78 progression nodes have one turn | Model-proposed graph labels with four user review corrections and second-pass audit fixes; source-backed review CSV generated in CI | Supersedes v1 for review. Eight training-review, two development, two holdout-review conversations. Same source as attachment pairs; do not sum counts. Review singleton process-versus-fact boundaries. |
+| `progression_routing/msc_graph_expansion_v1.json` | 84 turns from 3 additional complete MSC train conversations; 4 multiattachments and 1 composite creation/attachment | Provisional full-sequence graph labels | One development and two holdout-review conversations, disjoint from initial 12 and attachment pairs. Original text via pinned source audit in CI; independent semantic review pending. |
 | `../progression_calibration_scenarios.json` | 25 invented scenarios × 4 candidates = 100 pairs | Synthetic attachment calibration | Prototype contract only. |
 | `external_personal_facts/train/` | 2,223 published train facts, 1,368 self/long-term/valid candidates | Referent, temporal class, duration, validity, fact paraphrase | MSC-derived, single annotator, no conversation IDs; normalized source training rows checked in, raw Parquet fetched by pinned CI importer. Not independent of MSC pairs. |
 | `external_alpsbench/dev_task2_audit_v1.json` | 469 dev update cases | Before/after memory sets and source evidence | Real WildChat-derived dialogue; every case has one removed and two added IDs. Pin and fetch via CI; no hierarchy or representative no-op labels. Test held out. |
@@ -16,6 +17,9 @@ different question. LoCoMo and LongMemEval in `evaluation/data/` are held-out
 retrieval/QA benchmarks and must not supply writer training labels.
 
 There are now twelve **provisional model-annotated real full-sequence traces**.
+Three more full conversations extend development and holdout multi-process
+coverage, giving 15 conversations and 393 turns in total. The source files
+are all MSC train, so the sets are not independent datasets.
 User review identified four corrections; 109 default no-update placeholders,
 the remaining child proposals and explicit ambiguous boundaries still need
 source-grounded adjudication. Then add more conversations for rare actions.
