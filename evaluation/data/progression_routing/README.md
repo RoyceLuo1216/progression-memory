@@ -38,10 +38,10 @@ and achievements inspectable. If a year contains only a date boundary and no
 independent evolving process, it should instead be a segment of the degree.
 This distinction should be tested against real annotated conversations.
 
-The current action schema supports either creation or attachment in one
-decision, so a child-creation event does not simultaneously rewrite its
-parent's state. Milestone events explicitly update both when both states
-change. This is a contract limitation worth reviewing before production.
+The extended action schema supports `create_and_attach`: one new process and
+one or more existing process updates from the same source. It still cannot
+create two independent new processes in one decision. A child-creation event
+does not automatically rewrite its parent; an explicit target update does.
 
 ## What this closes and what remains
 
@@ -77,8 +77,9 @@ evaluation. The existing MSC attachment pairs overlap these conversations.
 
 `msc_graph_traces_v2.json` covers every turn in the pinned 12-conversation
 MSC train audit (309 turns, both participants). Its authoring script is
-`build_msc_graph_traces_v2.py`. There are 65 proposed root creations, 13
-children, 96 attachments, 3 multiattachments, and 132 no-update decisions.
+`build_msc_graph_traces_v2.py`. There are 64 proposed root creations, 13
+children, 96 attachments, 3 multiattachments, one composite creation and
+attachment, and 132 no-update decisions.
 Of the latter, **109 are default no-update placeholders** for turns not
 selected as changes. They are explicitly tagged `default_no_update` and
 should be checked against the source before inclusion in supervised training.
@@ -115,18 +116,19 @@ LongMemEval remain untouched retrieval/QA benchmarks.
 
 ### Remaining coverage gaps
 
-| Split | Conversations | Turns | Root | Child | Attach | Multiattach | No-update |
-|---|---:|---:|---:|---:|---:|---:|---:|
-| Training review | 8 | 215 | 44 | 7 | 69 | 3 | 92 |
-| Development | 2 | 46 | 8 | 2 | 9 | 0 | 27 |
-| Holdout review | 2 | 48 | 13 | 4 | 18 | 0 | 13 |
+| Split | Conversations | Turns | Root | Child | Attach | Multiattach | Composite | No-update |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| Training review | 8 | 215 | 43 | 7 | 69 | 3 | 1 | 92 |
+| Development | 2 | 46 | 8 | 2 | 9 | 0 | 0 | 27 |
+| Holdout review | 2 | 48 | 13 | 4 | 18 | 0 | 0 | 13 |
 
-The development and holdout splits have **no multiattachment examples**;
-the holdout has only 48 turns. Sample additional complete conversations
-containing multi-process changes, subject-directed updates, and ambiguous
-root-versus-child boundaries, then reserve whole conversations for evaluation.
-The writer contract also cannot create a new progression and attach an
-existing one in one action; `ordered_416:s3:t2` exposes that missing action.
+The initial twelve-conversation review set has no multiattachment examples
+in development or holdout; the expansion below remedies this coverage gap.
+Continue sampling complete conversations with subject-directed updates and
+ambiguous root-versus-child boundaries for reliable evaluation.
+The extended writer contract now creates bereavement and updates the snake
+decision atomically at `ordered_416:s3:t2`. Earlier v1 labels remain as a
+historical comparison; v2 is the current review trace.
 Do not turn the 109 default no-updates into trusted negative training rows
 just because graph replay succeeds. After review, run a held-out writer
 evaluation by action and process quality before comparing retrieval/QA to RAG.
@@ -140,3 +142,21 @@ single concert invitation. Treat these as explicit `progression` versus
 this set could over-create shallow roots, which is the construction failure
 the progression intervention is supposed to avoid. The review CSV includes
 `final_process_events` on creation rows to identify these cases.
+
+## Additional held-out multi-process traces
+
+`msc_graph_expansion_v1.json` adds three independent full MSC train
+conversations (84 turns): `ordered_1628` in development, and `ordered_909`
+and `ordered_7748` in holdout review. The pinned 48-conversation source
+artifact supplies original dialogue to the same replay/review exporter. The
+new traces contain **two multiattachments in development and two in holdout**;
+the football injury case also tests `create_and_attach` in holdout. Each is
+a source-grounded *model proposal*, not independently checked gold.
+
+The divorce conversation mentions a possible Barcelona trip in the same
+turn as first considering a dog. It later starts a travel progression when
+Madrid/Tuscany are mentioned. Both rows are flagged because the current
+contract permits only one new progression per turn. The review artifact
+`msc-expansion-graph-review` includes the source text and blank correction
+columns. See `docs/progression_specification.md` for the implementation
+contract and the remaining event-decomposition limitation.
