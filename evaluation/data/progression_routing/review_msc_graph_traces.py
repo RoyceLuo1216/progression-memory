@@ -29,7 +29,10 @@ def review_rows(traces, audit):
             turn = lookup[row['ref']]
             slot = int(turn['speaker_id'].rsplit(':', 1)[1])
             if row['subject'] != slot and row['action'] != 'no_update':
-                assert (conversation_id, row['ref']) == ('train:ordered_4998', 's2:t2')
+                assert (conversation_id, row['ref']) in {
+                    ('train:ordered_4998', 's2:t2'),
+                    ('train:ordered_6340', 's3:t10'),
+                }
             subject = f"{conversation_id}:{row['subject']}"
             targets = tuple(f"progression:{n}" for n in row.get('targets', []))
             updates = tuple(TargetUpdate(f"progression:{u['target']}", u['state'],
@@ -53,6 +56,7 @@ def review_rows(traces, audit):
                 'proposed_state': row.get('state') or json.dumps(row.get('updates', []), ensure_ascii=False),
                 'new_segment': row.get('segment', False), 'evidence_paraphrase': row['evidence'],
                 'label_origin': row['label_origin'], 'review_priority': row['review_priority'],
+                'review_issue': row.get('review_issue', ''),
                 'reviewer_action': '', 'reviewer_subject': '', 'reviewer_state': '',
                 'reviewer_notes': '',
             })
