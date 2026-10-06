@@ -22,6 +22,7 @@ def review_rows(traces, audit):
     for trace in traces['traces']:
         conversation_id = trace['conversation_id']
         memory = Memory()
+        created_rows = {}
         turns = source[conversation_id]['turns']
         lookup = {f"s{t['session']}:t{t['turn']}": t for t in turns}
         assert list(lookup) == [r['ref'] for r in trace['rows']], conversation_id
@@ -32,6 +33,7 @@ def review_rows(traces, audit):
                 assert (conversation_id, row['ref']) in {
                     ('train:ordered_4998', 's2:t2'),
                     ('train:ordered_6340', 's3:t10'),
+                    ('train:ordered_792', 's4:t5'),
                 }
             subject = f"{conversation_id}:{row['subject']}"
             targets = tuple(f"progression:{n}" for n in row.get('targets', []))
@@ -46,6 +48,8 @@ def review_rows(traces, audit):
                                 target_updates=updates)
             memory.apply(Event(turn['source_id'], subject, turn['text'], None,
                                turn['source_id']), decision)
+            if row['action'] in ('create_root', 'create_child'):
+                created_rows[f"progression:{len(memory.progressions)-1}"] = len(output)
             output.append({
                 'conversation_id': conversation_id, 'split': trace['split'],
                 'source_id': turn['source_id'],
@@ -57,9 +61,16 @@ def review_rows(traces, audit):
                 'new_segment': row.get('segment', False), 'evidence_paraphrase': row['evidence'],
                 'label_origin': row['label_origin'], 'review_priority': row['review_priority'],
                 'review_issue': row.get('review_issue', ''),
+                'final_process_events': '',
                 'reviewer_action': '', 'reviewer_subject': '', 'reviewer_state': '',
                 'reviewer_notes': '',
             })
+        for pid, index in created_rows.items():
+            count = len(memory.progressions[pid].current_state.evidence_ids)
+            output[index]['final_process_events'] = count
+            if count == 1:
+                output[index]['review_issue'] = (output[index]['review_issue'] + '; ' if output[index]['review_issue'] else '') + (
+                    'Only one supporting turn in this sampled conversation; inspect whether durable process')
     return output
 
 
