@@ -1,6 +1,6 @@
 """A future turn must never be indexed in its own continuation query."""
 
-from progression_memory.benchmarks.msc_progression_pair import cases, evaluate
+from progression_memory.benchmarks.msc_progression_pair import cases, evaluate, evaluate_budget_sweep
 
 
 class ExactEncoder:
@@ -32,3 +32,8 @@ def test_heldout_continuation_uses_only_earlier_sources():
     result = evaluate(sample, ExactEncoder(), depths=(1,), context_chars=1000)
     assert result['aggregates']['1']['append']['recall'] == 1
     assert result['aggregates']['1']['progression']['recall'] == 1
+    sweep = evaluate_budget_sweep(sample, ExactEncoder(), (5, 1000))
+    assert all(sweep['results']['5']['aggregates'][name]['recall'] == 0
+               for name in ('append', 'structure', 'progression'))
+    assert all(sweep['results']['1000']['aggregates'][name]['recall'] == 1
+               for name in ('append', 'structure', 'progression'))
