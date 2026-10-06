@@ -1,6 +1,6 @@
 {
   "source": "Meta/ParlAI Multi-Session Chat v0.1 train; local msc-dev-audit.json",
-  "annotation_status": "single-model provisional silver; all defaults and hierarchy require human review",
+  "annotation_status": "model-proposed silver with four user review corrections; full adjudication pending",
   "format": "Source references are s<session>:t<turn>; speaker/subject are participant slots 0 or 1; source text is rehydrated from the pinned MSC audit, not redistributed here.",
   "traces": [
     {
@@ -157,7 +157,8 @@
           "segment": true,
           "evidence": "Says husband died and has reconsidered a snake.",
           "label_origin": "model_authored",
-          "review_priority": "normal"
+          "review_priority": "high",
+          "review_issue": "Husband’s death first appears here; one-action schema cannot attach snake decision and create bereavement root together"
         },
         {
           "ref": "s3:t3",
@@ -1378,10 +1379,15 @@
         {
           "ref": "s3:t7",
           "subject": 1,
-          "action": "no_update",
-          "evidence": "No durable process update selected; inspect original turn",
-          "review_priority": "high",
-          "label_origin": "default_no_update"
+          "action": "attach",
+          "evidence": "Household has a GreenChef subscription and regularly receives coupon codes",
+          "state": "Household has a GreenChef subscription and regularly receives coupon codes",
+          "segment": false,
+          "targets": [
+            4
+          ],
+          "label_origin": "user_review_correction",
+          "review_priority": "normal"
         },
         {
           "ref": "s3:t8",
@@ -1794,10 +1800,15 @@
         {
           "ref": "s2:t10",
           "subject": 0,
-          "action": "no_update",
-          "evidence": "No durable process update selected; inspect original turn",
-          "review_priority": "high",
-          "label_origin": "default_no_update"
+          "action": "attach",
+          "evidence": "Plans another resale sourcing trip next Monday",
+          "state": "Plans another resale sourcing trip next Monday",
+          "segment": false,
+          "targets": [
+            3
+          ],
+          "label_origin": "user_review_correction",
+          "review_priority": "normal"
         },
         {
           "ref": "s2:t11",
@@ -1860,7 +1871,8 @@
           "segment": true,
           "parent": 0,
           "label_origin": "model_authored",
-          "review_priority": "high"
+          "review_priority": "high",
+          "review_issue": "Layoff phrasing does not establish that employment was part of the Lostfound app"
         },
         {
           "ref": "s3:t5",
@@ -2356,10 +2368,16 @@
         {
           "ref": "s3:t6",
           "subject": 0,
-          "action": "no_update",
-          "evidence": "No durable process update selected; inspect original turn",
+          "action": "attach",
+          "evidence": "Enjoys eating fish caught while fishing, but is willing to release catches",
+          "state": "Enjoys eating fish caught while fishing, but is willing to release catches",
+          "segment": false,
+          "targets": [
+            1
+          ],
+          "label_origin": "user_review_correction",
           "review_priority": "high",
-          "label_origin": "default_no_update"
+          "review_issue": "Preference attachment depends on whether stable habits belong in this process"
         },
         {
           "ref": "s3:t7",
@@ -2670,11 +2688,16 @@
         },
         {
           "ref": "s3:t10",
-          "subject": 0,
-          "action": "no_update",
-          "evidence": "No durable process update selected; inspect original turn",
-          "review_priority": "high",
-          "label_origin": "default_no_update"
+          "subject": 1,
+          "action": "attach",
+          "evidence": "Friend offers to check available online positions and send job descriptions",
+          "state": "Friend offers to check available online positions and send job descriptions",
+          "segment": false,
+          "targets": [
+            10
+          ],
+          "label_origin": "user_review_correction",
+          "review_priority": "normal"
         },
         {
           "ref": "s3:t11",
