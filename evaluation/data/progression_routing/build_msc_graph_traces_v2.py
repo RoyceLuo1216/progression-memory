@@ -35,6 +35,14 @@ USER_CORRECTIONS = {
     ('train:ordered_6340', 's3:t10'),
     ('train:ordered_6469', 's3:t6'),
 }
+SECOND_PASS_CORRECTIONS = {
+    ('train:ordered_2281', 's2:t5'),
+    ('train:ordered_7807', 's2:t0'),
+    ('train:ordered_792', 's3:t1'),
+    ('train:ordered_792', 's3:t7'),
+    ('train:ordered_792', 's3:t9'),
+    ('train:ordered_792', 's4:t5'),
+}
 ANNOTATIONS = {}
 
 
@@ -69,7 +77,7 @@ def multi(i, ref, subject, updates):
 # 1: separate dog ownership, dog/cat compatibility, book, and rabbit management.
 root(1,'s2:t0',0,'Dog ownership','Takes a dog for walks; dog chased a squirrel')
 attach(1,'s2:t2',0,'Dog ownership','Dog chased a squirrel for around ten minutes without catching it')
-root(1,'s2:t5',1,'Bella the cat','Owns a cat who usually watches through the window')
+root(1,'s2:t5',1,'Cat ownership','Owns a cat who usually watches through the window')
 root(1,'s2:t7',1,'Considering a dog','Considering another pet dog and whether it would get along with Bella')
 root(1,'s2:t10',0,'Cat allergy','Highly allergic to cats and cannot keep one in the house')
 root(1,'s2:t11',1,'Bible reading','Has not recently read the Bible and intends to resume reading')
@@ -77,7 +85,7 @@ root(1,'s3:t1',1,'Writing a book','Writing a new book')
 attach(1,'s3:t2',0,'Dog ownership','Owns Waylon, a black Labrador who has killed wild rabbits')
 attach(1,'s3:t3',1,'Considering a dog','May call a shelter to find a dog suited to cats')
 attach(1,'s3:t4',0,'Dog ownership','Got Waylon a few months earlier; he is settling in and friendly to people')
-attach(1,'s3:t5',1,'Bella the cat','Bella is a rescue cat owned for seven years')
+attach(1,'s3:t5',1,'Cat ownership','Bella is a rescue cat owned for seven years')
 child(1,'s3:t6',0,'Protecting yard rabbits','Dog ownership','Takes Waylon out on a leash so wild rabbits can escape the yard')
 attach(1,'s3:t8',0,'Protecting yard rabbits','Leash strategy seems to help; rabbits may be learning to avoid yard')
 attach(1,'s4:t0',0,'Dog ownership','Took Waylon for a hike')
@@ -136,8 +144,8 @@ attach(4,'s3:t8',0,'Interest in coworker','Shares college and musical interests 
 attach(4,'s3:t10',0,'Interest in coworker','Hopes coworker likes them; cohabitation is only a distant possibility')
 
 # 5: app, arbitrage income, job loss and a separate financial strain process.
-root(5,'s2:t0',0,'Lostfound app','Finished developing a new phone app')
-attach(5,'s2:t2',0,'Lostfound app','App called Lostfound tracks misplaced objects and sends reminders')
+root(5,'s2:t0',0,'Phone app project','Finished developing a new phone app')
+attach(5,'s2:t2',0,'Phone app project','App called Lostfound tracks misplaced objects and sends reminders')
 root(5,'s2:t3',1,'Additional income','Considering selling unneeded belongings for extra money')
 root(5,'s2:t5',1,'Hiking','Plans a hike the following day')
 root(5,'s2:t8',0,'Online resale business','Buys discounted goods and resells on eBay and Amazon for profit')
@@ -145,7 +153,7 @@ attach(5,'s2:t9',1,'Additional income','May learn about buying and reselling fro
 attach(5,'s2:t10',0,'Online resale business','Plans another resale sourcing trip next Monday')
 attach(5,'s3:t1',1,'Hiking','Enjoyed hike and took pictures; wants to return')
 attach(5,'s3:t2',0,'Online resale business','eBay and Amazon accounts suspended; resale income interrupted',True)
-child(5,'s3:t4',0,'App development job','Lostfound app','Reports being laid off from app-related work; relation to ownership of app uncertain')
+child(5,'s3:t4',0,'App development job','Phone app project','Reports being laid off from app-related work; relation to ownership of app uncertain')
 root(5,'s3:t6',0,'Family financial strain','Worried about ability to support children after losing income')
 
 # 6: move as root, storing belongings and rental as separate narrower processes.
@@ -220,17 +228,20 @@ root(11,'s2:t6',0,'Nature walks','Enjoys walking in nature')
 root(11,'s2:t7',1,'Reading habit','Reads a little but is easily distracted')
 root(11,'s2:t11',1,'Church attendance','Attends church each Sunday with parents')
 attach(11,'s3:t0',0,'Making cakes','Completed and handed over friend’s cake')
+root(11,'s3:t1',1,'Competitive eating','Previously ate ten wedding cakes in an eating competition')
 child(11,'s3:t2',0,'Wedding cake business','Making cakes','Perfecting cake skills for wedding season')
 attach(11,'s3:t4',0,'Wedding cake business','Spring and summer are busiest for wedding cake work')
 attach(11,'s3:t5',1,'Dance group','Offers dance lessons in exchange for cakes')
 attach(11,'s3:t6',0,'Learning dance','Interested in trading cakes for dance lessons')
-root(11,'s3:t7',1,'Competitive eating','Began competitive eating after a dance show')
+attach(11,'s3:t7',1,'Competitive eating','Began competitive eating after a dance show')
+attach(11,'s3:t9',1,'Competitive eating','Interested in practicing competitive eating with friend’s cakes')
 root(11,'s3:t10',0,'Harry Potter interest','Follows Harry Potter actors in other shows')
 attach(11,'s4:t0',0,'Learning dance','Considering taking friend up on cake-for-dance-lessons offer',True)
 attach(11,'s4:t1',1,'Competitive eating','Enjoys cakes and participates in eating competitions')
 attach(11,'s4:t2',0,'Wedding cake business','Paid for wedding cakes except when baking for friends or family')
 attach(11,'s4:t3',1,'Dance group','Dancing helps offset competitive eating; available for lessons')
 attach(11,'s4:t4',0,'Learning dance','Wants lessons soon to prepare for a wedding next Friday')
+attach(11,'s4:t5',0,'Learning dance','Friend is available to teach dance on Sunday afternoon before the wedding')
 attach(11,'s4:t6',0,'Nature walks','Using nature walks to get back in shape')
 attach(11,'s4:t7',1,'Competitive eating','Wants to attempt Nathan’s hot dog challenge; qualification is difficult')
 attach(11,'s4:t11',1,'Competitive eating','Plans to use cake as eating practice for hot dog challenge')
@@ -284,18 +295,22 @@ def build():
             'Layoff phrasing does not establish that employment was part of the Lostfound app',
         ('train:ordered_6469', 's3:t6'):
             'Preference attachment depends on whether stable habits belong in this process',
+        ('train:ordered_792', 's4:t5'):
+            'Friend’s scheduling offer advances recipient’s dance lessons; check target-directed update policy',
     }
     for conversation_id, trace in traces.items():
         for row in trace['rows']:
             if (conversation_id, row['ref']) in USER_CORRECTIONS:
                 row['label_origin'] = 'user_review_correction'
+            elif (conversation_id, row['ref']) in SECOND_PASS_CORRECTIONS:
+                row['label_origin'] = 'second_pass_audit_correction'
             if (conversation_id, row['ref']) in review_issues:
                 row['review_issue'] = review_issues[conversation_id, row['ref']]
                 row['review_priority'] = 'high'
     for conversation_id, trace in traces.items():
         trace['split'] = ('holdout_review' if conversation_id in HOLDOUT else
                           'development' if conversation_id in DEV else 'training_review')
-    return dict(source=v1['source'], annotation_status='model-proposed silver with four user review corrections; full adjudication pending',
+    return dict(source=v1['source'], annotation_status='model-proposed silver with user and second-pass audit corrections; full adjudication pending',
                 format=v1['format'], traces=list(traces.values()))
 
 
