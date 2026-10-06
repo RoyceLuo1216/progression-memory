@@ -78,18 +78,23 @@ evaluation. The existing MSC attachment pairs overlap these conversations.
 `msc_graph_traces_v2.json` covers every turn in the pinned 12-conversation
 MSC train audit (309 turns, both participants). Its authoring script is
 `build_msc_graph_traces_v2.py`. There are 65 proposed root creations, 13
-children, 89 attachments, 3 multiattachments, and 139 no-update decisions.
-Of the latter, **116 are default no-update placeholders** for turns not
+children, 93 attachments, 3 multiattachments, and 135 no-update decisions.
+Of the latter, **112 are default no-update placeholders** for turns not
 selected as changes. They are explicitly tagged `default_no_update` and
-must be reviewed before inclusion in supervised training. The 23 no-update
-labels from v1 were individually considered, but also need independent review.
+should be checked against the source before inclusion in supervised training.
+Four source-grounded corrections proposed during user review are tagged
+`user_review_correction`: `ordered_6210:s3:t7` (GreenChef),
+`ordered_7807:s2:t10` (next resale sourcing trip),
+`ordered_6340:s3:t10` (friend's remote job referral; subject is recipient),
+and `ordered_6469:s3:t6` (eating caught fish; lower confidence).
+`ordered_416:s3:t2` and `ordered_7807:s3:t4` remain explicit ambiguity cases.
 
 The source-backed review script validates chronological completeness, replay,
 subject consistency and target existence. In CI it exports a short-lived
 `msc-graph-review-queue` CSV with the source text, proposed label, subject,
 state, parent/targets, and empty reviewer fields. It is not checked into git.
 Review `high` priority rows first: all default no-updates, root/child choices,
-and multiattachments (197 rows). Then review every remaining state against
+multiattachments, and explicit ambiguity cases (195 rows). Then review every remaining state against
 its source turn, including cases where a turn contains multiple claims but
 the current writer contract permits only one creation action. A source-backed
 replay is an integrity check, **not** a semantic correctness score.
@@ -102,3 +107,21 @@ separate reviewer can establish a usable validation reference. Twelve
 conversations and 13 provisional child examples are a starting annotation
 set, not adequate evidence of generalized writer quality. LoCoMo and
 LongMemEval remain untouched retrieval/QA benchmarks.
+
+### Remaining coverage gaps
+
+| Split | Conversations | Turns | Root | Child | Attach | Multiattach | No-update |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| Training review | 8 | 215 | 44 | 7 | 67 | 3 | 94 |
+| Development | 2 | 46 | 8 | 2 | 10 | 0 | 26 |
+| Holdout review | 2 | 48 | 13 | 4 | 20 | 0 | 11 |
+
+The development and holdout splits have **no multiattachment examples**;
+the holdout has only 48 turns. Sample additional complete conversations
+containing multi-process changes, subject-directed updates, and ambiguous
+root-versus-child boundaries, then reserve whole conversations for evaluation.
+The writer contract also cannot create a new progression and attach an
+existing one in one action; `ordered_416:s3:t2` exposes that missing action.
+Do not turn the 112 default no-updates into trusted negative training rows
+just because graph replay succeeds. After review, run a held-out writer
+evaluation by action and process quality before comparing retrieval/QA to RAG.
