@@ -1,0 +1,65 @@
+{
+  "source": "Meta/ParlAI Multi-Session Chat v0.1 train; local msc-dev-audit.json",
+  "annotation_status": "single-model provisional silver; independent review pending",
+  "format": "Source references are s<session>:t<turn>; speaker/subject are participant slots 0 or 1; source text is rehydrated from the pinned MSC audit, not redistributed here.",
+  "traces": [
+    {
+      "conversation_id": "train:ordered_416",
+      "rows": [
+        {"ref":"s2:t0","subject":0,"action":"no_update","evidence":"Asks about keeping snakes; no personal commitment."},
+        {"ref":"s2:t1","subject":1,"action":"create_root","identity":"Keeping pet snakes","scope":"Ownership and care of Rattles and Chomper","state":"Owns snakes and enjoys caring for them; they require affection","evidence":"Describes own snakes and their care."},
+        {"ref":"s2:t2","subject":0,"action":"create_root","identity":"Considering a pet snake","scope":"Household decision about a pet snake","state":"Husband wanted a snake; speaker preferred a dog","evidence":"Describes a household pet preference."},
+        {"ref":"s2:t3","subject":1,"action":"attach","targets":[0],"state":"Owns affectionate snakes that enjoy mice as food","evidence":"Describes what own snakes eat."},
+        {"ref":"s2:t4","subject":0,"action":"create_root","identity":"Carter the dog","scope":"Ownership and care of Carter","state":"Has a dog named Carter","evidence":"Says the household got a dog named Carter."},
+        {"ref":"s2:t5","subject":1,"action":"attach","targets":[0],"state":"Owns snakes named Rattles and Chomper that enjoy mice","evidence":"Names own snakes."},
+        {"ref":"s2:t6","subject":0,"action":"no_update","evidence":"Asks about the other participant's snakes."},
+        {"ref":"s2:t7","subject":1,"action":"attach","targets":[0],"state":"Owns milk snakes named Rattles and Chomper; avoids rattlesnakes","evidence":"Identifies species and preference."},
+        {"ref":"s2:t8","subject":0,"action":"no_update","evidence":"Asks a question about milk snakes."},
+        {"ref":"s2:t9","subject":1,"action":"no_update","evidence":"Provides general information about milk snakes without a new personal state."},
+        {"ref":"s2:t10","subject":0,"action":"no_update","evidence":"Asks whether people visit the snakes."},
+        {"ref":"s2:t11","subject":1,"action":"create_root","identity":"Social connection","scope":"Friendship and social isolation","state":"Spends much time alone and reports few friends","evidence":"Describes own isolation."},
+        {"ref":"s3:t0","subject":0,"action":"no_update","evidence":"Asks about the other participant's snake food."},
+        {"ref":"s3:t1","subject":1,"action":"attach","targets":[0],"state":"Owns milk snakes Rattles and Chomper; feeding mice is relatively expensive","evidence":"Describes cost of feeding own snakes."},
+        {"ref":"s3:t2","subject":0,"action":"attach","targets":[1],"state":"After husband's death, reconsidering a pet snake and asking which kind to get","segment":true,"evidence":"Says husband died and has reconsidered a snake."},
+        {"ref":"s3:t3","subject":1,"action":"no_update","evidence":"Gives advice about corn snakes; no personal process change."},
+        {"ref":"s3:t4","subject":0,"action":"attach","targets":[1],"state":"Unsure about getting a snake because Carter may not tolerate it","evidence":"Expresses concern about dog's response to a snake."},
+        {"ref":"s3:t5","subject":1,"action":"attach","targets":[0],"state":"Owns milk snakes; has considered other pets but remains drawn to reptiles","evidence":"Describes pet interests and lack of other pets."},
+        {"ref":"s3:t6","subject":0,"action":"multi_attach","targets":[1,2],"updates":[{"target":1,"state":"Still considering a snake later; Carter's reaction to a former cat raises concern"},{"target":2,"state":"Carter is a large Labrador; household rehomed a cat he disliked"}],"evidence":"Describes Carter, the former cat, and postpones the snake decision."},
+        {"ref":"s3:t7","subject":1,"action":"no_update","evidence":"Offers advice and mentions an uncle's former dog; no own process update."},
+        {"ref":"s3:t8","subject":0,"action":"create_root","identity":"Family bereavement","scope":"Managing reminders of deceased husband at family gatherings","state":"Plans dinner with sister and husband's relatives; uneasy around the relatives","evidence":"Describes upcoming family dinner and discomfort."},
+        {"ref":"s3:t9","subject":1,"action":"no_update","evidence":"Asks a follow-up question."},
+        {"ref":"s3:t10","subject":0,"action":"attach","targets":[4],"state":"Frequently sees husband's relatives; their presence is a painful reminder of him","evidence":"Explains why visits with husband's relatives are difficult."},
+        {"ref":"s3:t11","subject":1,"action":"no_update","evidence":"Offers sympathy and references a friend's loss; no personal process update."}
+      ]
+    },
+    {
+      "conversation_id": "train:ordered_4998",
+      "rows": [
+        {"ref":"s2:t0","subject":0,"action":"no_update","evidence":"Asks about other participant's work."},
+        {"ref":"s2:t1","subject":1,"action":"create_root","identity":"Career at current employer","scope":"Work, advancement and dissatisfaction at current job","state":"Overlooked for a promotion after years of work; dissatisfied","evidence":"Reports missed promotion and frustration."},
+        {"ref":"s2:t2","subject":1,"action":"create_root","identity":"Potential career change","scope":"Considering a job at the other participant's plant","state":"Has been offered the possibility of working at the plant","evidence":"The offer addresses participant 1, although participant 0 speaks."},
+        {"ref":"s2:t3","subject":1,"action":"attach","targets":[1],"state":"Considering plant job but hesitant about moving across the country and changing careers","evidence":"Expresses hesitation about the offer."},
+        {"ref":"s2:t4","subject":0,"action":"create_root","identity":"Career at the power plant","scope":"Work and advancement at the plant","state":"Works at a power plant; values steady income, colleagues and good pay","evidence":"Describes own plant work and income."},
+        {"ref":"s2:t5","subject":1,"action":"no_update","evidence":"Acknowledges advice and asks about other participant's week."},
+        {"ref":"s2:t6","subject":0,"action":"no_update","evidence":"Mentions eating cakes; no durable evolving process."},
+        {"ref":"s2:t7","subject":1,"action":"attach","targets":[0],"state":"Overlooked for promotion after years of work; current job supplies free cakes","evidence":"Connects free cakes to own job."},
+        {"ref":"s2:t8","subject":0,"action":"no_update","evidence":"Mentions food preference, without a durable changing process."},
+        {"ref":"s2:t9","subject":1,"action":"no_update","evidence":"Asks about the other person's dinner."},
+        {"ref":"s2:t10","subject":0,"action":"no_update","evidence":"Describes dinner and suggests a future shared meal."},
+        {"ref":"s2:t11","subject":1,"action":"no_update","evidence":"Accepts a meal suggestion; no career change."},
+        {"ref":"s3:t0","subject":1,"action":"no_update","evidence":"Asks whether participant 1 has considered the plant job; offer unchanged."},
+        {"ref":"s3:t1","subject":1,"action":"multi_attach","targets":[0,1],"updates":[{"target":0,"state":"Overlooked for promotion after years at current job; now wants a new job","segment":true},{"target":1,"state":"Now seriously considering plant work and asking about the role","segment":true}],"evidence":"Says they need a new job and asks about the plant role."},
+        {"ref":"s3:t2","subject":0,"action":"attach","targets":[2],"state":"Works as an engineer at the plant; may ask boss about an opening for friend","evidence":"Identifies own engineering role and offers referral."},
+        {"ref":"s3:t3","subject":1,"action":"attach","targets":[1],"state":"Enthusiastic about a possible plant referral but concerned about safety","evidence":"Welcomes offer and asks about earthquake risks."},
+        {"ref":"s3:t4","subject":0,"action":"no_update","evidence":"Explains safety precautions; no changed career state."},
+        {"ref":"s3:t5","subject":1,"action":"no_update","evidence":"Jokes about fictional plant employees; no real update."},
+        {"ref":"s3:t6","subject":0,"action":"attach","targets":[2],"state":"Engineer at plant; gets along with boss and hopes extra hours will yield a raise","evidence":"Describes own boss and raise goal."},
+        {"ref":"s3:t7","subject":1,"action":"multi_attach","targets":[0,1],"updates":[{"target":0,"state":"Still frustrated by lack of advancement at current employer and considering leaving"},{"target":1,"state":"Considering plant job and assessing its advancement opportunities"}],"evidence":"Contrasts stalled advancement with hoped-for growth at plant."},
+        {"ref":"s3:t8","subject":0,"action":"no_update","evidence":"Encourages friend's prospects; own job unchanged."},
+        {"ref":"s3:t9","subject":1,"action":"attach","targets":[1],"state":"Plant job sounds appealing, but leaving long-held current job feels scary","evidence":"States conflict between changing jobs and staying."},
+        {"ref":"s3:t10","subject":0,"action":"no_update","evidence":"Comments on change and cakes; own career unchanged."},
+        {"ref":"s3:t11","subject":1,"action":"no_update","evidence":"Jokes about cakes and asks a flavor preference; job decision unchanged."}
+      ]
+    }
+  ]
+}
