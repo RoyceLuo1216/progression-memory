@@ -1,17 +1,23 @@
 """V2 contract tests: deterministic replay, semantic time, boundaries, and evidence."""
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import pytest
 
 from progression_memory.v2.models import (
-    AttributeOperation, AttributePatch, ChangeKind, Observation,
-    Progression, StateDelta, StorageTier, TimeSource,
+    AttributeOperation,
+    AttributePatch,
+    ChangeKind,
+    Observation,
+    Progression,
+    StateDelta,
+    StorageTier,
+    TimeSource,
 )
 from progression_memory.v2.state_engine import StateEngine
 
 
 def t(day: int) -> datetime:
-    return datetime(2026, 10, day, tzinfo=timezone.utc)
+    return datetime(2026, 10, day, tzinfo=UTC)
 
 
 def event(eid: str, recorded: int, semantic: int | None = None) -> Observation:
