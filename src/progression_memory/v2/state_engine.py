@@ -75,7 +75,7 @@ class StateEngine:
         result.segment_ids = []
         result.last_effective_at = None
         result.lifecycle = ProgressionLifecycle.ACTIVE
-        result.storage_tier = StorageTier.ACTIVE
+        result.storage_tier = progression.storage_tier
         result.metadata = deepcopy(progression.metadata)
         revisions: list[StateRevision] = []
         segments: dict[str, Segment] = {}
