@@ -10,8 +10,15 @@ from datetime import datetime
 from typing import Any
 
 from progression_memory.v2.models import (
-    AttributeOperation, ChangeKind, Observation, Progression,
-    ProgressionLifecycle, Segment, StateDelta, StateRevision, StorageTier,
+    AttributeOperation,
+    ChangeKind,
+    Observation,
+    Progression,
+    ProgressionLifecycle,
+    Segment,
+    StateDelta,
+    StateRevision,
+    StorageTier,
 )
 
 
