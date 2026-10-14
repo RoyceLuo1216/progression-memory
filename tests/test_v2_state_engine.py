@@ -126,3 +126,13 @@ def test_one_observation_can_update_multiple_progressions():
     assert e.progressions["job"].state["status"] == "interviewing"
     assert e.progressions["career"].state["focus"] == "internships"
     assert len(e.observations) == 1
+
+def test_archival_survives_late_arriving_evidence():
+    e = engine()
+    e.ingest(event("a", 7), patch("a", "hired", ChangeKind.CLOSE))
+    e.move_to_tier("job", StorageTier.ARCHIVED)
+    e.ingest(event("historical", 12, 6), patch("historical", "applied"))
+    assert e.progressions["job"].storage_tier == StorageTier.ARCHIVED
+    assert e.progressions["job"].lifecycle.value == "completed"
+    assert e.progressions["job"].state["status"] == "hired"
+
