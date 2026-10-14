@@ -111,3 +111,18 @@ def test_timezone_naive_rejected():
             id="bad", subject_id="person", source_id="bad", text="x",
             recorded_at=datetime(2026, 10, 8),
         )
+
+
+def test_one_observation_can_update_multiple_progressions():
+    e = engine()
+    shared = event("shared", 10)
+    e.ingest(shared, patch("shared", "interviewing"))
+    second = StateDelta(
+        id="delta-shared-career", progression_id="career", observation_id="shared",
+        patches=(AttributePatch(key="focus", operation=AttributeOperation.SET,
+                                value="internships"),),
+    )
+    assert e.ingest(shared, second)
+    assert e.progressions["job"].state["status"] == "interviewing"
+    assert e.progressions["career"].state["focus"] == "internships"
+    assert len(e.observations) == 1
