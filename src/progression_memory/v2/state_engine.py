@@ -135,14 +135,17 @@ class StateEngine:
         if progression is None or progression.subject_id != observation.subject_id:
             raise ValueError("missing progression or subject mismatch")
         prior_obs, prior_delta = self.observations.get(observation.id), self.deltas.get(delta.id)
-        if prior_obs is not None or prior_delta is not None:
-            if prior_obs == observation and prior_delta == delta:
+        if prior_obs is not None and prior_obs != observation:
+            raise ValueError("conflicting duplicate observation ID")
+        if prior_delta is not None:
+            if prior_delta == delta and prior_obs == observation:
                 return False
-            raise ValueError("conflicting duplicate ID")
-        # A source observation can affect several progressions, but must be identical.
-        existing = self.observations.get(observation.id)
-        if existing is not None and existing != observation:
-            raise ValueError("observation ID collision")
+            raise ValueError("conflicting duplicate delta ID")
+        if any(
+            d.observation_id == observation.id and d.progression_id == delta.progression_id
+            for d in self.deltas.values()
+        ):
+            raise ValueError("observation already updates this progression")
         entries = [
             (self.observations[d.observation_id], d)
             for d in self.deltas.values() if d.progression_id == progression.id
