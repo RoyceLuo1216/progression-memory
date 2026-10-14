@@ -63,7 +63,7 @@ class Observation(BaseModel):
         return TimeSource.SEMANTIC if self.semantic_at is not None else TimeSource.WALL_FALLBACK
 
     @model_validator(mode="after")
-    def validate_times(self) -> "Observation":
+    def validate_times(self) -> Observation:
         for value in (self.recorded_at, self.semantic_at):
             if value is not None and (value.tzinfo is None or value.utcoffset() is None):
                 raise ValueError("observation times must be timezone-aware")
@@ -77,7 +77,7 @@ class AttributePatch(BaseModel):
     value: Any = None
 
     @model_validator(mode="after")
-    def validate_operation(self) -> "AttributePatch":
+    def validate_operation(self) -> AttributePatch:
         if self.operation in (AttributeOperation.SET, AttributeOperation.ADD) and self.value is None:
             raise ValueError("set/add requires value")
         return self
