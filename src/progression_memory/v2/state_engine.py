@@ -29,6 +29,7 @@ class StateEngine:
         self.deltas: dict[str, StateDelta] = {}
         self.revisions: dict[str, list[StateRevision]] = {}
         self.segments: dict[str, Segment] = {}
+        self.dirty_progressions: set[str] = set()
 
     def create_progression(self, progression: Progression) -> None:
         if progression.id in self.progressions:
@@ -41,6 +42,7 @@ class StateEngine:
             raise ValueError("new progression must have empty materialized state")
         self.progressions[progression.id] = progression.model_copy(deep=True)
         self.revisions[progression.id] = []
+        self.invalidate_ancestors(progression.id)
 
     @staticmethod
     def _apply(state: dict[str, Any], delta: StateDelta) -> dict[str, Any]:
@@ -168,6 +170,7 @@ class StateEngine:
         self.segments.update(next_segments)
         self.observations[observation.id] = observation
         self.deltas[delta.id] = delta
+        self.invalidate_ancestors(progression.id)
         return True
 
     def state_at(
@@ -198,3 +201,10 @@ class StateEngine:
             for d in self.deltas.values() if d.progression_id == progression_id
         ]
         return sorted(rows, key=lambda obs: (obs.effective_at, obs.recorded_at, obs.id))
+
+    def invalidate_ancestors(self, progression_id: str) -> None:
+        from progression_memory.v2.hierarchy import HierarchyIndex
+
+        self.dirty_progressions.update(
+            HierarchyIndex(self.progressions).ancestors(progression_id)
+        )
