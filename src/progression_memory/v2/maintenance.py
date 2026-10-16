@@ -25,6 +25,9 @@ class MaintenanceWorker:
             key=lambda pid: (-index.depth(pid), pid),
         )
         for pid in targets:
+            # Never consolidate an ancestor while its descendants are still stale.
+            if any(child in self.engine.dirty_progressions for child in index.descendants(pid)):
+                continue
             parent = self.engine.progressions[pid]
             children = [self.engine.progressions[cid] for cid in index.children(pid)]
             fingerprint = child_fingerprint(children)
