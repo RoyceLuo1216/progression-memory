@@ -145,7 +145,7 @@ def main():
     }, "literal_visibility": {
         k: {b: round(v["literal_evidence_visibility_rate"], 4)
             for b, v in system.items()}
-        for k, system in result["literal_answerability"].items(),
+        for k, system in result["literal_answerability"].items()
     }}, indent=2))
 
 
