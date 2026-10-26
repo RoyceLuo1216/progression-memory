@@ -1,0 +1,36 @@
+name: V2 Hierarchical Retrieval Ablations
+on:
+  push:
+    branches: [v2/hierarchical-retrieval]
+  pull_request:
+    paths:
+      - 'src/progression_memory/v2/**'
+      - 'src/progression_memory/benchmarks/v2_retrieval_ablation.py'
+      - 'tests/test_v2_hierarchical_retrieval.py'
+      - '.github/workflows/v2-hierarchical-retrieval.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.11', '3.12']
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: python -m pip install -e '.[dev]'
+      - run: python -m pytest -q
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - run: python -m pip install ruff
+      - run: ruff check src/progression_memory/v2/hierarchical_retrieval.py src/progression_memory/benchmarks/v2_retrieval_ablation.py tests/test_v2_hierarchical_retrieval.py
