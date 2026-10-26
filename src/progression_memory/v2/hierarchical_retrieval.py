@@ -5,7 +5,6 @@ configuration is explicit: it never mislabels token overlap as neural embeddings
 """
 from __future__ import annotations
 
-import json
 import math
 from collections.abc import Callable
 from datetime import datetime
