@@ -126,7 +126,7 @@ def main() -> None:
     dest.parent.mkdir(parents=True, exist_ok=True)
     dest.write_text(json.dumps(result, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     print(json.dumps({"output": str(dest), "systems": {
-        k: v["status"] for k, v in result["systems"].items(),
+        k: v["status"] for k, v in result["systems"].items()
     }}, indent=2))
 
 
