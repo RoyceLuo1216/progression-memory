@@ -4,7 +4,6 @@ import pytest
 
 from progression_memory.v2.lifecycle import LifecyclePolicy, apply_lifecycle_policy
 from progression_memory.v2.models import (
-    ChangeKind,
     Observation,
     Progression,
     StateDelta,
