@@ -38,11 +38,26 @@ jobs:
         run: python -m progression_memory.benchmarks.v2_paired --fixture results/long_horizon_fixture.json --output results/v2_paired.json
       - name: Run lexical hierarchical ablation
         run: python -m progression_memory.benchmarks.v2_retrieval_ablation --fixture results/long_horizon_fixture.json --output results/v2_hierarchical_ablation.json
+      - name: Aggregate observability comparison
+        run: python -m progression_memory.benchmarks.v2_observability --paired results/v2_paired.json --ablation results/v2_hierarchical_ablation.json --output-json results/v2_observability.json --output-md results/v2_observability.md
       - name: Upload reproducible dataset and reports
         uses: actions/upload-artifact@v4
         with:
           name: v2-long-horizon-benchmark-results
-          path: results/*.json
+          path: |
+            results/*.json
+            results/*.md
+  observability_tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - run: python -m pip install -e '.[dev]'
+      - run: python -m pytest -q tests/test_v2_observability.py
+      - run: python -m pip install ruff
+      - run: ruff check src/progression_memory/benchmarks/v2_observability.py tests/test_v2_observability.py
   lint:
     runs-on: ubuntu-latest
     steps:
