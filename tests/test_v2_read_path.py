@@ -42,7 +42,7 @@ def test_read_views_and_historical_evidence_cutoffs():
     assert len(state) == 1
     assert state[0].evidence_ids == {"a", "b"}
     full = build_documents(engine, view="full", subject_id="u")
-    assert len(full) == 3
+    assert len(full) == 4
     assert any(d.id == "v2:state:parent" and d.evidence_ids == {"a", "b"} for d in full)
     assert retrieve(engine, "CSC373 exam", subject_id="u")
     historical = build_documents(
