@@ -65,7 +65,7 @@ def markdown_report(report: dict[str, Any]) -> str:
     lines = [
         "# Progression V2 — Observability Report",
         "",
-        f"Fixture SHA256: \`{report['fixture_sha256']}\`",
+        f"Fixture SHA256: `{report['fixture_sha256']}`",
         f"Observations: {report['observation_count']}; questions: {report['question_count']}",
         "",
         "## Retrieval results (measured)",
