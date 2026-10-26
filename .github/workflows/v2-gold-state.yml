@@ -1,0 +1,38 @@
+name: V2 Gold State and Long Horizon Visibility
+on:
+  push:
+    branches: [v2/gold-state-evaluation]
+  pull_request:
+    paths:
+      - 'src/progression_memory/benchmarks/v2_gold_state.py'
+      - 'tests/test_v2_gold_state.py'
+      - '.github/workflows/v2-gold-state.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - run: python -m pip install -e '.[dev]'
+      - run: ruff check src/progression_memory/benchmarks/v2_gold_state.py tests/test_v2_gold_state.py
+      - run: python -m pytest -q tests/test_v2_gold_state.py
+  long_horizon:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - run: python -m pip install -e '.[dev]'
+      - name: Run 96-cycle per stream benchmark
+        run: python -m progression_memory.benchmarks.v2_gold_state --events-per-stream 96 --output results/v2_gold_state_96.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: v2-gold-state-results
+          path: results/v2_gold_state_96.json
