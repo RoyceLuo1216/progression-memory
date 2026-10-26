@@ -57,7 +57,7 @@ def evaluate(fixture, *, budgets=(400, 1600, 3200)):
     state_correct = state_total = 0
     mismatches = []
     for valid_at, known_at in snapshots:
-        for pid, progression in engine.progressions.items():
+        for pid in engine.progressions:
             expected = oracle_replay(fixture, pid, valid_at, known_at)
             actual = engine.state_at(pid, valid_at=valid_at, known_at=known_at)
             state_total += 1
