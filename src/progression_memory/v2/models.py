@@ -128,6 +128,9 @@ class Progression(BaseModel):
     lifecycle: ProgressionLifecycle = ProgressionLifecycle.ACTIVE
     storage_tier: StorageTier = StorageTier.ACTIVE
     state: dict[str, Any] = Field(default_factory=dict)
+    derived_state: dict[str, Any] = Field(default_factory=dict)
+    derived_fingerprint: str | None = None
+    derived_summary: str = ""
     metadata: dict[str, Any] = Field(default_factory=dict)
     version: int = 0
     segment_ids: list[str] = Field(default_factory=list)

@@ -135,4 +135,5 @@ class WritePipeline:
         self.engine.deltas = staged.deltas
         self.engine.revisions = staged.revisions
         self.engine.segments = staged.segments
+        self.engine.dirty_progressions = staged.dirty_progressions
         return proposal
