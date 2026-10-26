@@ -8,7 +8,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 
-from progression_memory.v2.models import ProgressionLifecycle, StorageTier
+from progression_memory.v2.models import StorageTier
 from progression_memory.v2.state_engine import StateEngine
 
 
