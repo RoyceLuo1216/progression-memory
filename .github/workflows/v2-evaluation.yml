@@ -1,0 +1,40 @@
+name: V2 Evaluation Harness
+on:
+  push:
+    branches: [v2/benchmark-harness]
+  pull_request:
+    paths:
+      - 'src/progression_memory/v2/**'
+      - 'src/progression_memory/benchmarks/v2_paired.py'
+      - 'src/progression_memory/benchmarks/v2_writer_accuracy.py'
+      - 'tests/test_v2_*.py'
+      - '.github/workflows/v2-evaluation.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: v2-evaluation-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.11','3.12']
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: python -m pip install -e '.[dev]'
+      - run: python -m pytest -q
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - run: python -m pip install ruff
+      - run: ruff check src/progression_memory/v2 src/progression_memory/benchmarks/v2_paired.py src/progression_memory/benchmarks/v2_writer_accuracy.py tests/test_v2_read_path.py tests/test_v2_paired.py tests/test_v2_writer_accuracy.py
