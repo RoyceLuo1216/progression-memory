@@ -24,6 +24,25 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - run: python -m pip install -e '.[dev]'
       - run: python -m pytest -q tests/test_v2_long_horizon_dataset.py
+  benchmark:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - run: python -m pip install -e '.[dev]'
+      - name: Generate full-year fixture
+        run: python -m progression_memory.benchmarks.v2_long_horizon_dataset --output results/long_horizon_fixture.json
+      - name: Run RAG vs V2 comparison
+        run: python -m progression_memory.benchmarks.v2_paired --fixture results/long_horizon_fixture.json --output results/v2_paired.json
+      - name: Run lexical hierarchical ablation
+        run: python -m progression_memory.benchmarks.v2_retrieval_ablation --fixture results/long_horizon_fixture.json --output results/v2_hierarchical_ablation.json
+      - name: Upload reproducible dataset and reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: v2-long-horizon-benchmark-results
+          path: results/*.json
   lint:
     runs-on: ubuntu-latest
     steps:
