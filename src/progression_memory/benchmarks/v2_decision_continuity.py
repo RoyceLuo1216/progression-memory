@@ -54,7 +54,7 @@ def make_fixture(*, distractors: int = 8):
     for slug, ambition, initial_constraint, alternative in PERSONAS:
         subject = f"fictional:{slug}"
         pid = f"v2:{slug}-root:0"
-        def add(oid, day, text, proposal):
+        def add(oid, day, text, proposal, *, subject=subject):
             observation = Observation(id=oid, source_id=oid, subject_id=subject,
                                       text=text, recorded_at=start+timedelta(days=day))
             observations.append(observation)
