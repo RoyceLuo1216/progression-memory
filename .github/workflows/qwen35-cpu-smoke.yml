@@ -18,7 +18,7 @@ jobs:
         run: |
           python -m pip install -e .
           python -m pip install --no-cache-dir -U "transformers>=5.1.0" accelerate pillow
-          python -c "from transformers import AutoModelForMultimodalLM, AutoProcessor; print(\'Qwen-compatible Transformers imported\')"
+          python -c "from transformers import AutoModelForMultimodalLM, AutoProcessor; print('Qwen-compatible Transformers imported')"
       - name: Real local model inference
         env:
           HF_HUB_DISABLE_XET: "1"
