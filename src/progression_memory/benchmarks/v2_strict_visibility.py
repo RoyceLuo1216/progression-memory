@@ -104,7 +104,7 @@ def main():
     path.write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
     print(json.dumps({"dataset": result["dataset"], "recall_at_1600": {
         key: round(value["1600"]["visible_evidence_recall"], 4)
-        for key, value in result["systems"].items(),
+        for key, value in result["systems"].items()
     }}, indent=2))
 
 
