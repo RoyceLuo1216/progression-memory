@@ -76,6 +76,7 @@ def lexical_semantic_rank(docs, query):
     """
     import math
     from collections import Counter
+
     from progression_memory.evaluation.retrieval import tokenize
     lexical = BM25Index(docs).retrieve(query, len(docs))
     query_tf = Counter(tokenize(query))
@@ -120,7 +121,7 @@ def state_trace(fixture, *, live_writer=None):
     for obs in fixture.observations:
         try:
             pipeline.process(obs)
-        except Exception as error:
+        except (ValueError, TypeError, RuntimeError, KeyError) as error:
             failures.append({"observation": obs.id,
                              "type": type(error).__name__, "message": str(error)[:160]})
     return engine, {"model_calls": live_writer.calls, "writer_failures": len(failures),
