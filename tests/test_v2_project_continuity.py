@@ -16,7 +16,7 @@ def test_project_continuity_fixture_long_horizon_and_labeled():
 def test_project_continuity_rag_and_v2_replay():
     fixture = generate(distractors_per_stage=1)
     result = run(fixture, [400])
-    assert result["query_count"] == 220
+    assert result["questions"] == 220
     assert set(result["systems"]) == {"rag", "v2_state", "v2_full"}
     assert all(0 <= system["budgets"]["400"]["macro_evidence_recall"] <= 1
                for system in result["systems"].values())
