@@ -37,7 +37,7 @@ class LocalQwen:
         started = time.monotonic()
         with torch.inference_mode():
             out = self.model.generate(
-                **ids, max_new_tokens=192, do_sample=False,
+                **ids, max_new_tokens=512, do_sample=False,
                 pad_token_id=self.processor.tokenizer.eos_token_id,
             )
         text = self.processor.decode(
