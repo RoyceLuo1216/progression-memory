@@ -1,5 +1,5 @@
-from progression_memory.benchmarks.v2_project_continuity import generate
 from progression_memory.benchmarks.v2_paired import run
+from progression_memory.benchmarks.v2_project_continuity import generate
 
 
 def test_project_continuity_fixture_long_horizon_and_labeled():
