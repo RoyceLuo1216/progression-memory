@@ -35,7 +35,7 @@ def make_variant(*, remove_goal_repetition: bool, new_tail: int, distractors: in
     for obs in fixture.observations:
         text = obs.text
         if remove_goal_repetition and "-update-" in obs.id:
-            text = re.sub(r" Long-term goal remains [^.]+\\.", "", text)
+            text = re.sub(r" Long-term goal remains [^.]+\.", "", text)
         observations.append(obs.model_copy(update={"text": text}))
     if new_tail:
         for checkpoint in checkpoints:
@@ -67,10 +67,10 @@ def summarize(observations):
     for obs in sorted(observations, key=lambda x:(x.recorded_at, x.id)):
         text = obs.text
         rules = (
-            ("long_term_goal", r"My enduring goal is ([^.]+)\\."),
-            ("long_term_goal", r"Long-term goal remains ([^.]+)\\."),
-            ("priority", r"Current top priority: ([^.]+)\\."),
-            ("constraint", r"Active constraint: ([^.]+)\\."),
+            ("long_term_goal", r"My enduring goal is ([^.]+)\."),
+            ("long_term_goal", r"Long-term goal remains ([^.]+)\."),
+            ("priority", r"Current top priority: ([^.]+)\."),
+            ("constraint", r"Active constraint: ([^.]+)\."),
         )
         for key, pattern in rules:
             match = re.search(pattern, text)
@@ -104,7 +104,7 @@ def context_prefix(docs, budget):
             break
         text.append(doc.text)
         used += len(doc.text)
-    return "\\n".join(text), used
+    return "\n".join(text), used
 
 
 def cluster_ci(rows, system, baseline="flat_summary", metric="field_visibility",
@@ -209,7 +209,7 @@ def main():
             ]}
     dest=Path(args.output)
     dest.parent.mkdir(parents=True,exist_ok=True)
-    dest.write_text(json.dumps(report,indent=2)+"\\n")
+    dest.write_text(json.dumps(report,indent=2)+"\n")
     for exp in experiments:
         print(exp["variant"],"obs",exp["dataset"]["observations"])
         print(json.dumps({s:exp["budgets"]["400"][s]["field_visibility"]
