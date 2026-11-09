@@ -129,22 +129,30 @@ def state_trace(fixture, *, live_writer=None):
 
 
 def score_output(payload, gold):
-    """Rule-based factual criterion scores; narrative grades need blinded review."""
-    fields = {key: str(payload.get(key, "")).strip().casefold() ==
-              str(gold[key]).strip().casefold() for key in FIELDS}
-    return {"goal_fidelity": int(fields["long_term_goal"]),
-            "preference_fidelity": int(fields["priority"]),
-            "constraint_fidelity": int(fields["constraint"]),
-            "hard_constraint_violation": int(not fields["constraint"]),
-            "obsolete_priority_reliance": int(not fields["priority"]),
-            "has_grounded_tradeoff_candidates": int(
-                isinstance(payload.get("tradeoffs"), list) and
-                len(payload.get("tradeoffs", [])) >= 2),
-            "has_three_next_steps": int(
-                isinstance(payload.get("next_steps"), list) and
-                len(payload.get("next_steps", [])) >= 3)}
-    # The last two are structural proxies, not independent judges of
-    # grounded trade-off quality or real next-step feasibility.
+    """Check factual field restatement and structural output only.
+
+    These are proxies, not grounded decision-quality scores. A field mismatch
+    is NOT by itself proof of an actual hard-constraint violation or obsolete
+    priority reliance.
+    """
+    values = {
+        key: str(payload.get("goal" if key == "long_term_goal" else key, ""))
+        .strip().casefold() == str(gold[key]).strip().casefold()
+        for key in FIELDS
+    }
+    return {
+        "goal_fidelity": int(values["long_term_goal"]),
+        "preference_fidelity": int(values["priority"]),
+        "constraint_fidelity": int(values["constraint"]),
+        "constraint_field_mismatch": int(not values["constraint"]),
+        "priority_field_mismatch": int(not values["priority"]),
+        "two_tradeoff_items": int(
+            isinstance(payload.get("tradeoffs"), list)
+            and len(payload.get("tradeoffs", [])) >= 2),
+        "three_next_steps": int(
+            isinstance(payload.get("next_steps"), list)
+            and len(payload.get("next_steps", [])) >= 3),
+    }
 
 
 def cluster_ci(rows, a, b, metric, samples=2000, seed=42):
