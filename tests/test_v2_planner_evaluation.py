@@ -19,7 +19,9 @@ def test_scoring_missing_and_correct_values():
     gold = {"long_term_goal": "startup building",
             "priority": "financial runway", "constraint": "tuition is high"}
     correct = score_output({
-        **gold,
+        "goal": gold["long_term_goal"],
+        "priority": gold["priority"],
+        "constraint": gold["constraint"],
         "tradeoffs": ["risk", "learning"],
         "next_steps": ["compare", "interview", "decide"]}, gold)
     assert correct["goal_fidelity"] == 1
