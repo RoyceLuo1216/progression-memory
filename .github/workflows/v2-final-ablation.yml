@@ -1,0 +1,26 @@
+name: V2 final state-summary diagnostic
+on:
+  push:
+    branches: [eval/final-ablations-and-report]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  diagnostic:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+      - name: Install
+        run: python -m pip install -e '.[dev]'
+      - name: Run real V2 state diagnostic
+        run: |
+          python -m progression_memory.benchmarks.v2_state_summary_diagnostic --output results/v2_final_ablation.json
+      - name: Upload all paired results
+        uses: actions/upload-artifact@v4
+        with:
+          name: v2-final-ablation
+          path: results/v2_final_ablation.json
