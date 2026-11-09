@@ -23,9 +23,9 @@ def test_scoring_missing_and_correct_values():
         "tradeoffs": ["risk", "learning"],
         "next_steps": ["compare", "interview", "decide"]}, gold)
     assert correct["goal_fidelity"] == 1
-    assert correct["hard_constraint_violation"] == 0
+    assert correct["constraint_field_mismatch"] == 0
     wrong = score_output({}, gold)
-    assert wrong["obsolete_priority_reliance"] == 1
+    assert wrong["priority_field_mismatch"] == 1
 
 
 def test_retriever_and_persona_cluster_ci():
