@@ -18,9 +18,12 @@ jobs:
       - run: python scripts/lifebench_schema_probe.py
       - name: Validate chronological event retrieval on one user
         run: python -m progression_memory.benchmarks.lifebench_evidence_retrieval --max-people 1 --output results/lifebench_one_user.json
+      - name: Run all released LifeBench users
+        run: python -u -m progression_memory.benchmarks.lifebench_evidence_retrieval --output results/lifebench_all_users.json
       - uses: actions/upload-artifact@v4
         with:
           name: lifebench-schema
           path: |
             results/lifebench_schema.json
             results/lifebench_one_user.json
+            results/lifebench_all_users.json
