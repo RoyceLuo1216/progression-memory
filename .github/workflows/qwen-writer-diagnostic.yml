@@ -1,0 +1,31 @@
+name: Qwen writer schema diagnostics
+on:
+  push:
+    branches: [eval/meme-large-scale]
+    paths:
+      - scripts/qwen35_writer_diagnostics.py
+      - .github/workflows/qwen-writer-diagnostic.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  writer_diagnostic:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+      - run: |
+          python -m pip install -e .
+          python -m pip install --no-cache-dir -U "transformers>=5.1.0" accelerate pillow torchvision
+      - name: Real Qwen3.5 CPU writer diagnostic
+        env:
+          OMP_NUM_THREADS: "2"
+        run: python scripts/qwen35_writer_diagnostics.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: qwen-writer-diagnostic
+          path: results/qwen35_writer_diagnostics.json
