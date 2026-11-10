@@ -28,7 +28,7 @@ from progression_memory.v2.writer_pipeline import WritePipeline, ScriptedWriter,
 
 BUDGETS=(400,800,1600,3200,6400)
 TASKS=("Cas","Tr","Agg","ER")
-SYSTEMS=("raw_bm25","wiki_current","wiki_history","v2_oracle")
+SYSTEMS=("raw_bm25","wiki_current","wiki_history","v2_current_only","v2_oracle")
 
 
 def history_from_sessions(ep):
@@ -52,7 +52,7 @@ def history_from_sessions(ep):
     return out
 
 
-def oracle_engine(facts,episode_id):
+def oracle_engine(facts,episode_id, *, include_history=True):
     engine=StateEngine()
     proposals={}
     observations=[]
@@ -68,11 +68,10 @@ def oracle_engine(facts,episode_id):
             days=fact["session"],microseconds=i)
         observations.append(Observation(id=oid,source_id=oid,
             subject_id=f"meme:{episode_id}",text=fact["text"],recorded_at=timepoint))
-        patches=(
-            AttributePatch(key="value",operation=AttributeOperation.SET,value=value),
-            AttributePatch(key="history",operation=AttributeOperation.SET,
-                           value=list(histories[entity])),
-        )
+        patches=(AttributePatch(key="value",operation=AttributeOperation.SET,value=value),)
+        if include_history:
+            patches+=(AttributePatch(key="history",operation=AttributeOperation.SET,
+                           value=list(histories[entity])),)
         if entity not in first:
             first[entity]=oid
             upd=ProposedUpdate(action="create",name=entity,
@@ -128,6 +127,7 @@ def evaluate(episodes):
         start=time.perf_counter()
         try:
             engine=oracle_engine(facts,ep["episode_id"])
+            current_engine=oracle_engine(facts,ep["episode_id"],include_history=False)
         except (ValueError,RuntimeError,KeyError,TypeError) as exc:
             build_errors.append({"episode":ep["episode_id"],"type":type(exc).__name__,
                                  "message":str(exc)[:250]})
@@ -144,10 +144,13 @@ def evaluate(episodes):
             when=datetime(2023,1,1,tzinfo=UTC)+timedelta(days=cutoff)
             v2docs=list(build_documents(engine,subject_id=f"meme:{ep['episode_id']}",
                                         view="state",valid_at=when,known_at=when))
+            current_v2docs=list(build_documents(current_engine,subject_id=f"meme:{ep['episode_id']}",
+                                                 view="state",valid_at=when,known_at=when))
             configs={
                 "raw_bm25":corpus,
                 "wiki_current":wiki_docs(facts,cutoff,False),
                 "wiki_history":wiki_docs(facts,cutoff,True),
+                "v2_current_only":current_v2docs,
                 "v2_oracle":v2docs,
             }
             question=q.get("question","")
