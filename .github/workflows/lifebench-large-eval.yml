@@ -14,7 +14,8 @@ jobs:
       - uses: actions/setup-python@v6
         with:
           python-version: "3.11"
-      - run: python -m pip install -e . huggingface_hub
+      - run: python -m pip install -e ".[dev]" huggingface_hub
+      - run: python -m pytest -q tests/test_lifebench_evidence_retrieval.py
       - run: python scripts/lifebench_schema_probe.py
       - name: Validate chronological event retrieval on one user
         run: python -m progression_memory.benchmarks.lifebench_evidence_retrieval --max-people 1 --output results/lifebench_one_user.json
