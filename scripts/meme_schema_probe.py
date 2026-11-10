@@ -25,8 +25,8 @@ for ep in episodes:
         t=str(task.get("type") if isinstance(task,dict) else type(task).__name__)
         report["tasks"][t]=report["tasks"].get(t,0)+1
 report["first_session"]=summarize(episodes[0]["sessions"][0])
-report["first_before_question"]=summarize(episodes[0]["before_questions"][0]) if episodes[0]["before_questions"] else None
-report["first_after_question"]=summarize(episodes[0]["after_questions"][0]) if episodes[0]["after_questions"] else None
+report["first_before_question"]=summarize(episodes[0]["before_questions"]) if episodes[0]["before_questions"] else None
+report["first_after_question"]=summarize(episodes[0]["after_questions"]) if episodes[0]["after_questions"] else None
 report["task_samples"]={}
 for ep in episodes:
     for t in ep["tasks"]:
