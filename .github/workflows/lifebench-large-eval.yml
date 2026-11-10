@@ -1,0 +1,22 @@
+name: LifeBench large retrieval
+on:
+  push:
+    branches: [eval/lifebench-large-retrieval]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  evaluate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+      - run: python -m pip install -e . huggingface_hub
+      - run: python scripts/lifebench_schema_probe.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: lifebench-schema
+          path: results/lifebench_schema.json
