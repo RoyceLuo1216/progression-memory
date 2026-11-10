@@ -18,9 +18,12 @@ jobs:
       - run: python scripts/meme_schema_probe.py
       - name: Run complete 100-episode retrieval evaluation
         run: python -m progression_memory.benchmarks.meme_evidence_retrieval --output results/meme_retrieval_100.json
+      - name: Run oracle V2 vs topic wiki on 100 episodes
+        run: python -m progression_memory.benchmarks.meme_v2_oracle_wiki --output results/meme_oracle_wiki_100.json
       - uses: actions/upload-artifact@v4
         with:
           name: meme-100-episode-results
           path: |
             results/meme_schema_probe.json
             results/meme_retrieval_100.json
+            results/meme_oracle_wiki_100.json
