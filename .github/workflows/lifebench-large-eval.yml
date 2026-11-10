@@ -16,7 +16,11 @@ jobs:
           python-version: "3.11"
       - run: python -m pip install -e . huggingface_hub
       - run: python scripts/lifebench_schema_probe.py
+      - name: Validate chronological event retrieval on one user
+        run: python -m progression_memory.benchmarks.lifebench_evidence_retrieval --max-people 1 --output results/lifebench_one_user.json
       - uses: actions/upload-artifact@v4
         with:
           name: lifebench-schema
-          path: results/lifebench_schema.json
+          path: |
+            results/lifebench_schema.json
+            results/lifebench_one_user.json
