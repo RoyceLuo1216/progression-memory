@@ -1,0 +1,33 @@
+name: MEME Real Qwen Answer-Level Pilot
+on:
+  push:
+    branches: [eval/final-hybrid-memory]
+    paths:
+      - scripts/meme_downstream_qa.py
+      - .github/workflows/meme-downstream-qa.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  answer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+      - name: Install Qwen inference stack
+        run: |
+          python -m pip install -e . huggingface_hub
+          python -m pip install -U "transformers>=5.1.0" accelerate pillow torchvision
+      - name: Generate actual MEME answers with Qwen 3.5 0.8B
+        env:
+          OMP_NUM_THREADS: "2"
+          HF_HUB_DISABLE_XET: "1"
+        run: python -u -m scripts.meme_downstream_qa
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: meme-downstream-qa-30
+          path: results/meme_qwen_qa_30.json
