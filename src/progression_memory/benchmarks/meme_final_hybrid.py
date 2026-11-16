@@ -163,7 +163,7 @@ def candidates(doc_groups, query, budget):
     # each topic in the same tiny context. Compact V2 histories on temporal
     # questions, compact wiki current values otherwise. This is a memory
     # routing/serialization ablation, not a claim about unique V2 semantics.
-    routed=compact if temporal else doc_groups["wiki_current"]
+    routed=compact if temporal and compact else wiki
     return {
         "raw_bm25":doc_groups["raw"],
         "raw_dense":doc_groups["raw"],
