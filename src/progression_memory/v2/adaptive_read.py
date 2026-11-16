@@ -67,7 +67,7 @@ def compact_progression(doc: RetrievalDocument, *, history: bool) -> RetrievalDo
 
 
 def _topic_key(doc: RetrievalDocument) -> str:
-    match = re.match(r"^(?:Topic|Progression):\\s*([^.]+)\\.", doc.text)
+    match = re.match(r"^(?:Topic|Progression):\s*([^.]+)\.", doc.text)
     return (match.group(1).casefold().strip() if match
             else doc.id.split(":")[-1].casefold())
 
