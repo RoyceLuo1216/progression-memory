@@ -230,10 +230,12 @@ def evaluate(episodes, *, model, max_episodes=None):
             if not target_sources and not atoms:continue
             query=q.get("question","")
             question_id=f"{timing}:{i}"
+            # Each ranking is computed exactly once per query, not once per budget.
+            layouts=candidates(document_groups,query,max(BUDGETS))
+            ranked_layouts={method:rank(method,docs,query,store)
+                            for method,docs in layouts.items() if docs}
             for budget in BUDGETS:
-                for method,docs in candidates(document_groups,query,budget).items():
-                    if not docs:continue
-                    ranked=rank(method,docs,query,store)
+                for method,ranked in ranked_layouts.items():
                     selected,used=budget_pack(ranked,budget)
                     texts="\n".join(d.text for d in selected).casefold()
                     retrieved=set()
