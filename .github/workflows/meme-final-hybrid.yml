@@ -1,0 +1,31 @@
+name: MEME Neural Hybrid and Adaptive Progression
+on:
+  push:
+    branches: [eval/final-hybrid-memory]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  hybrid:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+      - name: Install benchmark and real neural encoder
+        run: |
+          python -m pip install -e ".[dev]" huggingface_hub
+          python -m pip install sentence-transformers==3.4.1 "transformers>=4.48,<5"
+      - name: Test real neural retrieval and adaptive memory (5 MEME episodes)
+        env:
+          OMP_NUM_THREADS: "2"
+          TOKENIZERS_PARALLELISM: "false"
+        run: |
+          python -u -m progression_memory.benchmarks.meme_final_hybrid --max-episodes 5 --output results/meme_hybrid_5.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: meme-hybrid-neural-pilot
+          path: results/meme_hybrid_*.json
