@@ -29,6 +29,7 @@ from progression_memory.v2.read_path import build_documents
 
 # This model provides actual learned semantic embeddings, not sparse SVD.
 EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
+EMBEDDING_REVISION = "1110a243fdf4706b3f48f1d95db1a4f5529b4d41"
 MODES = (
     "raw_bm25", "raw_dense", "raw_bm25_dense",
     "raw_bm25_dense_recency", "wiki_current", "wiki_history",
@@ -83,7 +84,7 @@ def budget_pack(docs, budget):
 class NeuralStore:
     def __init__(self, name):
         from sentence_transformers import SentenceTransformer
-        self.model = SentenceTransformer(name, device="cpu")
+        self.model = SentenceTransformer(name, device="cpu", revision=EMBEDDING_REVISION)
         self.vectors = {}
         self.encode_seconds = 0.
         self.sentences_encoded = 0
@@ -277,7 +278,8 @@ def evaluate(episodes, *, model, max_episodes=None):
                    "sentences_encoded":store.sentences_encoded})
     return {"protocol":"meme-real-neural-hybrid-progressions-v1",
         "source":{"hf_repo":MODEL_REPO,"revision":REVISION,
-                  "embedding_model":model},
+                  "embedding_model":model,
+                  "embedding_revision":EMBEDDING_REVISION},
         "counts":counts,"budgets":BUDGETS,
         "summary":summary,"rows":rows,
         "limitations":[
