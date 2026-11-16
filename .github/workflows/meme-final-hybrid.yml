@@ -3,6 +3,9 @@ on:
   push:
     branches: [eval/final-hybrid-memory]
   workflow_dispatch:
+concurrency:
+  group: meme-final-hybrid-${{ github.ref }}
+  cancel-in-progress: true
 permissions:
   contents: read
 jobs:
