@@ -159,12 +159,11 @@ def candidates(doc_groups, query, budget):
     # When asked about temporal changes, history is eligible even at 400 chars.
     wiki=doc_groups["wiki_history" if temporal else "wiki_current"]
     compact=doc_groups["compact_history" if temporal else "compact_current"]
-    # Query-aware union; deduplicate identical text, preserving evidence units.
-    united=[]
-    seen=set()
-    for d in [*wiki,*compact]:
-        if d.text not in seen:
-            united.append(d);seen.add(d.text)
+    # Route by topic and intent rather than storing TWO representations of
+    # each topic in the same tiny context. Compact V2 histories on temporal
+    # questions, compact wiki current values otherwise. This is a memory
+    # routing/serialization ablation, not a claim about unique V2 semantics.
+    routed=compact if temporal else doc_groups["wiki_current"]
     return {
         "raw_bm25":doc_groups["raw"],
         "raw_dense":doc_groups["raw"],
@@ -175,8 +174,8 @@ def candidates(doc_groups, query, budget):
         "v2_current":doc_groups["v2_current"],
         "v2_history":doc_groups["v2_history"],
         "v2_compact_adaptive":compact,
-        "wiki_v2_adaptive":united,
-        "wiki_v2_hybrid_rag":[*united,*doc_groups["raw"]],
+        "wiki_v2_adaptive":routed,
+        "wiki_v2_hybrid_rag":[*routed,*doc_groups["raw"]],
     }
 
 
