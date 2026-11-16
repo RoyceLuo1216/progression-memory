@@ -8,7 +8,7 @@ permissions:
 jobs:
   hybrid:
     runs-on: ubuntu-latest
-    timeout-minutes: 50
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-python@v6
@@ -18,14 +18,16 @@ jobs:
         run: |
           python -m pip install -e ".[dev]" huggingface_hub
           python -m pip install sentence-transformers==3.4.1 "transformers>=4.48,<5"
-      - name: Test real neural retrieval and adaptive memory (5 MEME episodes)
+      - name: Validate adaptive memory controls
+        run: python -m pytest -q tests/test_meme_final_hybrid.py
+      - name: Run full 100-episode neural retrieval and adaptive memory
         env:
           OMP_NUM_THREADS: "2"
           TOKENIZERS_PARALLELISM: "false"
         run: |
-          python -u -m progression_memory.benchmarks.meme_final_hybrid --max-episodes 5 --output results/meme_hybrid_5.json
+          python -u -m progression_memory.benchmarks.meme_final_hybrid --output results/meme_hybrid_100.json
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: meme-hybrid-neural-pilot
+          name: meme-hybrid-neural-full
           path: results/meme_hybrid_*.json
