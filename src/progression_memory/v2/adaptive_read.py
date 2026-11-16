@@ -66,6 +66,25 @@ def compact_progression(doc: RetrievalDocument, *, history: bool) -> RetrievalDo
     )
 
 
+def _topic_key(doc: RetrievalDocument) -> str:
+    match = re.match(r"^(?:Topic|Progression):\\s*([^.]+)\\.", doc.text)
+    return (match.group(1).casefold().strip() if match
+            else doc.id.split(":")[-1].casefold())
+
+
+def _merge_by_topic(
+    primary: list[RetrievalDocument], fallback: Sequence[RetrievalDocument],
+) -> list[RetrievalDocument]:
+    seen = {_topic_key(d) for d in primary}
+    output = list(primary)
+    for doc in fallback:
+        topic = _topic_key(doc)
+        if topic not in seen:
+            output.append(doc)
+            seen.add(topic)
+    return output
+
+
 def pack_skip_oversized(
     ranked: Sequence[RetrievalDocument], budget: int,
 ) -> tuple[tuple[RetrievalDocument, ...], int]:
@@ -113,11 +132,15 @@ def read_adaptive(
     # One representation per query, not duplicate wiki and progression
     # summaries of identical topics. Temporal questions use compact V2 if
     # it has a history; otherwise fall back to versioned wiki pages.
-    has_history = any("Historical values in order:" in doc.text for doc in compact)
     if wants_history:
-        active = compact if has_history else list(wiki_history) or compact
+        with_history = [doc for doc in compact
+                        if "Historical values in order:" in doc.text]
+        no_history = [doc for doc in compact
+                      if "Historical values in order:" not in doc.text]
+        active = _merge_by_topic(with_history, wiki_history)
+        active = _merge_by_topic(active, no_history)
     else:
-        active = list(wiki_current) or compact
+        active = _merge_by_topic(list(wiki_current), compact)
 
     if source_rescue:
         source_docs = list(build_documents(
