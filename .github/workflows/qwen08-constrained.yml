@@ -18,7 +18,7 @@ jobs:
       - name: Install CPU and grammar constrained decoding stack
         run: |
           python -m pip install -e . huggingface_hub
-          python -m pip install --no-cache-dir -U "transformers>=5.1.0" accelerate pillow torchvision "lm-format-enforcer>=0.10.11"
+          python -m pip install --no-cache-dir -U "transformers>=5.1.0" accelerate pillow torchvision "git+https://github.com/noamgat/lm-format-enforcer.git@817f944fcc8851917c40300a47f62d1defc3ffc3"
       - name: Schema-constrained V2 writer on eight fixed 0.8B cases
         env:
           OMP_NUM_THREADS: "2"
