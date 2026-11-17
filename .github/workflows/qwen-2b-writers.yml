@@ -1,0 +1,32 @@
+name: Qwen3.5 2B V2 vs Wiki Writer
+on:
+  push:
+    branches: [eval/final-reader-writer-2b]
+    paths: [scripts/qwen_2b_writer_comparison.py, .github/workflows/qwen-2b-writers.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  writers:
+    runs-on: ubuntu-latest
+    timeout-minutes: 100
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+      - name: Install CPU 2B model runtime
+        run: |
+          python -m pip install -e . huggingface_hub
+          python -m pip install --no-cache-dir -U "transformers>=5.1.0" accelerate pillow torchvision
+      - name: Test 10 author-labeled writer cases, identical source input
+        run: python -u -m scripts.qwen_2b_writer_comparison
+        env:
+          OMP_NUM_THREADS: "2"
+          HF_HUB_DISABLE_XET: "1"
+          TOKENIZERS_PARALLELISM: "false"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: qwen-2b-writer-comparison
+          path: results/qwen_2b_writers.json
