@@ -1,0 +1,32 @@
+name: Qwen 0.8B Constrained Writer
+on:
+  push:
+    branches: [eval/final-reader-writer-2b]
+    paths: [scripts/qwen08_constrained_writer.py, .github/workflows/qwen08-constrained.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  constrained:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+      - name: Install CPU and grammar constrained decoding stack
+        run: |
+          python -m pip install -e . huggingface_hub
+          python -m pip install --no-cache-dir -U "transformers>=5.1.0" accelerate pillow torchvision "git+https://github.com/noamgat/lm-format-enforcer.git@817f944fcc8851917c40300a47f62d1defc3ffc3"
+      - name: Schema-constrained V2 writer on eight fixed 0.8B cases
+        env:
+          OMP_NUM_THREADS: "2"
+          HF_HUB_DISABLE_XET: "1"
+        run: python -u -m scripts.qwen08_constrained_writer
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: qwen08-constrained-writer
+          path: results/qwen08_constrained_writer.json
+

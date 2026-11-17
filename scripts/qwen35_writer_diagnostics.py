@@ -11,7 +11,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 from pydantic import ValidationError
 
-from qwen35_cpu_smoke import LocalQwen
+from scripts.qwen35_cpu_smoke import LocalQwen
 from progression_memory.v2.model_writer import ModelWriter
 from progression_memory.v2.models import Observation
 from progression_memory.v2.writer_pipeline import WriterProposal
