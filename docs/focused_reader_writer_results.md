@@ -31,7 +31,7 @@ Interpretation boundary: the score's salient-anchor check is a simple proxy, not
 
 ## Supporting diagnostic
 
-0.8B schema-constrained `WriterProposal` decoding, eight previously tested observations. Its purpose is to separate formatting failures from semantic mistakes; do not count a JSON-valid hallucination as a correct write. CI records [run 44007119659](https://github.com/RoyceLuo1216/progression-memory/actions/runs/44007119659).
+0.8B schema-constrained canonical `WriterProposal` decoding **completed** on eight previously tested observations, [successful workflow run 44007119659](https://github.com/RoyceLuo1216/progression-memory/actions/runs/44007119659). **4/8** schema-valid, **3/8** correct change/no-change decisions, **4/8** proposals accepted by the state engine, with 1,344 prompt and 2,048 generation tokens and 331.8 seconds CPU generation. The constrained parser could not prevent 256-token truncation or unsupported semantic actions; one friend-hypothetical was incorrectly promoted to durable memory. These outcomes are not evidence of correct writer operation.
 
 ## Remaining for definitive closeout
 
